@@ -753,7 +753,7 @@ public class Raid {
 
     public void spawnDigger(Faction faction, BlockPos spawnBlockPos) {
         // check how many diggers are already spawned
-        if(getDiggersInWave() > Mth.ceil(this.getRaidersInWave(this.getGroupsSpawned()).size() * 0.25)) return;
+        if(getDiggersInWave() > Mth.ceil(this.getRaidersInWave(this.getGroupsSpawned()).size() * 0.10)) return;
         EntityWeightMapProperties entityWeightMapProperties = new EntityWeightMapProperties().setAllowedRanks(List.of(FactionEntityRank.DIGGER)).setBlockPos(spawnBlockPos);
         List<Pair<FactionEntityType, Integer>> weightMap = faction.getWeightMap(entityWeightMapProperties);
         if (weightMap.isEmpty()) return;
