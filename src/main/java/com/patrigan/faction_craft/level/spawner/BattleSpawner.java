@@ -26,7 +26,7 @@ public class BattleSpawner implements CustomSpawner {
    public int tick(ServerLevel pLevel, boolean pSpawnHostiles, boolean pSpawnPassives) {
       if (!pSpawnHostiles) {
          return 0;
-      } else if (FactionCraftConfig.DISABLE_FACTION_PATROLS.get()) {
+      } else if (FactionCraftConfig.DISABLE_FACTION_BATTLES.get()) {
          return 0;
       } else {
          RandomSource random = pLevel.random;
@@ -77,7 +77,11 @@ public class BattleSpawner implements CustomSpawner {
       if(faction1 == null) {
          return 0;
       }
-      List<Faction> enemies = faction1.getRelations().getEnemies().stream().filter(resourceLocation -> !FactionCraftConfig.DISABLED_FACTIONS.get().contains(resourceLocation.toString())).map(Factions::getFaction).filter(faction -> faction.getRelations().getEnemies().contains(faction1.getName())).collect(Collectors.toList());
+      List<Faction> enemies = faction1.getRelations().getEnemies().stream()
+              .filter(resourceLocation -> !FactionCraftConfig.DISABLED_FACTIONS.get().contains(resourceLocation.toString()))
+              .map(Factions::getFaction)
+              .filter(faction -> Factions.isFactionActive(pLevel, faction))
+              .filter(faction -> faction.getRelations().getEnemies().contains(faction1.getName())).collect(Collectors.toList());
       if(enemies.isEmpty()) {
          return 0;
       }else{

@@ -124,7 +124,7 @@ public class Factions {
         return getFactionData().values().stream().filter(faction -> isFactionActive(level, faction)).collect(Collectors.toList());
     }
 
-    private static boolean isFactionActive(ServerLevel level, Faction faction) {
+    public static boolean isFactionActive(ServerLevel level, Faction faction) {
         Advancement advancement = level.getServer().getAdvancements().getAdvancement(faction.getActivationAdvancement());
         if(advancement == null) return true;
         return level.getServer().getPlayerList().getPlayers().stream().anyMatch(serverPlayerEntity -> serverPlayerEntity.getAdvancements().getOrStartProgress(advancement).isDone());
