@@ -1,5 +1,5 @@
 # Changelog
-## [1.18.2-1.1.11] 2023-08-04
+## [1.18.2-1.1.11] 2024-04-18
 ### General
 1.18.2 will get very limited updates. If you do feel a fix is really needed, please make a bug report on github.
 ### Bugfixes / Tweaks
