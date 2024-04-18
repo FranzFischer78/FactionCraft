@@ -6,6 +6,7 @@
 - Fixed Infinite Digger spawns
 - Fixed HealthBoost not healing to max health.
 - Fixed Battles spawning factions that are not (yet) active on the level
+- Improvements to selecting opposing faction in battles
 ## [1.19.2-1.3.6] 2023-08-04
 ### Minor Features
 - New factionraid command, where you can give all the raiders a glow. Great for when you have a battle or raid and can not find all the raiders

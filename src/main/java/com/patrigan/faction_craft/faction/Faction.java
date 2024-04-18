@@ -8,17 +8,21 @@ import com.patrigan.faction_craft.data.ResourceSet;
 import com.patrigan.faction_craft.faction.entity.FactionEntityType;
 import com.patrigan.faction_craft.faction.entity.FactionEntityRank;
 import com.patrigan.faction_craft.faction.relations.FactionRelations;
+import net.minecraft.advancements.Advancement;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 import java.util.*;
 
 import static com.patrigan.faction_craft.FactionCraft.MODID;
+import static com.patrigan.faction_craft.config.FactionCraftConfig.DISABLED_FACTIONS;
 import static net.minecraft.world.level.Level.OVERWORLD;
 
 public class Faction {
@@ -157,5 +161,17 @@ public class Faction {
 
     public FactionData toFactionData() {
         return new FactionData(name, relations);
+    }
+
+    public boolean isActive() {
+        return !DISABLED_FACTIONS.get().contains(name.toString());
+    }
+
+    public boolean isActive(Level level) {
+        if(level instanceof ServerLevel serverLevel){
+            Advancement advancement = serverLevel.getServer().getAdvancements().getAdvancement(getActivationAdvancement());
+            return isActive() && (advancement == null || level.getServer().getPlayerList().getPlayers().stream().anyMatch(serverPlayerEntity -> serverPlayerEntity.getAdvancements().getOrStartProgress(advancement).isDone()));
+        }
+        return isActive();
     }
 }

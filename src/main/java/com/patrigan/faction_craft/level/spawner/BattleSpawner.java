@@ -78,10 +78,10 @@ public class BattleSpawner implements CustomSpawner {
          return 0;
       }
       List<Faction> enemies = faction1.getRelations().getEnemies().stream()
-              .filter(resourceLocation -> !FactionCraftConfig.DISABLED_FACTIONS.get().contains(resourceLocation.toString()))
               .map(Factions::getFaction)
-              .filter(faction -> Factions.isFactionActive(pLevel, faction))
-              .filter(faction -> faction.getRelations().getEnemies().contains(faction1.getName())).collect(Collectors.toList());
+              .filter(faction -> faction.isActive(pLevel))
+              .filter(faction -> faction.isEnemyOf(faction1))
+              .collect(Collectors.toList());
       if(enemies.isEmpty()) {
          return 0;
       }else{

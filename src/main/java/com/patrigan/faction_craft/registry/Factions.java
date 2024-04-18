@@ -14,7 +14,6 @@ import com.patrigan.faction_craft.faction.FactionType;
 import com.patrigan.faction_craft.faction.relations.FactionRelations;
 import com.patrigan.faction_craft.faction.entity.FactionEntityType;
 import com.patrigan.faction_craft.util.GeneralUtils;
-import net.minecraft.advancements.Advancement;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -117,17 +116,11 @@ public class Factions {
     }
 
     public static Map<ResourceLocation, Faction> getFactionData(){
-        return FACTION_DATA.getData().entrySet().stream().filter(entry -> !DISABLED_FACTIONS.get().contains(entry.getKey().toString())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        return FACTION_DATA.getData().entrySet().stream().filter(entry -> entry.getValue().isActive()).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     private static Collection<Faction> getActiveFactions(ServerLevel level){
-        return getFactionData().values().stream().filter(faction -> isFactionActive(level, faction)).collect(Collectors.toList());
-    }
-
-    public static boolean isFactionActive(ServerLevel level, Faction faction) {
-        Advancement advancement = level.getServer().getAdvancements().getAdvancement(faction.getActivationAdvancement());
-        if(advancement == null) return true;
-        return level.getServer().getPlayerList().getPlayers().stream().anyMatch(serverPlayerEntity -> serverPlayerEntity.getAdvancements().getOrStartProgress(advancement).isDone());
+        return FACTION_DATA.getData().values().stream().filter(faction -> faction.isActive(level)).collect(Collectors.toList());
     }
 
     public static Faction getRandomFaction(ServerLevel level, RandomSource random, Predicate<Faction> predicate) {
