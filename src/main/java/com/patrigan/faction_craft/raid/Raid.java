@@ -466,7 +466,7 @@ public class Raid {
             waveFactionEntities.merge(randomEntry, 1, Integer::sum);
             selectedStrength += randomEntry.getStrength();
             if(waveFactionEntities.get(randomEntry) >= randomEntry.getMaximumSpawned()) {
-                weightMap.removeIf(pair -> pair.getFirst().equals(randomEntry));
+                weightMap = weightMap.stream().filter(pair -> !pair.getFirst().equals(randomEntry)).toList();
             }
         }
         return waveFactionEntities;
