@@ -5,6 +5,7 @@
 ### Bugfixes / Tweaks
 - Fixed Infinite Digger spawns
 - Fixed HealthBoost not healing to max health.
+- Cleaned up a lot of wave spawning code
 - Fixed Battles spawning factions that are not (yet) active on the level
 - Improvements to selecting opposing faction in battles
 - Minor changes to wither faction, removing the spider mount.

@@ -264,8 +264,9 @@ public class FactionEntityType {
         List<FactionEntityRank> possibleRanks = getRanks();
         return requiredRanks.stream().anyMatch(possibleRanks::contains);
     }
-    public int getMaxSpawned(int totalSpawned) {
-        return getSpawnedRange().getMax() * Mth.ceil(totalSpawned / (float) getMaxSpawnedPerX());
+
+    public int getMaxSpawnedInGroup(int totalSpawned) {
+        return getSpawnedRange().getMax() * Mth.ceil((totalSpawned+1) / (float) getMaxSpawnedPerX());
     }
 
     public Entity createEntity(ServerLevel level, Faction faction, BlockPos spawnBlockPos, boolean bannerHolder, FactionEntityRank rank, MobSpawnType spawnReason) {

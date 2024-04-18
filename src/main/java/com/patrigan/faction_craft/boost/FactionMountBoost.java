@@ -70,7 +70,7 @@ public class FactionMountBoost extends Boost {
                 if (raiderCap.hasActiveRaid()) {
                     weightMap = weightMap.stream()
                             .filter(pair -> pair.getFirst().canSpawnInWave(raiderCap.getWave()))
-                            .filter(pair -> pair.getFirst().getMaxSpawned(raiderCap.getRaid().getRaidersInWave(raiderCap.getWave()).size()) > raiderCap.getRaid().getRaidersInWave(raiderCap.getWave()).stream()
+                            .filter(pair -> pair.getFirst().getMaxSpawnedInGroup(raiderCap.getRaid().getRaidersInWave(raiderCap.getWave()).size()) > raiderCap.getRaid().getRaidersInWave(raiderCap.getWave()).stream()
                                     .filter(entity -> FactionEntityHelper.getFactionEntityCapability(entity).getFactionEntityType() != null && FactionEntityHelper.getFactionEntityCapability(entity).getFactionEntityType().equals(pair.getFirst()))
                                     .count())
                             .collect(Collectors.toList());
@@ -111,7 +111,7 @@ public class FactionMountBoost extends Boost {
             if (raiderCap.hasActiveRaid()) {
                 weightMap = weightMap.stream()
                         .filter(pair -> pair.getFirst().canSpawnInWave(raiderCap.getWave()))
-                        .filter(pair -> pair.getFirst().getMaxSpawned(raiderCap.getRaid().getRaidersInWave(raiderCap.getWave()).size()) > raiderCap.getRaid().getRaidersInWave(raiderCap.getWave()).stream()
+                        .filter(pair -> pair.getFirst().getMaxSpawnedInGroup(raiderCap.getRaid().getRaidersInWave(raiderCap.getWave()).size()) > raiderCap.getRaid().getRaidersInWave(raiderCap.getWave()).stream()
                                 .filter(entity -> FactionEntityHelper.getFactionEntityCapability(entity).getFactionEntityType() != null && FactionEntityHelper.getFactionEntityCapability(entity).getFactionEntityType().equals(pair.getFirst()))
                                 .count())
                         .collect(Collectors.toList());

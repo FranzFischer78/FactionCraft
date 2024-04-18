@@ -20,6 +20,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.patrigan.faction_craft.FactionCraft.MODID;
 import static com.patrigan.faction_craft.config.FactionCraftConfig.DISABLED_FACTIONS;
@@ -122,14 +124,14 @@ public class Faction {
         return entityTypes.stream().filter(factionEntityType -> factionEntityType.hasRank(rank)).map(factionEntityType -> new Pair<>(factionEntityType, factionEntityType.getWeight())).toList();
     }
 
-    public List<Pair<FactionEntityType, Integer>> getWeightMap(EntityWeightMapProperties properties){
+    public Map<FactionEntityType, Integer> getWeightMap(EntityWeightMapProperties properties){
         return entityTypes.stream().filter(
                 factionEntityType -> factionEntityType.canSpawnInWave(properties.getWave())
                 && factionEntityType.hasRanks(properties.getAllowedRanks())
                 && factionEntityType.canSpawnForOmen(properties.getOmen())
                 && factionEntityType.canSpawnForBiome(properties.getBiome())
                 && factionEntityType.canSpawnForYPos(properties.getBlockPos()))
-                .map(factionEntityType -> new Pair<>(factionEntityType, factionEntityType.getWeight())).toList();
+                .collect(Collectors.toMap(Function.identity(), FactionEntityType::getWeight));
     }
 
     public ItemStack getBannerInstance() {

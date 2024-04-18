@@ -12,6 +12,7 @@ import com.patrigan.faction_craft.event.FactionRaidEvent;
 import com.patrigan.faction_craft.faction.EntityWeightMapProperties;
 import com.patrigan.faction_craft.faction.Faction;
 import com.patrigan.faction_craft.faction.FactionBoostHelper;
+import com.patrigan.faction_craft.faction.FactionGroupSpawner;
 import com.patrigan.faction_craft.faction.entity.FactionEntityType;
 import com.patrigan.faction_craft.faction.entity.FactionEntityRank;
 import com.patrigan.faction_craft.raid.target.RaidTarget;
@@ -378,93 +379,15 @@ public class Raid {
     }
 
     private void spawnGroupForFaction(BlockPos spawnBlockPos, int waveNumber, int targetStrength, Faction faction) {
-        int mobsFraction = (int) Math.floor(targetStrength * faction.getRaidConfig().getMobsFraction());
-
-        int waveStrength = 0;
-        Map<FactionEntityType, Integer> waveFactionEntities = determineFactionEntityTypes(mobsFraction, waveNumber, faction, spawnBlockPos);
-        List<Mob> entities = new ArrayList<>();
-        // Collect Entities
-        for (Map.Entry<FactionEntityType, Integer> entry : waveFactionEntities.entrySet()) {
-            FactionEntityType factionEntityType = entry.getKey();
-            Integer amount = entry.getValue();
-            for (int i = 0; i < amount; i++) {
-                Entity entity = factionEntityType.createEntity(level, faction, spawnBlockPos, false, FactionEntityRank.SOLDIER, MobSpawnType.PATROL);
-                if (entity instanceof Mob mobEntity) {
-                    //Add to Raid
-                    addToRaid(waveNumber, faction, entities, factionEntityType, mobEntity);
-                    waveStrength += factionEntityType.getStrength();
-                }
-
-            }
-        }
-        // Apply Boosts
-        FactionBoostHelper.applyBoosts(targetStrength - waveStrength, entities, faction, this.level);
-
-        List<Entity> newEntities = entities.stream().flatMap(mobEntity -> mobEntity.getRootVehicle().getSelfAndPassengers()).filter(entity -> !entities.contains(entity)).toList();
-        newEntities.forEach(entity -> {
-            if (entity instanceof Mob) {
-                Mob mobEntity = (Mob) entity;
-                FactionEntity entityCapability = FactionEntityHelper.getFactionEntityCapability(mobEntity);
-                if (entityCapability.getFaction() != null && entityCapability.getFactionEntityType() != null) {
-                    this.joinRaid(waveNumber, mobEntity);
-                    entities.add(mobEntity);
-                }
+        FactionGroupSpawner factionGroupSpawner = new FactionGroupSpawner(level, spawnBlockPos, waveNumber, targetStrength, faction.getRaidConfig().getMobsFraction(), faction);
+        factionGroupSpawner.spawnGroup();
+        factionGroupSpawner.getEntities().forEach(mobEntity -> {
+            FactionEntity factionEntityCapability = FactionEntityHelper.getFactionEntityCapability(mobEntity);
+            if (factionEntityCapability.getFaction() != null && factionEntityCapability.getFactionEntityType() != null) {
+                this.joinRaid(waveNumber, mobEntity);
             }
         });
-
-        List<Mob> captainEntities = entities.stream().filter(mobEntity -> FactionEntityHelper.getFactionEntityCapability(mobEntity).getFactionEntityType().canBeBannerHolder()).toList();
-        Mob randomItem = GeneralUtils.getRandomItem(captainEntities, level.getRandom());
-        if (randomItem != null) {
-            faction.makeBannerHolder(randomItem);
-            Raider raiderCapability = RaiderHelper.getRaiderCapability(randomItem);
-            raiderCapability.setWaveLeader(true);
-            FactionEntityHelper.getFactionEntityCapability(randomItem).setFactionEntityRank(FactionEntityRank.CAPTAIN);
-        }
         this.playSound(spawnBlockPos, factions.get(0).getRaidConfig().getWaveSoundEvent());
-    }
-
-    private void addToRaid(int waveNumber, Faction faction, List<Mob> entities, FactionEntityType factionEntityType, Mob baseEntity) {
-        baseEntity.getRootVehicle().getSelfAndPassengers().forEach(entity -> {
-            if (entity instanceof Mob) {
-                Mob mobEntity = (Mob) entity;
-                FactionEntity factionEntityCapability = FactionEntityHelper.getFactionEntityCapability(mobEntity);
-                if (factionEntityCapability != null && faction.equals(factionEntityCapability.getFaction())) {
-                    this.joinRaid(waveNumber, mobEntity);
-                    entities.add(mobEntity);
-                }
-            }
-        });
-    }
-
-    private Map<FactionEntityType, Integer> determineFactionEntityTypes(int targetStrength, int waveNumber, Faction faction, BlockPos spawnBlockPos) {
-        Map<FactionEntityType, Integer> waveFactionEntities = new HashMap<>();
-        int selectedStrength = 0;
-        Holder<Biome> biome = this.level.getBiome(spawnBlockPos);
-        EntityWeightMapProperties entityWeightMapProperties = new EntityWeightMapProperties().setWave(waveNumber).setBiome(biome.get()).setBlockPos(spawnBlockPos);
-        List<Pair<FactionEntityType, Integer>> weightMap = faction.getWeightMap(entityWeightMapProperties);
-        for (Pair<FactionEntityType, Integer> pair : weightMap) {
-            if (selectedStrength < targetStrength) {
-                FactionEntityType factionEntityType = pair.getFirst();
-                if (factionEntityType.getSpawnedRange().min() > 0) {
-                    int strength = factionEntityType.getStrength();
-                    int amount = Math.min((int) Math.ceil((targetStrength - selectedStrength) / strength), factionEntityType.getSpawnedRange().min());
-                    selectedStrength += strength * amount;
-                    waveFactionEntities.merge(factionEntityType, amount, Integer::sum);
-                }
-            }
-            if (selectedStrength >= targetStrength) {
-                break;
-            }
-        }
-        while (selectedStrength < targetStrength && weightMap.size() > 0) {
-            FactionEntityType randomEntry = getRandomEntry(weightMap, level.random);
-            waveFactionEntities.merge(randomEntry, 1, Integer::sum);
-            selectedStrength += randomEntry.getStrength();
-            if (waveFactionEntities.get(randomEntry) >= randomEntry.getMaxSpawned(waveFactionEntities.values().stream().reduce(0, Integer::sum))) {
-                weightMap = weightMap.stream().filter(pair -> !pair.getFirst().equals(randomEntry)).toList();
-            }
-        }
-        return waveFactionEntities;
     }
 
     public double getDifficultyMultiplier(Difficulty difficulty) {
@@ -755,7 +678,7 @@ public class Raid {
         // check how many diggers are already spawned
         if(getDiggersInWave() > Mth.ceil(this.getRaidersInWave(this.getGroupsSpawned()).size() * 0.10)) return;
         EntityWeightMapProperties entityWeightMapProperties = new EntityWeightMapProperties().setAllowedRanks(List.of(FactionEntityRank.DIGGER)).setBlockPos(spawnBlockPos);
-        List<Pair<FactionEntityType, Integer>> weightMap = faction.getWeightMap(entityWeightMapProperties);
+        Map<FactionEntityType, Integer> weightMap = faction.getWeightMap(entityWeightMapProperties);
         if (weightMap.isEmpty()) return;
         FactionEntityType randomEntry = getRandomEntry(weightMap, level.random);
         Entity entity = randomEntry.createEntity(level, faction, spawnBlockPos, false, FactionEntityRank.DIGGER, MobSpawnType.PATROL);

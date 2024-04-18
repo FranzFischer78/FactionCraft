@@ -28,6 +28,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 
 import java.util.List;
+import java.util.Map;
 
 import static net.minecraftforge.registries.ForgeRegistries.ENTITY_TYPES;
 
@@ -117,7 +118,7 @@ public class PatrolSpawner implements CustomSpawner {
       } else {
          entityWeightMapProperties.setAllowedRanks(List.of(FactionEntityRank.SOLDIER));
       }
-      List<Pair<FactionEntityType, Integer>> weightMap = faction.getWeightMap(entityWeightMapProperties);
+      Map<FactionEntityType, Integer> weightMap = faction.getWeightMap(entityWeightMapProperties);
       if(weightMap.isEmpty()) {
          return false;
       }
