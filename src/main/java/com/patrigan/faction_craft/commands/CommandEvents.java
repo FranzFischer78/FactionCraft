@@ -17,5 +17,6 @@ public class CommandEvents {
         FactionPatrolCommand.register(commandDispatcher);
         FactionBattleCommand.register(commandDispatcher);
         FactionSummonCommand.register(commandDispatcher);
+        DominionCommand.register(commandDispatcher);
     }
 }

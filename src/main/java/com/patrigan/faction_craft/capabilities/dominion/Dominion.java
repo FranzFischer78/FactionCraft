@@ -13,6 +13,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraftforge.common.util.INBTSerializable;
 
 import java.util.HashMap;
@@ -42,7 +43,8 @@ public class Dominion implements INBTSerializable<CompoundTag> {
 
 
     public Dominion setChunkDominions(Map<ChunkPos, ChunkDominion> chunkDominions) {
-        this.chunkDominions = chunkDominions;
+
+        this.chunkDominions = new HashMap<>(chunkDominions);
         return this;
     }
 
@@ -60,6 +62,13 @@ public class Dominion implements INBTSerializable<CompoundTag> {
         if (pCompound.contains("ChunkDominions", 10)) {
             DataResult<Dominion> dataresult = Dominion.CODEC.parse(new Dynamic<>(NbtOps.INSTANCE, pCompound.get("ChunkDominions")));
             dataresult.resultOrPartial(FactionCraft.LOGGER::error).ifPresent(dominion -> this.setChunkDominions(dominion.getChunkDominions()));
+        }
+    }
+
+    public void initChunkDominion(ChunkAccess chunk) {
+        ChunkPos chunkPos = chunk.getPos();
+        if (!chunkDominions.containsKey(chunkPos)) {
+            chunkDominions.put(chunkPos, new ChunkDominion());
         }
     }
 }

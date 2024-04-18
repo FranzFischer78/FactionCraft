@@ -4,7 +4,10 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.HashMap;
 import java.util.Map;
+
+import static com.patrigan.faction_craft.faction.Faction.GAIA;
 
 public class ChunkDominion {
 
@@ -14,6 +17,12 @@ public class ChunkDominion {
             ).apply(builder, ChunkDominion::new));
 
     private final Map<ResourceLocation, Integer> factionDominions;
+
+    public ChunkDominion() {
+        Map<ResourceLocation, Integer> factionDominions = new HashMap<>();
+        factionDominions.put(GAIA.getName(), 100);
+        this.factionDominions = factionDominions ;
+    }
 
     public ChunkDominion(Map<ResourceLocation, Integer> factionDominions) {
         this.factionDominions = factionDominions;
