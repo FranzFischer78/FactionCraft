@@ -9,6 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraftforge.common.util.LazyOptional;
 
 import static com.patrigan.faction_craft.boost.BoostProviders.ATTRIBUTE;
@@ -92,6 +93,9 @@ public class AttributeBoost extends Boost {
         }
         AttributeModifier modifier = new AttributeModifier("Attribute Boost", adjustment, operation);
         livingEntity.getAttribute(attribute).addPermanentModifier(modifier);
+        if(attribute.equals(Attributes.MAX_HEALTH)){
+            livingEntity.setHealth(livingEntity.getMaxHealth());
+        }
         super.apply(livingEntity);
         return strengthAdjustment;
     }
