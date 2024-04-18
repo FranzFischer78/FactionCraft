@@ -128,7 +128,7 @@ public class PatrolSpawner implements CustomSpawner {
       } else if (!(pLevel.getBrightness(LightLayer.BLOCK, pPos) <= 8 && pLevel.getDifficulty() != Difficulty.PEACEFUL && Mob.checkMobSpawnRules(entityType, pLevel, MobSpawnType.PATROL, pPos, pRandom))) {
          return false;
       } else {
-         Mob entity = (Mob) factionEntityType.createEntity(pLevel, faction, pPos, pLeader, MobSpawnType.PATROL);
+         Mob entity = (Mob) factionEntityType.createEntity(pLevel, faction, pPos, pLeader, pLeader? FactionEntityRank.CAPTAIN : FactionEntityRank.SOLDIER, MobSpawnType.PATROL);
          if (entity != null) {
             Patroller patrollerCap = PatrollerHelper.getPatrollerCapability(entity);
             if (pLeader) {

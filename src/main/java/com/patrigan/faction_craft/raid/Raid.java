@@ -388,7 +388,7 @@ public class Raid {
             FactionEntityType factionEntityType = entry.getKey();
             Integer amount = entry.getValue();
             for (int i = 0; i < amount; i++) {
-                Entity entity = factionEntityType.createEntity(level, faction, spawnBlockPos, false, MobSpawnType.PATROL);
+                Entity entity = factionEntityType.createEntity(level, faction, spawnBlockPos, false, FactionEntityRank.SOLDIER, MobSpawnType.PATROL);
                 if (entity instanceof Mob mobEntity) {
                     //Add to Raid
                     addToRaid(waveNumber, faction, entities, factionEntityType, mobEntity);
@@ -418,6 +418,7 @@ public class Raid {
             faction.makeBannerHolder(randomItem);
             Raider raiderCapability = RaiderHelper.getRaiderCapability(randomItem);
             raiderCapability.setWaveLeader(true);
+            FactionEntityHelper.getFactionEntityCapability(randomItem).setFactionEntityRank(FactionEntityRank.CAPTAIN);
         }
         this.playSound(spawnBlockPos, factions.get(0).getRaidConfig().getWaveSoundEvent());
     }
@@ -757,7 +758,7 @@ public class Raid {
         List<Pair<FactionEntityType, Integer>> weightMap = faction.getWeightMap(entityWeightMapProperties);
         if (weightMap.isEmpty()) return;
         FactionEntityType randomEntry = getRandomEntry(weightMap, level.random);
-        Entity entity = randomEntry.createEntity(level, faction, spawnBlockPos, false, MobSpawnType.PATROL);
+        Entity entity = randomEntry.createEntity(level, faction, spawnBlockPos, false, FactionEntityRank.DIGGER, MobSpawnType.PATROL);
         if(entity instanceof Mob mob) {
             this.joinRaid(this.getGroupsSpawned(), mob);
         }

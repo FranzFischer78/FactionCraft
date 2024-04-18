@@ -268,7 +268,7 @@ public class FactionEntityType {
         return getSpawnedRange().getMax() * Mth.ceil(totalSpawned / (float) getMaxSpawnedPerX());
     }
 
-    public Entity createEntity(ServerLevel level, Faction faction, BlockPos spawnBlockPos, boolean bannerHolder, MobSpawnType spawnReason) {
+    public Entity createEntity(ServerLevel level, Faction faction, BlockPos spawnBlockPos, boolean bannerHolder, FactionEntityRank rank, MobSpawnType spawnReason) {
         EntityType<?> entityType = ENTITY_TYPES.getValue(this.getEntityType());
         Entity entity;
         entity = entityType.create(level);
@@ -298,6 +298,7 @@ public class FactionEntityType {
                         cap.setFactionEntityType(this);
                         cap.getFaction().getBoostConfig().getMandatoryBoosts().forEach(boost -> boost.apply(mob));
                         cap.getFactionEntityType().getBoostConfig().getMandatoryBoosts().forEach(boost -> boost.apply(mob));
+                        cap.setFactionEntityRank(rank);
                     }
                 });
 

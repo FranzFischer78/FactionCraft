@@ -9,14 +9,12 @@ import com.patrigan.faction_craft.commands.arguments.FactionArgument;
 import com.patrigan.faction_craft.commands.arguments.FactionEntitySummonArgument;
 import com.patrigan.faction_craft.faction.Faction;
 import com.patrigan.faction_craft.faction.FactionBoostHelper;
+import com.patrigan.faction_craft.faction.entity.FactionEntityRank;
 import com.patrigan.faction_craft.faction.entity.FactionEntityType;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.commands.arguments.CompoundTagArgument;
 import net.minecraft.commands.arguments.coordinates.Vec3Argument;
-import net.minecraft.commands.synchronization.SuggestionProviders;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
@@ -42,7 +40,7 @@ public class FactionSummonCommand {
     }
 
     private static int spawnEntity(CommandSourceStack source, Faction faction, FactionEntityType factionEntityType, Vec3 pos, int boostStrength) {
-        Entity entity = factionEntityType.createEntity(source.getLevel(), faction, new BlockPos(pos), false, MobSpawnType.PATROL);
+        Entity entity = factionEntityType.createEntity(source.getLevel(), faction, new BlockPos(pos), false, FactionEntityRank.SOLDIER, MobSpawnType.PATROL);
         if(entity instanceof Mob mob) {
             FactionEntity entityCapability = FactionEntityHelper.getFactionEntityCapability(mob);
             entityCapability.getFaction().getBoostConfig().getMandatoryBoosts().forEach(boost -> boost.apply(mob));

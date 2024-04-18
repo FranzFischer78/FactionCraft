@@ -79,7 +79,7 @@ public class FactionMountBoost extends Boost {
                     return 0;
                 }
                 FactionEntityType randomEntry = GeneralUtils.getRandomEntry(weightMap, mob.getRandom());
-                Entity entity = randomEntry.createEntity(level, cap.getFaction(), livingEntity.blockPosition(), false, MobSpawnType.JOCKEY);
+                Entity entity = randomEntry.createEntity(level, cap.getFaction(), livingEntity.blockPosition(), false, FactionEntityRank.MOUNT, MobSpawnType.JOCKEY);
                 if(raiderCap.hasActiveRaid() && entity instanceof Mob mountMob){
                     raiderCap.getRaid().addWaveMob(raiderCap.getWave(), mountMob, true);
                 }
