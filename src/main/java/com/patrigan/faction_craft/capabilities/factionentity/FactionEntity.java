@@ -10,10 +10,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraftforge.common.util.INBTSerializable;
 
 import java.util.Objects;
 
+import static com.patrigan.faction_craft.capabilities.ModCapabilities.DOMINION_CAPABILITY;
 import static com.patrigan.faction_craft.capabilities.ModCapabilities.FACTION_ENTITY_CAPABILITY;
 
 public class FactionEntity implements INBTSerializable<CompoundTag> {
@@ -137,5 +139,14 @@ public class FactionEntity implements INBTSerializable<CompoundTag> {
 
     public boolean hasRank(FactionEntityRank factionEntityRank) {
         return this.factionEntityRank == factionEntityRank;
+    }
+
+    public void tick(){
+        if(entity.level.isClientSide) return;
+        if(entity.tickCount % 100 == 0 && entity.getRandom().nextFloat() < 1F) {
+            entity.level.getCapability((DOMINION_CAPABILITY)).ifPresent(dominion -> {
+                dominion.adjust(new ChunkPos(entity.blockPosition()), faction, 1);
+            });
+        }
     }
 }

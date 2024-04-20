@@ -1,4 +1,7 @@
 # Changelog
+## [1.19.2-1.4.0] 2024-XX-XX
+### Major Features
+- Dominion now increases and decreases
 ## [1.19.2-1.3.7] 2024-XX-XX
 ### Minor Features
 - New dominion command, shows dominion in a chunk. To be used at a later version when Dominion is fully introduced

@@ -20,8 +20,10 @@ import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.event.PlayLevelSoundEvent;
+import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingConversionEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -78,6 +80,16 @@ public class EntityEvents {
             if(event.getSound() == soundEvent){
                 event.setSound(SHIELD_BLOCK);
             }
+        }
+    }
+
+    //Entity Event subscriber that calls FactionEntity.tick
+    @SubscribeEvent
+    public static void onEntityTick(LivingEvent.LivingTickEvent event) {
+        Entity entity = event.getEntity();
+        if(entity.level.isClientSide()) return;
+        if(entity instanceof Mob mob) {
+            FactionEntityHelper.getFactionEntityCapability(mob).tick();
         }
     }
 }

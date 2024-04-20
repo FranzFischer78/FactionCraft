@@ -4,21 +4,23 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 
 public enum FactionEntityRank {
-    LEADER("leader", null),
-    SUPPORT("support", null),
-    MOUNT("mount", null),
-    DIGGER("digger", null),
-    GENERAL("general", LEADER),
-    CAPTAIN("captain", GENERAL),
-    SOLDIER("soldier", CAPTAIN);
+    LEADER("leader", 5, null),
+    SUPPORT("support", 0, null),
+    MOUNT("mount", 0, null),
+    DIGGER("digger", 1, null),
+    GENERAL("general", 3, LEADER),
+    CAPTAIN("captain", 2, GENERAL),
+    SOLDIER("soldier", 1, CAPTAIN);
 
     public static final Codec<FactionEntityRank> CODEC = Codec.STRING.flatComapMap(s -> FactionEntityRank.byName(s, null), d -> DataResult.success(d.getName()));
 
     private final String name;
+    private final int grade;
     private final FactionEntityRank promotion;
 
-    FactionEntityRank(String name, FactionEntityRank promotion) {
+    FactionEntityRank(String name, int grade, FactionEntityRank promotion) {
         this.name = name;
+        this.grade = grade;
         this.promotion = promotion;
     }
 
@@ -38,5 +40,9 @@ public enum FactionEntityRank {
 
     public String getName() {
         return name;
+    }
+
+    public int getGrade() {
+        return grade;
     }
 }

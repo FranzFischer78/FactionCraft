@@ -66,9 +66,19 @@ public class Dominion implements INBTSerializable<CompoundTag> {
     }
 
     public void initChunkDominion(ChunkAccess chunk) {
-        ChunkPos chunkPos = chunk.getPos();
+        initChunkDominion(chunk.getPos());
+    }
+
+    public void initChunkDominion(ChunkPos chunkPos) {
         if (!chunkDominions.containsKey(chunkPos)) {
             chunkDominions.put(chunkPos, new ChunkDominion());
         }
+    }
+
+    public void adjust(ChunkPos chunkPos, Faction faction, int adjustment) {
+        if (!chunkDominions.containsKey(chunkPos)) {
+            initChunkDominion(chunkPos);
+        }
+        chunkDominions.get(chunkPos).adjust(faction, adjustment);
     }
 }

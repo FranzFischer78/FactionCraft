@@ -2,6 +2,7 @@ package com.patrigan.faction_craft.capabilities.dominion;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.patrigan.faction_craft.faction.Faction;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.HashMap;
@@ -30,5 +31,9 @@ public class ChunkDominion {
 
     public Map<ResourceLocation, Integer> getFactionDominions() {
         return factionDominions;
+    }
+
+    public void adjust(Faction faction, int adjustment) {
+        factionDominions.merge(faction.getName(), adjustment, Integer::sum);
     }
 }
