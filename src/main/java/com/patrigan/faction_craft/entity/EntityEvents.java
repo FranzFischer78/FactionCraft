@@ -20,9 +20,9 @@ import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.event.PlayLevelSoundEvent;
-import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingConversionEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -53,7 +53,7 @@ public class EntityEvents {
         Entity entity = event.getEntity();
         if (entity instanceof Mob mob) {
             FactionEntity factionEntity = FactionEntityHelper.getFactionEntityCapability(mob);
-            if(FactionCraftConfig.ENABLE_DEFAULT_FACTION.get()) {
+            if (FactionCraftConfig.ENABLE_DEFAULT_FACTION.get()) {
                 if (factionEntity.getFaction() == null || factionEntity.getFaction() == Faction.GAIA) {
                     List<Faction> factions = Factions.getFactionData().values().stream().filter(faction -> faction.getDefaultEntities().contains(entity.getType())).toList();
                     if (!factions.isEmpty()) {
@@ -65,7 +65,7 @@ public class EntityEvents {
             Raider raiderCap = RaiderHelper.getRaiderCapability(mob);
             Patroller patrollerCap = PatrollerHelper.getPatrollerCapability(mob);
             if (raiderCap.hasActiveRaid() || patrollerCap.isPatrolling()) {
-                if(mob instanceof AbstractPiglin piglin){
+                if (mob instanceof AbstractPiglin piglin) {
                     piglin.setImmuneToZombification(true);
                 }
             }
@@ -77,19 +77,29 @@ public class EntityEvents {
         LivingEntity nearestEntity = event.getLevel().getNearestEntity(LivingEntity.class, TargetingConditions.forNonCombat(), null, event.getPosition().x, event.getPosition().y, event.getPosition().z, AABB.ofSize(event.getPosition(), 1, 1, 1));
         if (nearestEntity instanceof Mob mob && mob.getUseItem().canPerformAction(net.minecraftforge.common.ToolActions.SHIELD_BLOCK) && mob.getLastDamageSource() != null) {
             SoundEvent soundEvent = ((LivingEntityAccessor) mob).invokeGetHurtSound(mob.getLastDamageSource());
-            if(event.getSound() == soundEvent){
+            if (event.getSound() == soundEvent) {
                 event.setSound(SHIELD_BLOCK);
             }
         }
     }
 
-    //Entity Event subscriber that calls FactionEntity.tick
     @SubscribeEvent
     public static void onEntityTick(LivingEvent.LivingTickEvent event) {
         Entity entity = event.getEntity();
-        if(entity.level.isClientSide()) return;
-        if(entity instanceof Mob mob) {
+        if (entity.level.isClientSide()) return;
+        if (entity instanceof Mob mob) {
             FactionEntityHelper.getFactionEntityCapability(mob).tick();
         }
     }
+
+    // On entity death, call FactionEntity onDeath
+    @SubscribeEvent
+    public static void onEntityDeath(LivingDeathEvent event) {
+        Entity entity = event.getEntity();
+        if (entity.level.isClientSide()) return;
+        if (entity instanceof Mob mob) {
+            FactionEntityHelper.getFactionEntityCapability(mob).onDeath();
+        }
+    }
+
 }
