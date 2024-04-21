@@ -143,10 +143,10 @@ public class FactionEntity implements INBTSerializable<CompoundTag> {
 
     public void tick(){
         if(entity.level.isClientSide) return;
-        if(entity.tickCount % 100 == 0 && entity.getRandom().nextFloat() < 1F) {
+        if(faction != null && !faction.equals(Faction.GAIA) && entity.tickCount % 100 == 0 && entity.getRandom().nextFloat() < 1F) {
             entity.level.getCapability((DOMINION_CAPABILITY)).ifPresent(dominion -> {
                 if(faction != null && factionEntityRank.getGrade() > 0) {
-                    dominion.adjust(new ChunkPos(entity.blockPosition()), faction, 1);
+                    dominion.adjust(entity.level, new ChunkPos(entity.blockPosition()), faction, 1);
                 }
             });
         }
@@ -155,8 +155,8 @@ public class FactionEntity implements INBTSerializable<CompoundTag> {
     public void onDeath() {
         if(entity.level.isClientSide) return;
         entity.level.getCapability((DOMINION_CAPABILITY)).ifPresent(dominion -> {
-            if (faction != null && faction != Faction.GAIA) {
-                dominion.adjust(new ChunkPos(entity.blockPosition()), faction, -factionEntityRank.getGrade());
+            if (faction != null && !faction.equals(Faction.GAIA)) {
+                dominion.adjust(entity.level, new ChunkPos(entity.blockPosition()), faction, -factionEntityRank.getGrade());
             }
         });
     }

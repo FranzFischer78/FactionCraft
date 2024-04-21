@@ -13,6 +13,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraftforge.common.util.INBTSerializable;
 
@@ -75,10 +76,10 @@ public class Dominion implements INBTSerializable<CompoundTag> {
         }
     }
 
-    public void adjust(ChunkPos chunkPos, Faction faction, int adjustment) {
+    public void adjust(Level level, ChunkPos chunkPos, Faction faction, int adjustment) {
         if (!chunkDominions.containsKey(chunkPos)) {
             initChunkDominion(chunkPos);
         }
-        chunkDominions.get(chunkPos).adjust(faction, adjustment);
+        chunkDominions.get(chunkPos).adjust(level, faction, adjustment);
     }
 }
