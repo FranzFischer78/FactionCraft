@@ -30,6 +30,7 @@ import static net.minecraft.world.level.Level.OVERWORLD;
 public class Faction {
     public static final Faction DEFAULT = new Faction(new ResourceLocation("faction/default"), false, FactionType.MONSTER, new CompoundTag(), FactionRaidConfig.DEFAULT, FactionBoostConfig.DEFAULT, FactionRelations.DEFAULT, Collections.emptyList(), new ResourceLocation(MODID, "default"), List.of(OVERWORLD.location()), ResourceSet.getEmpty(Registry.ENTITY_TYPE_REGISTRY));
     public static final Faction GAIA = new Faction(new ResourceLocation("faction/gaia"), false, FactionType.GAIA, new CompoundTag(), FactionRaidConfig.DEFAULT, FactionBoostConfig.DEFAULT, FactionRelations.DEFAULT, Collections.emptyList(), new ResourceLocation(MODID, "default"), List.of(OVERWORLD.location()), ResourceSet.getEmpty(Registry.ENTITY_TYPE_REGISTRY));
+    public static final ResourceLocation VILLAGE_NAME = new ResourceLocation("faction/village");
 
     public static final Codec<Faction> CODEC = RecordCodecBuilder.create(builder ->
             builder.group(

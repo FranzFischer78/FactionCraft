@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.patrigan.faction_craft.faction.Faction.GAIA;
+import static com.patrigan.faction_craft.faction.Faction.VILLAGE_NAME;
 
 public class ChunkDominion {
 
@@ -76,6 +77,13 @@ public class ChunkDominion {
 
     private void normalize(Level level) {
         int totalDominion = factionDominions.values().stream().mapToInt(Integer::intValue).sum();
+        if(factionDominions.containsKey(VILLAGE_NAME)){
+            // remove village dominion from gaia dominion
+            factionDominions.compute(GAIA.getName(), (k, v) -> {
+                if(v == null) return 0;
+                return v - factionDominions.get(VILLAGE_NAME);
+            });
+        }
         if(totalDominion > 100) {
             int totalDominionDifference = totalDominion - 100;
             for(Map.Entry<ResourceLocation, Integer> entry : factionDominions.entrySet()) {
@@ -84,6 +92,13 @@ public class ChunkDominion {
             }
         }else{
             factionDominions.put(GAIA.getName(), factionDominions.get(GAIA.getName()) + 100 - totalDominion);
+        }
+        if(factionDominions.containsKey(VILLAGE_NAME)){
+            // remove village dominion from gaia dominion
+            factionDominions.compute(GAIA.getName(), (k, v) -> {
+                if(v == null) return 0;
+                return v + factionDominions.get(VILLAGE_NAME);
+            });
         }
     }
 }
