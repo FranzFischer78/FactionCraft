@@ -5,6 +5,7 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.patrigan.faction_craft.FactionCraft;
+import com.patrigan.faction_craft.config.FactionCraftConfig;
 import com.patrigan.faction_craft.data.CodecHelper;
 import com.patrigan.faction_craft.faction.Faction;
 import com.patrigan.faction_craft.faction.relations.FactionRelation;
@@ -17,6 +18,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraftforge.common.util.INBTSerializable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,19 +69,39 @@ public class Dominion implements INBTSerializable<CompoundTag> {
     }
 
     public void initChunkDominion(ChunkAccess chunk) {
+        if(!FactionCraftConfig.ENABLE_DOMINION.get()) return;
         initChunkDominion(chunk.getPos());
     }
 
     public void initChunkDominion(ChunkPos chunkPos) {
+
+        if(!FactionCraftConfig.ENABLE_DOMINION.get()) return;
         if (!chunkDominions.containsKey(chunkPos)) {
-            chunkDominions.put(chunkPos, new ChunkDominion());
+            chunkDominions.put(chunkPos, new ChunkDominion(chunkPos));
         }
     }
 
     public void adjust(Level level, ChunkPos chunkPos, Faction faction, int adjustment) {
+        if(!FactionCraftConfig.ENABLE_DOMINION.get()) return;
         if (!chunkDominions.containsKey(chunkPos)) {
             initChunkDominion(chunkPos);
         }
-        chunkDominions.get(chunkPos).adjust(level, faction, adjustment);
+        chunkDominions.get(chunkPos).adjust(level, chunkPos, faction, adjustment);
+    }
+
+    public List<ChunkDominion> getNeighbourDominions(ChunkPos chunkPos) {
+        List<ChunkDominion> neighbourDominions = new ArrayList<>();
+        for (int x = -1; x <= 1; x++) {
+            for (int z = -1; z <= 1; z++) {
+                if ((x == 0 && z != 0) || (x != 0 && z == 0)) {
+                    ChunkPos neighbourPos = new ChunkPos(chunkPos.x + x, chunkPos.z + z);
+                    if (!chunkDominions.containsKey(neighbourPos)) {
+                        initChunkDominion(neighbourPos);
+                    }
+                    neighbourDominions.add(chunkDominions.get(neighbourPos));
+                }
+            }
+        }
+        return neighbourDominions;
     }
 }

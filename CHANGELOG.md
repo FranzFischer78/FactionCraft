@@ -1,7 +1,11 @@
 # Changelog
 ## [1.19.2-1.4.0] 2024-XX-XX
 ### Major Features
+#### Dominion
+The first big step to making Factions a living breathing thing is the dominion system. This system will allow factions to expand their territory. The system is still in its infancy, but it will be expanded upon in the future.
+- Added a config to enable or disable the new faction system. Disabled by default while gathering player feedback.
 - Dominion now increases and decreases
+- Dominion now propagates to nearby chunks
 ## [1.19.2-1.3.7] 2024-XX-XX
 ### Minor Features
 - New dominion command, shows dominion in a chunk. To be used at a later version when Dominion is fully introduced

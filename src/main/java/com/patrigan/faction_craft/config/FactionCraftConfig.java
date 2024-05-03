@@ -66,6 +66,9 @@ public class FactionCraftConfig {
 
     public static ForgeConfigSpec.ConfigValue<Boolean> ENABLE_DIGGER_AI;
 
+    public static ForgeConfigSpec.ConfigValue<Boolean> ENABLE_DOMINION;
+    public static ForgeConfigSpec.ConfigValue<Integer> PROPAGATE_FACTION_DOMINION_TRESHOLD;
+
 
     public static class Common {
 
@@ -78,6 +81,7 @@ public class FactionCraftConfig {
             factionBattleConfig(builder);
             reconstructBlockConfig(builder);
             AIConfig(builder);
+            dominionConfig(builder);
         }
 
         private void modConfig(ForgeConfigSpec.Builder builder) {
@@ -311,6 +315,19 @@ public class FactionCraftConfig {
                     .comment("Enables Digger AI and the spawning of diggers \n" +
                             "Default true")
                     .define("enableDiggerAI", true);
+            builder.pop();
+        }
+
+        private void dominionConfig(ForgeConfigSpec.Builder builder) {
+            builder.comment("Dominion Config").push("dominion_config");
+            ENABLE_DOMINION = builder
+                    .comment("Enables Faction Dominion \n" +
+                            "Default false")
+                    .define("enableFactionDominion", false);
+            PROPAGATE_FACTION_DOMINION_TRESHOLD = builder
+                    .comment("The treshold for faction dominion propagation. \n" +
+                            "Default 50")
+                    .defineInRange("propagateFactionDominionTreshold", 50, 0, 100);
             builder.pop();
         }
     }
