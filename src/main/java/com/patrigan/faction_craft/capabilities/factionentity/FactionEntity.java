@@ -4,6 +4,7 @@ package com.patrigan.faction_craft.capabilities.factionentity;
 import com.patrigan.faction_craft.config.FactionCraftConfig;
 import com.patrigan.faction_craft.faction.Faction;
 import com.patrigan.faction_craft.faction.entity.FactionEntityRank;
+import com.patrigan.faction_craft.faction.entity.LegacyFactionEntityTypeLoader;
 import com.patrigan.faction_craft.registry.Factions;
 import com.patrigan.faction_craft.faction.entity.FactionEntityType;
 import net.minecraft.core.BlockPos;
@@ -118,7 +119,7 @@ public class FactionEntity implements INBTSerializable<CompoundTag> {
             }
         }
         if(tag.contains("FactionEntityType")) {
-            factionEntityType = FactionEntityType.load(tag.getCompound("FactionEntityType"));
+            factionEntityType = LegacyFactionEntityTypeLoader.load(tag.getCompound("FactionEntityType"));
         }
         if(tag.contains("TargetPosition")) {
             targetPosition = BlockPos.of(tag.getLong("TargetPosition"));

@@ -6,7 +6,6 @@ import com.patrigan.faction_craft.capabilities.factionentity.FactionEntity;
 import com.patrigan.faction_craft.capabilities.factionentity.FactionEntityHelper;
 import com.patrigan.faction_craft.data.ResourceSet;
 import com.patrigan.faction_craft.faction.Faction;
-import com.patrigan.faction_craft.registry.FactionEntityTypes;
 import com.patrigan.faction_craft.util.IntRange;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
@@ -128,50 +127,6 @@ public class FactionEntityType {
         this.biomeWhitelist = ResourceSet.getEmpty(Registry.BIOME_REGISTRY);
         this.biomeBlacklist = ResourceSet.getEmpty(Registry.BIOME_REGISTRY);
         this.dominionToSpawn = Integer.MAX_VALUE;
-    }
-
-    public static FactionEntityType load(CompoundTag compoundNbt) {
-        if (compoundNbt.contains("factionEntityType")) {
-            ResourceLocation factionEntityType = new ResourceLocation(compoundNbt.getString("factionEntityType"));
-            if (FactionEntityTypes.getFactionEntityType(factionEntityType) != null) {
-                return FactionEntityTypes.getFactionEntityType(factionEntityType);
-            } else {
-                return FactionEntityType.DEFAULT;
-            }
-        } else {
-            FactionEntityRank rank = FactionEntityRank.byName(compoundNbt.getString("rank"), FactionEntityRank.SOLDIER);
-            FactionEntityRank maximumRank = FactionEntityRank.byName(compoundNbt.getString("maximumRank"), null);
-            List<FactionEntityRank> ranks = new ArrayList<>();
-            FactionEntityRank currentRank = rank;
-            while (currentRank != null) {
-                ranks.add(currentRank);
-                if (currentRank.equals(maximumRank)) {
-                    break;
-                }
-                currentRank = currentRank.promote();
-            }
-            return new FactionEntityType(
-                    new ResourceLocation(compoundNbt.getString("entityType")),
-                    compoundNbt.getCompound("tag"),
-                    false,
-                    true,
-                    compoundNbt.getInt("weight"),
-                    compoundNbt.getInt("strength"),
-                    ranks,
-                    EntityBoostConfig.load(compoundNbt.getCompound("entityBoostConfig")),
-                    new IntRange(compoundNbt.getInt("minimumWave"),
-                            compoundNbt.getInt("maximumWave")),
-                    new IntRange(compoundNbt.getInt("minimumSpawned"),
-                            compoundNbt.getInt("maximumSpawned")),
-                    Integer.MAX_VALUE,
-                    new IntRange(compoundNbt.getInt("minimumOmen"),
-                            compoundNbt.getInt("maximumOmen")),
-                    new IntRange(-64, 320),
-                    ResourceSet.getEmpty(Registry.BIOME_REGISTRY),
-                    ResourceSet.getEmpty(Registry.BIOME_REGISTRY),
-                    Integer.MAX_VALUE
-            );
-        }
     }
 
     public ResourceLocation getEntityType() {
@@ -320,26 +275,7 @@ public class FactionEntityType {
     }
 
     public CompoundTag save(CompoundTag compoundNbt) {
-        ResourceLocation factionEntityType = FactionEntityTypes.getFactionEntityTypeKey(this);
-        if (factionEntityType != null) {
-            compoundNbt.putString("factionEntityType", factionEntityType.toString());
-        } else {
-            compoundNbt.putString("entityType", this.entityType.toString());
-            compoundNbt.put("tag", tag);
-            compoundNbt.putInt("weight", weight);
-            compoundNbt.putInt("strength", strength);
-            compoundNbt.putString("rank", ranks.get(0).getName());
-            compoundNbt.putString("maximumRank", ranks.get(ranks.size() - 1).getName());
-            CompoundTag boostConfigNbt = new CompoundTag();
-            compoundNbt.put("entityBoostConfig", entityBoostConfig.save(boostConfigNbt));
-            compoundNbt.putInt("minimumWave", waveRange.min());
-            compoundNbt.putInt("maximumWave", waveRange.max());
-            compoundNbt.putInt("minimumSpawned", spawnedRange.min());
-            compoundNbt.putInt("maximumSpawned", spawnedRange.max());
-            compoundNbt.putInt("minimumOmen", omenRange.min());
-            compoundNbt.putInt("maximumOmen", omenRange.max());
-        }
-        return compoundNbt;
+        return LegacyFactionEntityTypeLoader.saveStatic(this, compoundNbt);
     }
 
 }
