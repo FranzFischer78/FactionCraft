@@ -104,4 +104,11 @@ public class Dominion implements INBTSerializable<CompoundTag> {
         }
         return neighbourDominions;
     }
+
+    public ChunkDominion getChunkDominion(ChunkPos chunkPos) {
+        if (!chunkDominions.containsKey(chunkPos)) {
+            initChunkDominion(chunkPos);
+        }
+        return chunkDominions.get(chunkPos);
+    }
 }

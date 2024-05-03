@@ -2,7 +2,6 @@ package com.patrigan.faction_craft.capabilities.dominion;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.patrigan.faction_craft.capabilities.ModCapabilities;
 import com.patrigan.faction_craft.config.FactionCraftConfig;
 import com.patrigan.faction_craft.faction.Faction;
 import com.patrigan.faction_craft.registry.Factions;
@@ -64,14 +63,18 @@ public class ChunkDominion {
         Map<ResourceLocation, Integer> factionsWithDominion = factionDominions.entrySet().stream().filter(entry -> entry.getValue() > FactionCraftConfig.PROPAGATE_FACTION_DOMINION_TRESHOLD.get()).filter(entry -> !entry.equals(GAIA.getName())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         for(Map.Entry<ResourceLocation, Integer> entry : factionsWithDominion.entrySet()) {
             for(ChunkDominion neighbourDominion : DominionHelper.getCapability(level).getNeighbourDominions(chunkPos)) {
-                if(neighbourDominion.GetFaction(entry.getKey()) < FactionCraftConfig.PROPAGATE_FACTION_DOMINION_TRESHOLD.get()) {
+                if(neighbourDominion.GetFactionDominion(entry.getKey()) < FactionCraftConfig.PROPAGATE_FACTION_DOMINION_TRESHOLD.get()) {
                     neighbourDominion.adjust(level, chunkPos, Factions.getFaction(entry.getKey()), 1);
                 }
             }
         }
     }
 
-    public int GetFaction(ResourceLocation key) {
+    public int getFactionDominion(Faction faction) {
+        return factionDominions.get(faction.getName());
+    }
+
+    public int GetFactionDominion(ResourceLocation key) {
         return factionDominions.get(key);
     }
 

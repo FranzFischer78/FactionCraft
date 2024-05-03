@@ -55,7 +55,7 @@ public class DominionCommand {
             // Get the ChunkPos of the block
             ChunkPos chunkPos = new ChunkPos(blockPos);
             // Get the ChunkDominion of the block
-            ChunkDominion chunkDominion = dominion.getChunkDominions().get(chunkPos);
+            ChunkDominion chunkDominion = dominion.getChunkDominion(chunkPos);
             // If the ChunkDominion is not null
             if (chunkDominion != null) {
                 // Send a message to the player with the Factions in the Chunk

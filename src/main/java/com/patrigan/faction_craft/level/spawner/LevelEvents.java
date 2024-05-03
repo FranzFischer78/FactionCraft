@@ -22,23 +22,25 @@ public class LevelEvents {
     public static void onLevelLoaded(LevelEvent.Load event){
         if(event.getLevel() instanceof ServerLevel){
             ServerLevel serverLevel = (ServerLevel) event.getLevel();
-            ServerLevelAccessor accessor = castToAccessor(serverLevel);
-            List<CustomSpawner> customSpawners = accessor.getCustomSpawners();
-            List<CustomSpawner> newCustomSpawners = customSpawners.stream()
-                    .filter(LevelEvents::filterVanillaPatrols)
-                    .collect(Collectors.toList());
-            newCustomSpawners.add(new com.patrigan.faction_craft.level.spawner.PatrolSpawner());
-            newCustomSpawners.add(new com.patrigan.faction_craft.level.spawner.BattleSpawner());
-            accessor.setCustomSpawners(newCustomSpawners);
-
+            customSpawners(serverLevel);
         }
+    }
+
+    private static void customSpawners(ServerLevel serverLevel) {
+        ServerLevelAccessor accessor = castToAccessor(serverLevel);
+        List<CustomSpawner> customSpawners = accessor.getCustomSpawners();
+        List<CustomSpawner> newCustomSpawners = customSpawners.stream()
+                .filter(LevelEvents::filterVanillaPatrols)
+                .collect(Collectors.toList());
+        newCustomSpawners.add(new com.patrigan.faction_craft.level.spawner.PatrolSpawner());
+        newCustomSpawners.add(new BattleSpawner());
+        accessor.setCustomSpawners(newCustomSpawners);
     }
 
     public static boolean filterVanillaPatrols(CustomSpawner iSpecialSpawner){
         return !(iSpecialSpawner instanceof PatrolSpawner) || !FactionCraftConfig.DISABLE_VANILLA_PATROLS.get();
 
     }
-
 
     public static ServerLevelAccessor castToAccessor(ServerLevel serverLevel) {
         //noinspection unchecked
