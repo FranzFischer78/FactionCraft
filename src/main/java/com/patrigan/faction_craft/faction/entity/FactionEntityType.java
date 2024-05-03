@@ -29,7 +29,7 @@ import static net.minecraftforge.registries.ForgeRegistries.ENTITY_TYPES;
 
 
 public class FactionEntityType {
-    public static final FactionEntityType DEFAULT = new FactionEntityType(new ResourceLocation("minecraft:pig"), new CompoundTag(), false, true, 1, 1, List.of(FactionEntityRank.SOLDIER), EntityBoostConfig.DEFAULT, new IntRange(0, 10000), new IntRange(0, 10000), Integer.MAX_VALUE, new IntRange(0, 10000), new IntRange(-64, 320), ResourceSet.getEmpty(Registry.BIOME_REGISTRY), ResourceSet.getEmpty(Registry.BIOME_REGISTRY));
+    public static final FactionEntityType DEFAULT = new FactionEntityType(new ResourceLocation("minecraft:pig"), new CompoundTag(), false, true, 1, 1, List.of(FactionEntityRank.SOLDIER), EntityBoostConfig.DEFAULT, new IntRange(0, 10000), new IntRange(0, 10000), Integer.MAX_VALUE, new IntRange(0, 10000), new IntRange(-64, 320), ResourceSet.getEmpty(Registry.BIOME_REGISTRY), ResourceSet.getEmpty(Registry.BIOME_REGISTRY), Integer.MAX_VALUE);
     public static final Codec<FactionEntityType> CODEC = RecordCodecBuilder.create(builder ->
             builder.group(
                     ResourceLocation.CODEC.fieldOf("entity_type").forGetter(data -> data.entityType),
@@ -46,7 +46,8 @@ public class FactionEntityType {
                     IntRange.getCodec(0, 10000).optionalFieldOf("omen_range", new IntRange(0, 10000)).forGetter(data -> data.omenRange),
                     IntRange.getCodec(-10000, 10000).optionalFieldOf("y_range", new IntRange(-64, 320)).forGetter(data -> data.yRange),
                     ResourceSet.getCodec(Registry.BIOME_REGISTRY).optionalFieldOf("biome_whitelist", ResourceSet.getEmpty(Registry.BIOME_REGISTRY)).forGetter(data -> data.biomeWhitelist),
-                    ResourceSet.getCodec(Registry.BIOME_REGISTRY).optionalFieldOf("biome_blacklist", ResourceSet.getEmpty(Registry.BIOME_REGISTRY)).forGetter(data -> data.biomeBlacklist)
+                    ResourceSet.getCodec(Registry.BIOME_REGISTRY).optionalFieldOf("biome_blacklist", ResourceSet.getEmpty(Registry.BIOME_REGISTRY)).forGetter(data -> data.biomeBlacklist),
+                    Codec.INT.optionalFieldOf("dominion_to_spawn", Integer.MAX_VALUE).forGetter(data -> data.dominionToSpawn)
             ).apply(builder, FactionEntityType::new));
 
     public static final Codec<FactionEntityType> CODEC_OLD = RecordCodecBuilder.create(builder ->
@@ -81,8 +82,9 @@ public class FactionEntityType {
     private final IntRange yRange;
     private final ResourceSet<Biome> biomeWhitelist;
     private final ResourceSet<Biome> biomeBlacklist;
+    private final int dominionToSpawn;
 
-    public FactionEntityType(ResourceLocation entityType, CompoundTag tag, boolean tagFirst, boolean shouldFinalizeSpawn, int weight, int strength, List<FactionEntityRank> ranks, EntityBoostConfig entityBoostConfig, IntRange waveRange, IntRange spawnedRange, int maxSpawnedPerX, IntRange omenRange, IntRange yRange, ResourceSet<Biome> biomeWhitelist, ResourceSet<Biome> biomeBlacklist) {
+    public FactionEntityType(ResourceLocation entityType, CompoundTag tag, boolean tagFirst, boolean shouldFinalizeSpawn, int weight, int strength, List<FactionEntityRank> ranks, EntityBoostConfig entityBoostConfig, IntRange waveRange, IntRange spawnedRange, int maxSpawnedPerX, IntRange omenRange, IntRange yRange, ResourceSet<Biome> biomeWhitelist, ResourceSet<Biome> biomeBlacklist, int dominionToSpawn) {
         this.entityType = entityType;
         this.tag = tag;
         this.tagFirst = tagFirst;
@@ -98,6 +100,7 @@ public class FactionEntityType {
         this.yRange = yRange;
         this.biomeWhitelist = biomeWhitelist;
         this.biomeBlacklist = biomeBlacklist;
+        this.dominionToSpawn = dominionToSpawn;
     }
 
     public FactionEntityType(ResourceLocation entityType, CompoundTag tag, int weight, int strength, FactionEntityRank rank, FactionEntityRank maximumRank, EntityBoostConfig entityBoostConfig, int minimumWave, int maximumWave, int minimumSpawned, int maximumSpawned, int minimumOmen, int maximumOmen) {
@@ -124,6 +127,7 @@ public class FactionEntityType {
         this.yRange = new IntRange(-64, 320);
         this.biomeWhitelist = ResourceSet.getEmpty(Registry.BIOME_REGISTRY);
         this.biomeBlacklist = ResourceSet.getEmpty(Registry.BIOME_REGISTRY);
+        this.dominionToSpawn = Integer.MAX_VALUE;
     }
 
     public static FactionEntityType load(CompoundTag compoundNbt) {
@@ -135,7 +139,6 @@ public class FactionEntityType {
                 return FactionEntityType.DEFAULT;
             }
         } else {
-
             FactionEntityRank rank = FactionEntityRank.byName(compoundNbt.getString("rank"), FactionEntityRank.SOLDIER);
             FactionEntityRank maximumRank = FactionEntityRank.byName(compoundNbt.getString("maximumRank"), null);
             List<FactionEntityRank> ranks = new ArrayList<>();
@@ -165,7 +168,8 @@ public class FactionEntityType {
                             compoundNbt.getInt("maximumOmen")),
                     new IntRange(-64, 320),
                     ResourceSet.getEmpty(Registry.BIOME_REGISTRY),
-                    ResourceSet.getEmpty(Registry.BIOME_REGISTRY)
+                    ResourceSet.getEmpty(Registry.BIOME_REGISTRY),
+                    Integer.MAX_VALUE
             );
         }
     }
