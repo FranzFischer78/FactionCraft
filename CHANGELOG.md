@@ -11,6 +11,9 @@ The first big step to making Factions a living breathing thing is the dominion s
 As part of dominion, various things can happen that affect the world, like entity spawning. These are all configurable.
 - Config field added to set minimum dominion to allow for dominion entities to spawn naturally.
 - Faction Entity Types now have a new field, `dominion_to_spawn`, which will allow you to set the dominion requirement to spawn that faction entity type.
+- Config field added to set the minimum dominion to allow for default entities to be assigned to a faction.
+- Config field added to set the minimum dominion to allow for dominion entities to spawn naturally.
+- Config field added to set the minimum dominion to suppress the spawning of normal (GAIA) entities.
 ## [1.19.2-1.3.7] 2024-XX-XX
 ### Minor Features
 - New dominion command, shows dominion in a chunk. To be used at a later version when Dominion is fully introduced

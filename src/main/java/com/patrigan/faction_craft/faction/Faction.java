@@ -8,8 +8,10 @@ import com.patrigan.faction_craft.data.ResourceSet;
 import com.patrigan.faction_craft.faction.entity.FactionEntityType;
 import com.patrigan.faction_craft.faction.entity.FactionEntityRank;
 import com.patrigan.faction_craft.faction.relations.FactionRelations;
+import com.patrigan.faction_craft.faction.spawning.DominionSpawner;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -20,6 +22,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 
 import java.util.*;
@@ -61,6 +64,7 @@ public class Faction {
     private final ResourceLocation activationAdvancement;
     private final List<ResourceLocation> homeDimensions;
     private final ResourceSet<EntityType<?>> defaultEntities;
+    private final DominionSpawner dominionSpawner = new DominionSpawner(this);
 
     public Faction(ResourceLocation name, boolean replace, FactionType factionType, CompoundTag banner, FactionRaidConfig raidConfig, FactionBoostConfig boostConfig, FactionRelations relations, List<FactionEntityType> entityTypes, ResourceLocation activationAdvancement, List<ResourceLocation> homeDimensions, ResourceSet<EntityType<?>> defaultEntities) {
         this.name = name;
@@ -181,7 +185,11 @@ public class Faction {
         return isActive();
     }
 
-    public List<MobSpawnSettings.SpawnerData> getDominionSpawners(LevelAccessor level, BlockPos pos, int dominionAmount) {
-        return new ArrayList<>();
+    public List<MobSpawnSettings.SpawnerData> getDominionSpawners(LevelAccessor level, BlockPos spawnBlockPos, int dominionAmount) {
+        return dominionSpawner.GetSpawnerData(level, spawnBlockPos, dominionAmount);
+    }
+
+    public List<FactionEntityType> getSpawnableFactionEntityTypes(LevelAccessor level, BlockPos spawnBlockPos, int dominionAmount) {
+        return dominionSpawner.GetSpawnableFactionEntityTypes(level, spawnBlockPos, dominionAmount);
     }
 }

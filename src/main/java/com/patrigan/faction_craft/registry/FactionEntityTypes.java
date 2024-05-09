@@ -43,7 +43,7 @@ public class FactionEntityTypes {
     }
 
     private static boolean entityTypeExists(FactionEntityType value) {
-        return ENTITY_TYPES.containsKey(value.getEntityType());
+        return ENTITY_TYPES.containsKey(value.getEntityTypeName());
     }
 
     private static boolean isOfFaction(ResourceLocation entityType, ResourceLocation faction) {

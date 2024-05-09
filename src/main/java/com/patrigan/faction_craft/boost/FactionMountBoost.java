@@ -65,7 +65,7 @@ public class FactionMountBoost extends Boost {
             if (cap.getFaction() == null) {
                 return 0;
             } else {
-                List<Pair<FactionEntityType, Integer>> weightMap = cap.getFaction().getWeightMapForRank(FactionEntityRank.MOUNT).stream().filter(pair -> pair.getFirst().getEntityType().equals(entityTypeLocation)).collect(Collectors.toList());
+                List<Pair<FactionEntityType, Integer>> weightMap = cap.getFaction().getWeightMapForRank(FactionEntityRank.MOUNT).stream().filter(pair -> pair.getFirst().getEntityTypeName().equals(entityTypeLocation)).collect(Collectors.toList());
                 Raider raiderCap = RaiderHelper.getRaiderCapability(mob);
                 if (raiderCap.hasActiveRaid()) {
                     weightMap = weightMap.stream()
@@ -106,7 +106,7 @@ public class FactionMountBoost extends Boost {
             if(cap.getFaction() == null){
                 return false;
             }
-            List<Pair<FactionEntityType, Integer>> weightMap = cap.getFaction().getWeightMapForRank(FactionEntityRank.MOUNT).stream().filter(pair -> pair.getFirst().getEntityType().equals(entityTypeLocation)).collect(Collectors.toList());
+            List<Pair<FactionEntityType, Integer>> weightMap = cap.getFaction().getWeightMapForRank(FactionEntityRank.MOUNT).stream().filter(pair -> pair.getFirst().getEntityTypeName().equals(entityTypeLocation)).collect(Collectors.toList());
             Raider raiderCap = RaiderHelper.getRaiderCapability(mob);
             if (raiderCap.hasActiveRaid()) {
                 weightMap = weightMap.stream()

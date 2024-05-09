@@ -1,6 +1,5 @@
 package com.patrigan.faction_craft.level.spawner;
 
-import com.mojang.datafixers.util.Pair;
 import com.patrigan.faction_craft.capabilities.patroller.Patroller;
 import com.patrigan.faction_craft.capabilities.patroller.PatrollerHelper;
 import com.patrigan.faction_craft.config.FactionCraftConfig;
@@ -123,7 +122,7 @@ public class PatrolSpawner implements CustomSpawner {
          return false;
       }
       FactionEntityType factionEntityType = GeneralUtils.getRandomEntry(weightMap, pRandom);
-      EntityType<? extends Mob> entityType = (EntityType<? extends Mob>) ENTITY_TYPES.getValue(factionEntityType.getEntityType());
+      EntityType<? extends Mob> entityType = (EntityType<? extends Mob>) factionEntityType.getEntityType();
       if (!NaturalSpawner.isValidEmptySpawnBlock(pLevel, pPos, blockstate, blockstate.getFluidState(), entityType)) {
          return false;
       } else if (!(pLevel.getBrightness(LightLayer.BLOCK, pPos) <= 8 && pLevel.getDifficulty() != Difficulty.PEACEFUL && Mob.checkMobSpawnRules(entityType, pLevel, MobSpawnType.PATROL, pPos, pRandom))) {

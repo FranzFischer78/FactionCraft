@@ -68,6 +68,9 @@ public class FactionCraftConfig {
 
     public static ForgeConfigSpec.ConfigValue<Boolean> ENABLE_DOMINION;
     public static ForgeConfigSpec.ConfigValue<Integer> PROPAGATE_FACTION_DOMINION_TRESHOLD;
+    public static ForgeConfigSpec.ConfigValue<Integer> DOMINION_FACTION_SPAWN_TRESHOLD;
+    public static ForgeConfigSpec.ConfigValue<Integer> DOMINION_SUPPRESS_GAIA_SPAWN_TRESHOLD;
+    public static ForgeConfigSpec.ConfigValue<Integer> DOMINION_DEFAULT_ENTITY_TRESHOLD;
 
 
     public static class Common {
@@ -328,6 +331,18 @@ public class FactionCraftConfig {
                     .comment("The treshold for faction dominion propagation. \n" +
                             "Default 50")
                     .defineInRange("propagateFactionDominionTreshold", 50, 0, 100);
+            DOMINION_FACTION_SPAWN_TRESHOLD = builder
+                    .comment("The treshold for faction dominion spawning. \n" +
+                            "Default 50")
+                    .defineInRange("dominionFactionSpawnTreshold", 60, 0, 100);
+            DOMINION_SUPPRESS_GAIA_SPAWN_TRESHOLD = builder
+                    .comment("The treshold to suppress normal spawns. \n" +
+                            "Default 80")
+                    .defineInRange("dominionSuppressGaiaSpawnTreshold", 80, 0, 100);
+            DOMINION_DEFAULT_ENTITY_TRESHOLD = builder
+                    .comment("The treshold for default entities to start being assigned. \n" +
+                            "Default 30")
+                    .defineInRange("dominionDefaultEntityTreshold", 30, 0, 100);
             builder.pop();
         }
     }

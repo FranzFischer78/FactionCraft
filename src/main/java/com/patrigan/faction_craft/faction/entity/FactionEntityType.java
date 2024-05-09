@@ -19,6 +19,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.MobSpawnSettings;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -129,8 +130,12 @@ public class FactionEntityType {
         this.dominionToSpawn = Integer.MAX_VALUE;
     }
 
-    public ResourceLocation getEntityType() {
+    public ResourceLocation getEntityTypeName() {
         return entityType;
+    }
+
+    public EntityType<?> getEntityType() {
+        return ENTITY_TYPES.getValue(entityType);
     }
 
     public CompoundTag getTag() {
@@ -138,6 +143,10 @@ public class FactionEntityType {
     }
 
     public int getWeight() {
+        return weight;
+    }
+
+    public int getSpawnWeight() {
         return weight;
     }
 
@@ -201,6 +210,10 @@ public class FactionEntityType {
         }
     }
 
+    public boolean canSpawnForDominion(int dominion) {
+        return dominion >= dominionToSpawn;
+    }
+
     public List<FactionEntityRank> getRanks() {
         return ranks;
     }
@@ -228,10 +241,12 @@ public class FactionEntityType {
         return getSpawnedRange().getMax() * Mth.ceil((totalSpawned+1) / (float) getMaxSpawnedPerX());
     }
 
+    public void convertEntity(Faction faction, Entity entity){
+    }
+
     public Entity createEntity(ServerLevel level, Faction faction, BlockPos spawnBlockPos, boolean bannerHolder, FactionEntityRank rank, MobSpawnType spawnReason) {
-        EntityType<?> entityType = ENTITY_TYPES.getValue(this.getEntityType());
         Entity entity;
-        entity = entityType.create(level);
+        entity = getEntityType().create(level);
         if (entity == null) {
             return null;
         }
@@ -278,4 +293,7 @@ public class FactionEntityType {
         return LegacyFactionEntityTypeLoader.saveStatic(this, compoundNbt);
     }
 
+    public MobSpawnSettings.SpawnerData toSpawnerData() {
+        return new MobSpawnSettings.SpawnerData(getEntityType(), weight, 1, 1);
+    }
 }

@@ -68,7 +68,7 @@ public class LegacyFactionEntityTypeLoader {
         if (factionEntityType != null) {
             compoundNbt.putString("factionEntityType", factionEntityTypeResource.toString());
         } else {
-            compoundNbt.putString("entityType", factionEntityType.getEntityType().toString());
+            compoundNbt.putString("entityType", factionEntityType.getEntityTypeName().toString());
             compoundNbt.put("tag", factionEntityType.getTag());
             compoundNbt.putInt("weight", factionEntityType.getWeight());
             compoundNbt.putInt("strength", factionEntityType.getStrength());
