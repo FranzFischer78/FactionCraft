@@ -242,6 +242,9 @@ public class FactionEntityType {
     }
 
     public void convertEntity(Faction faction, Entity entity){
+        if(entity.level instanceof ServerLevel serverLevel) {
+            updateEntity(serverLevel, faction, entity.blockPosition(), false, ranks.get(0), entity);
+        }
     }
 
     public Entity createEntity(ServerLevel level, Faction faction, BlockPos spawnBlockPos, boolean bannerHolder, FactionEntityRank rank, MobSpawnType spawnReason) {
@@ -252,11 +255,21 @@ public class FactionEntityType {
         }
         entity.moveTo(spawnBlockPos.getX() + 0.5D, spawnBlockPos.getY() + 1.0D, spawnBlockPos.getZ() + 0.5D, entity.getYRot(), entity.getXRot());
         if (entity instanceof Mob mobEntity) {
+            if (net.minecraftforge.common.ForgeHooks.canEntitySpawn(mobEntity, level, spawnBlockPos.getX(), spawnBlockPos.getY(), spawnBlockPos.getZ(), null, spawnReason) == -1) {
+                return null;
+            }
+        }
+        updateEntity(level, faction, spawnBlockPos, bannerHolder, rank, entity);
+
+        level.addFreshEntityWithPassengers(entity.getRootVehicle());
+        return entity;
+    }
+
+    private void updateEntity(ServerLevel level, Faction faction, BlockPos spawnBlockPos, boolean bannerHolder, FactionEntityRank rank, Entity entity) {
+        if (entity instanceof Mob mobEntity) {
             if (bannerHolder) {
                 faction.makeBannerHolder(mobEntity);
             }
-            if (net.minecraftforge.common.ForgeHooks.canEntitySpawn(mobEntity, level, spawnBlockPos.getX(), spawnBlockPos.getY(), spawnBlockPos.getZ(), null, spawnReason) == -1)
-                return null;
             if(tagFirst) mergeTag(entity, this.getTag());
             if(shouldFinalizeSpawn)  mobEntity.finalizeSpawn(level, level.getCurrentDifficultyAt(spawnBlockPos), MobSpawnType.EVENT, null, null);
             if(!tagFirst) mergeTag(entity, this.getTag());
@@ -276,9 +289,6 @@ public class FactionEntityType {
                         cap.setFactionEntityRank(rank);
                     }
                 });
-
-        level.addFreshEntityWithPassengers(entity.getRootVehicle());
-        return entity;
     }
 
     private void mergeTag(Entity entity, CompoundTag tag) {
