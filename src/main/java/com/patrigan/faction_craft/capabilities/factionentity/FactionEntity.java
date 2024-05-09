@@ -144,12 +144,29 @@ public class FactionEntity implements INBTSerializable<CompoundTag> {
 
     public void tick(){
         if(entity.level.isClientSide) return;
-        if(faction != null && !faction.equals(Faction.GAIA) && entity.tickCount % 100 == 0 && entity.getRandom().nextFloat() < 1F) {
+        if(faction != null && !faction.equals(Faction.GAIA) && entity.tickCount % 2400 == 0 && entity.getRandom().nextFloat() < getChanceForGrade(factionEntityRank.getGrade())) {
             entity.level.getCapability((DOMINION_CAPABILITY)).ifPresent(dominion -> {
                 if(faction != null && factionEntityRank.getGrade() > 0) {
                     dominion.adjust(entity.level, new ChunkPos(entity.blockPosition()), faction, 1);
                 }
             });
+        }
+    }
+
+    private float getChanceForGrade(int grade) {
+        switch (grade) {
+            case 0:
+                return 0;
+            case 1:
+                return (float) (FactionCraftConfig.AVERAGE_DOMINION_DAY_GRADE_1.get() / 10f);
+            case 2:
+                return (float) (FactionCraftConfig.AVERAGE_DOMINION_DAY_GRADE_2.get() / 10f);
+            case 3:
+                return (float) (FactionCraftConfig.AVERAGE_DOMINION_DAY_GRADE_3.get() / 10f);
+            case 4:
+                return (float) (FactionCraftConfig.AVERAGE_DOMINION_DAY_GRADE_4.get() / 10f);
+            default:
+                return (float) (FactionCraftConfig.AVERAGE_DOMINION_DAY_GRADE_5.get() / 10f);
         }
     }
 

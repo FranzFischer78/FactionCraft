@@ -67,6 +67,11 @@ public class FactionCraftConfig {
     public static ForgeConfigSpec.ConfigValue<Boolean> ENABLE_DIGGER_AI;
 
     public static ForgeConfigSpec.ConfigValue<Boolean> ENABLE_DOMINION;
+    public static ForgeConfigSpec.ConfigValue<Double> AVERAGE_DOMINION_DAY_GRADE_1;
+    public static ForgeConfigSpec.ConfigValue<Double> AVERAGE_DOMINION_DAY_GRADE_2;
+    public static ForgeConfigSpec.ConfigValue<Double> AVERAGE_DOMINION_DAY_GRADE_3;
+    public static ForgeConfigSpec.ConfigValue<Double> AVERAGE_DOMINION_DAY_GRADE_4;
+    public static ForgeConfigSpec.ConfigValue<Double> AVERAGE_DOMINION_DAY_GRADE_5;
     public static ForgeConfigSpec.ConfigValue<Integer> PROPAGATE_FACTION_DOMINION_TRESHOLD;
     public static ForgeConfigSpec.ConfigValue<Integer> DOMINION_FACTION_SPAWN_TRESHOLD;
     public static ForgeConfigSpec.ConfigValue<Integer> DOMINION_SUPPRESS_GAIA_SPAWN_TRESHOLD;
@@ -327,6 +332,26 @@ public class FactionCraftConfig {
                     .comment("Enables Faction Dominion \n" +
                             "Default false")
                     .define("enableFactionDominion", false);
+            AVERAGE_DOMINION_DAY_GRADE_1 = builder
+                    .comment("The average dominion per day for grade 1. \n" +
+                            "Default 0.1")
+                    .defineInRange("averageDominionDayGrade1", 0.1, 0.0, 100.0);
+            AVERAGE_DOMINION_DAY_GRADE_2 = builder
+                    .comment("The average dominion per day for grade 2. \n" +
+                            "Default 1")
+                    .defineInRange("averageDominionDayGrade2", 1, 0.0, 100.0);
+            AVERAGE_DOMINION_DAY_GRADE_3 = builder
+                    .comment("The average dominion per day for grade 3. \n" +
+                            "Default 2")
+                    .defineInRange("averageDominionDayGrade3", 2, 0.0, 100.0);
+            AVERAGE_DOMINION_DAY_GRADE_4 = builder
+                    .comment("The average dominion per day for grade 4. \n" +
+                            "Default 3")
+                    .defineInRange("averageDominionDayGrade4", 3, 0.0, 100.0);
+            AVERAGE_DOMINION_DAY_GRADE_5 = builder
+                    .comment("The average dominion per day for grade 5. \n" +
+                            "Default 5")
+                    .defineInRange("averageDominionDayGrade5", 5, 0.0, 100.0);
             PROPAGATE_FACTION_DOMINION_TRESHOLD = builder
                     .comment("The treshold for faction dominion propagation. \n" +
                             "Default 50")
