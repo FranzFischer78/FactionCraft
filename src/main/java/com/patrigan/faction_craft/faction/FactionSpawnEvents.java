@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static com.patrigan.faction_craft.config.FactionCraftConfig.DOMINION_FACTION_SPAWN_TRESHOLD;
+import static com.patrigan.faction_craft.config.FactionCraftConfig.DOMINION_SUPPRESS_GAIA_SPAWN_TRESHOLD;
 
 @Mod.EventBusSubscriber(modid = FactionCraft.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class FactionSpawnEvents {
@@ -33,7 +34,9 @@ public class FactionSpawnEvents {
             Dominion dominion = DominionHelper.getCapability(level);
             ChunkDominion chunkDominion = dominion.getChunkDominion(new ChunkPos(event.getPos()));
             List<Faction> spawningFactions = getSpawningFactions(chunkDominion);
-
+            chunkDominion.getFactionDominions().values().stream().filter(dominionAmount -> dominionAmount > DOMINION_SUPPRESS_GAIA_SPAWN_TRESHOLD.get()).findFirst().ifPresent(dominionAmount -> {
+                event.getSpawnerDataList().forEach(event::removeSpawnerData);
+            });
             spawningFactions.forEach(faction -> {
                 int dominionAmount = chunkDominion.getFactionDominion(faction);
                 faction.getDominionSpawners(event.getLevel(), event.getPos(), dominionAmount).forEach(event::addSpawnerData);
