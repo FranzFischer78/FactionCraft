@@ -4,7 +4,7 @@
 #### Dominion
 The first big step to making Factions a living breathing thing is the dominion system. This system will allow factions to expand their territory. The system is still in its infancy, but it will be expanded upon in the future. Every 10 days, dominion is normalized to 100, so config options should be set with that in mind.
 - Config field to enable or disable the new faction system. Disabled by default while gathering player feedback.
-- Dominion now increases and decreases
+- Dominion now increases and decreases based on faction entity presence and activity
 - Dominion now propagates to nearby chunks
 - Config Field to set the treshold for propagation. only propagates when it is above that treshold. And propagation can only push until the receiving chunk is right below that treshold. This limit is hard enforced to prevent infinite propagation. 
 
