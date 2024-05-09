@@ -63,7 +63,7 @@ public class ChunkDominion {
         Map<ResourceLocation, Integer> factionsWithDominion = factionDominions.entrySet().stream().filter(entry -> entry.getValue() > FactionCraftConfig.PROPAGATE_FACTION_DOMINION_TRESHOLD.get()).filter(entry -> !entry.equals(GAIA.getName())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         for(Map.Entry<ResourceLocation, Integer> entry : factionsWithDominion.entrySet()) {
             for(ChunkDominion neighbourDominion : DominionHelper.getCapability(level).getNeighbourDominions(chunkPos)) {
-                if(neighbourDominion.GetFactionDominion(entry.getKey()) < FactionCraftConfig.PROPAGATE_FACTION_DOMINION_TRESHOLD.get()) {
+                if(neighbourDominion.getFactionDominion(entry.getKey()) < FactionCraftConfig.PROPAGATE_FACTION_DOMINION_TRESHOLD.get()) {
                     neighbourDominion.adjust(level, chunkPos, Factions.getFaction(entry.getKey()), 1);
                 }
             }
@@ -71,11 +71,11 @@ public class ChunkDominion {
     }
 
     public int getFactionDominion(Faction faction) {
-        return factionDominions.get(faction.getName());
+        return getFactionDominion(faction.getName());
     }
 
-    public int GetFactionDominion(ResourceLocation key) {
-        return factionDominions.get(key);
+    public int getFactionDominion(ResourceLocation key) {
+        return factionDominions.getOrDefault(key, 0);
     }
 
     private void normalize(Level level) {

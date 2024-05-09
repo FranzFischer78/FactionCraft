@@ -52,22 +52,20 @@ public class FactionSpawnEvents {
     }
 
     @SubscribeEvent
-    public static void onEntityJoinLevelEvent(EntityJoinLevelEvent event){
+    public static void onEntityJoinLevelEvent(EntityJoinLevelEvent event) {
         if (event.getEntity().level.isClientSide() || event.loadedFromDisk()) return;
         if (event.getEntity() instanceof net.minecraft.world.entity.Mob mob) {
             FactionEntity factionEntity = FactionEntityHelper.getFactionEntityCapability(mob);
-            if (FactionCraftConfig.ENABLE_DEFAULT_FACTION.get()) {
-                if (factionEntity.getFaction() == null || factionEntity.getFaction() == Faction.GAIA) {
-                    Dominion dominion = DominionHelper.getCapability(event.getLevel());
-                    ChunkDominion chunkDominion = dominion.getChunkDominion(new ChunkPos(event.getEntity().blockPosition()));
-                    List<Faction> spawningFactions = getSpawningFactions(chunkDominion);
-                    List<WeightedEntry.Wrapper<Consumer<Entity>>> factionEntityConverters = spawningFactions.stream()
-                            .flatMap(faction -> getWeightedEntries(faction, event.getLevel(), event.getEntity().blockPosition(), chunkDominion.getFactionDominion(faction)).stream())
-                            .toList();
-                    WeightedRandom.getRandomItem(event.getLevel().getRandom(), factionEntityConverters).ifPresent(wrapper -> {
-                        wrapper.getData().accept(event.getEntity());
-                    });
-                }
+            if (factionEntity.getFaction() == null || factionEntity.getFaction() == Faction.GAIA) {
+                Dominion dominion = DominionHelper.getCapability(event.getLevel());
+                ChunkDominion chunkDominion = dominion.getChunkDominion(new ChunkPos(event.getEntity().blockPosition()));
+                List<Faction> spawningFactions = getSpawningFactions(chunkDominion);
+                List<WeightedEntry.Wrapper<Consumer<Entity>>> factionEntityConverters = spawningFactions.stream()
+                        .flatMap(faction -> getWeightedEntries(faction, event.getLevel(), event.getEntity().blockPosition(), chunkDominion.getFactionDominion(faction)).stream())
+                        .toList();
+                WeightedRandom.getRandomItem(event.getLevel().getRandom(), factionEntityConverters).ifPresent(wrapper -> {
+                    wrapper.getData().accept(event.getEntity());
+                });
             }
         }
     }

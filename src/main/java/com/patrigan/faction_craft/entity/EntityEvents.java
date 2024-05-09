@@ -1,5 +1,7 @@
 package com.patrigan.faction_craft.entity;
 
+import com.patrigan.faction_craft.capabilities.dominion.ChunkDominion;
+import com.patrigan.faction_craft.capabilities.dominion.DominionHelper;
 import com.patrigan.faction_craft.capabilities.factionentity.FactionEntity;
 import com.patrigan.faction_craft.capabilities.factionentity.FactionEntityHelper;
 import com.patrigan.faction_craft.capabilities.patroller.Patroller;
@@ -55,7 +57,11 @@ public class EntityEvents {
             FactionEntity factionEntity = FactionEntityHelper.getFactionEntityCapability(mob);
             if (FactionCraftConfig.ENABLE_DEFAULT_FACTION.get()) {
                 if (factionEntity.getFaction() == null || factionEntity.getFaction() == Faction.GAIA) {
-                    List<Faction> factions = Factions.getFactionData().values().stream().filter(faction -> faction.getDefaultEntities().contains(entity.getType())).toList();
+                    ChunkDominion chunkDominion = DominionHelper.getCapability(event.getLevel()).getChunkDominion(new ChunkPos(mob.blockPosition()));
+                    List<Faction> factions = Factions.getFactionData().values().stream()
+                            .filter(faction -> faction.getDefaultEntities().contains(entity.getType()))
+                            .filter(faction -> !FactionCraftConfig.ENABLE_DOMINION.get() || chunkDominion.getFactionDominion(faction) > FactionCraftConfig.DOMINION_DEFAULT_ENTITY_TRESHOLD.get())
+                            .toList();
                     if (!factions.isEmpty()) {
                         RandomSource randomSource = RandomSource.create(new ChunkPos(mob.blockPosition()).toLong());
                         factionEntity.setFaction(factions.get(randomSource.nextInt(factions.size())));
