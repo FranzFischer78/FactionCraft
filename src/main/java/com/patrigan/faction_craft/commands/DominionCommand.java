@@ -4,11 +4,13 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.patrigan.faction_craft.FactionCraft;
 import com.patrigan.faction_craft.capabilities.dominion.AreaDominion;
 import com.patrigan.faction_craft.capabilities.dominion.AreaPos;
 import com.patrigan.faction_craft.capabilities.dominion.Dominion;
 import com.patrigan.faction_craft.capabilities.dominion.DominionHelper;
 import com.patrigan.faction_craft.commands.arguments.FactionArgument;
+import com.patrigan.faction_craft.config.FactionCraftConfig;
 import com.patrigan.faction_craft.faction.Faction;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -45,6 +47,10 @@ public class DominionCommand {
     }
 
     private static int getDominion(CommandSourceStack source, BlockPos blockPos) {
+        if(FactionCraftConfig.ENABLE_DOMINION.get() == false) {
+            source.sendSuccess(Component.translatable("commands.dominion.disabled"), true);
+            return 0;
+        }
         ServerLevel level = source.getLevel();
         Dominion dominion = DominionHelper.getCapability(level);
         AreaPos areaPos = new AreaPos(blockPos);
@@ -59,6 +65,10 @@ public class DominionCommand {
     }
 
     private static int adjustDominion(CommandSourceStack source, Faction faction, int adjustment, BlockPos blockPos) {
+        if(FactionCraftConfig.ENABLE_DOMINION.get() == false) {
+            source.sendSuccess(Component.translatable("commands.dominion.disabled"), true);
+            return 0;
+        }
         ServerLevel level = source.getLevel();
         Dominion dominion = DominionHelper.getCapability(level);
         AreaPos areaPos = new AreaPos(blockPos);

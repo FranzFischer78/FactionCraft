@@ -17,6 +17,7 @@
   "commands.factionsummon.success": "Spawned a faction entity at %s",
   "commands.argument.factionEntityTypeNotFound": "Faction Entity Type is not known." ,
   "commands.argument.factionNotFound": "Faction is not known.",
+  "commands.dominion.disabled": "Dominion is currently disabled in the config",
   "commands.dominion.factions": "Factions in the chunk dominion: %s",
   "commands.dominion.no_faction": "No factions have dominion in the area",
   "commands.dominion.adjusted": "Adjusted the dominion for faction %s by %s",

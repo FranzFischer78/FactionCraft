@@ -56,4 +56,7 @@ public class AreaPos {
     public int hashCode() {
         return Objects.hash(x, z);
     }
+    public String toString() {
+        return "[" + this.x + ", " + this.z + "]";
+    }
 }
