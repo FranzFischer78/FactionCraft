@@ -14,6 +14,8 @@ As part of dominion, various things can happen that affect the world, like entit
 - Config field added to set the minimum dominion to allow for default entities to be assigned to a faction.
 - Config field added to set the minimum dominion to allow for dominion entities to spawn naturally.
 - Config field added to set the minimum dominion to suppress the spawning of normal (GAIA) entities.
+
+A new subcommand has also been added to the dominion command. You cna now adjust the dominion of a specific faction.
 ## [1.19.2-1.3.7] 2024-XX-XX
 ### Minor Features
 - New dominion command, shows dominion in a chunk. To be used at a later version when Dominion is fully introduced
