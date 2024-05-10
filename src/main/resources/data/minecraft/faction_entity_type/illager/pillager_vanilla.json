@@ -3,6 +3,7 @@
   "weight": 100,
   "strength": 6,
   "ranks": ["soldier","captain", "general", "leader"],
+  "dominion_to_spawn": 50,
   "boosts": {
     "rarity_overrides": [
       {

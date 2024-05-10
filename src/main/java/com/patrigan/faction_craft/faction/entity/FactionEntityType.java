@@ -242,7 +242,7 @@ public class FactionEntityType {
     }
 
     public void convertEntity(Faction faction, Entity entity){
-        if(entity.level instanceof ServerLevel serverLevel) {
+        if(entity.level instanceof ServerLevel serverLevel && entity.getType().equals(getEntityType())){
             updateEntity(serverLevel, faction, entity.blockPosition(), false, ranks.get(0), entity);
         }
     }

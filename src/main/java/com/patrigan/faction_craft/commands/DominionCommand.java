@@ -1,12 +1,14 @@
 package com.patrigan.faction_craft.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.patrigan.faction_craft.capabilities.ModCapabilities;
 import com.patrigan.faction_craft.capabilities.dominion.ChunkDominion;
 import com.patrigan.faction_craft.capabilities.dominion.Dominion;
+import com.patrigan.faction_craft.capabilities.dominion.DominionHelper;
 import com.patrigan.faction_craft.capabilities.raidmanager.RaidManager;
 import com.patrigan.faction_craft.capabilities.raidmanager.RaidManagerHelper;
 import com.patrigan.faction_craft.commands.arguments.FactionArgument;
@@ -22,6 +24,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -33,9 +36,16 @@ public class DominionCommand {
                 = Commands.literal("dominion")
                 .requires(commandSource -> commandSource.hasPermission(2))
                 .then(Commands.literal("get").executes(sourceCommandContext ->
-                    getDominion(sourceCommandContext.getSource())
+                        getDominion(sourceCommandContext.getSource())
                 ).then(Commands.argument("location", BlockPosArgument.blockPos()).executes(sourceCommandContext ->
-                    getDominion(sourceCommandContext.getSource(), BlockPosArgument.getLoadedBlockPos(sourceCommandContext, "location")))));
+                        getDominion(sourceCommandContext.getSource(), BlockPosArgument.getLoadedBlockPos(sourceCommandContext, "location"))
+                )))
+                .then(Commands.literal("adjust").then(Commands.argument("faction", FactionArgument.factions()).executes(sourceCommandContext ->
+                        adjustDominion(sourceCommandContext.getSource(), FactionArgument.getFaction(sourceCommandContext, "faction"), 1, new BlockPos(sourceCommandContext.getSource().getPosition()))
+                ).then(Commands.argument("adjustment", IntegerArgumentType.integer()).executes(sourceCommandContext ->
+                        adjustDominion(sourceCommandContext.getSource(), FactionArgument.getFaction(sourceCommandContext, "faction"), IntegerArgumentType.getInteger(sourceCommandContext, "adjustment"), new BlockPos(sourceCommandContext.getSource().getPosition()))
+                ).then(Commands.argument("location", BlockPosArgument.blockPos()).executes(sourceCommandContext ->
+                        adjustDominion(sourceCommandContext.getSource(), FactionArgument.getFaction(sourceCommandContext, "faction"), IntegerArgumentType.getInteger(sourceCommandContext, "adjustment"), BlockPosArgument.getLoadedBlockPos(sourceCommandContext, "location")))))));
 
         dispatcher.register(dominionCommand);
     }
@@ -46,28 +56,26 @@ public class DominionCommand {
     }
 
     private static int getDominion(CommandSourceStack source, BlockPos blockPos) {
-        // Get the ServerLevel
         ServerLevel level = source.getLevel();
-        // Get the Dominion Capability of the level
-        Optional<Dominion> dominionOptional = level.getCapability(ModCapabilities.DOMINION_CAPABILITY).resolve();
-        if (dominionOptional.isPresent()) {
-            Dominion dominion = dominionOptional.get();
-            // Get the ChunkPos of the block
-            ChunkPos chunkPos = new ChunkPos(blockPos);
-            // Get the ChunkDominion of the block
-            ChunkDominion chunkDominion = dominion.getChunkDominion(chunkPos);
-            // If the ChunkDominion is not null
-            if (chunkDominion != null) {
-                // Send a message to the player with the Factions in the Chunk
-                source.sendSuccess(Component.translatable("commands.dominion.factions", chunkDominion.getFactionDominions()), true);
-                return 1;
-            } else {
-                // Send a message to the player that there is no Faction in the Chunk
-                source.sendSuccess(Component.translatable("commands.dominion.no_faction"), true);
-                return 0;
-            }
+        Dominion dominion = DominionHelper.getCapability(level);
+        ChunkPos chunkPos = new ChunkPos(blockPos);
+        ChunkDominion chunkDominion = dominion.getChunkDominion(chunkPos);
+        if (chunkDominion != null) {
+            source.sendSuccess(Component.translatable("commands.dominion.factions", chunkDominion.getFactionDominions()), true);
+            return 1;
+        } else {
+            source.sendSuccess(Component.translatable("commands.dominion.no_faction"), true);
+            return 0;
         }
-        return 0;
+    }
+
+    private static int adjustDominion(CommandSourceStack source, Faction faction, int adjustment, BlockPos blockPos) {
+        ServerLevel level = source.getLevel();
+        Dominion dominion = DominionHelper.getCapability(level);
+        ChunkPos chunkPos = new ChunkPos(blockPos);
+        dominion.adjust(level, chunkPos, faction, adjustment);
+        source.sendSuccess(Component.translatable("commands.dominion.adjusted", adjustment, faction.getName(), blockPos), true);
+        return 1;
     }
 }
 

@@ -20,14 +20,8 @@ public class AttacherDominion {
     private static class DominionProvider implements ICapabilityProvider, INBTSerializable<CompoundTag> {
 
         public static final ResourceLocation IDENTIFIER = new ResourceLocation(MODID, "dominion");
-        private final Dominion backend;
-        private final LazyOptional<Dominion> optionalData;
-
-        public DominionProvider() {
-            backend = new Dominion();
-            optionalData = LazyOptional.of(() -> backend);
-        }
-
+        private final Dominion backend = new Dominion();
+        private final LazyOptional<Dominion> optionalData = LazyOptional.of(() -> backend);
 
         @Override
         public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> cap, Direction side) {

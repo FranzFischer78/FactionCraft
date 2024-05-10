@@ -18,6 +18,8 @@
   "commands.argument.factionEntityTypeNotFound": "Faction Entity Type is not known." ,
   "commands.argument.factionNotFound": "Faction is not known.",
   "commands.dominion.factions": "Factions in the chunk dominion: %s",
+  "commands.dominion.noFactions": "No factions in the chunk dominion",
+  "commands.dominion.adjusted": "Adjusted the dominion for faction %s by %s",
 
   "effect.faction_craft.faction_bad_omen": "Bad Omen",
   "event.faction_craft.battle": "Faction Battle",

@@ -2,21 +2,26 @@ package com.patrigan.faction_craft.capabilities.dominion;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.patrigan.faction_craft.boost.Boost;
 import com.patrigan.faction_craft.config.FactionCraftConfig;
 import com.patrigan.faction_craft.faction.Faction;
 import com.patrigan.faction_craft.registry.Factions;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.util.INBTSerializable;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.patrigan.faction_craft.capabilities.ModCapabilities.APPLIED_BOOSTS_CAPABILITY;
 import static com.patrigan.faction_craft.faction.Faction.GAIA;
 import static com.patrigan.faction_craft.faction.Faction.VILLAGE_NAME;
 
-public class ChunkDominion {
+public class ChunkDominion implements INBTSerializable<CompoundTag> {
 
     public static final Codec<ChunkDominion> CODEC = RecordCodecBuilder.create(builder ->
             builder.group(
@@ -103,5 +108,27 @@ public class ChunkDominion {
                 return v + factionDominions.get(VILLAGE_NAME);
             });
         }
+    }
+
+    @Override
+    public CompoundTag serializeNBT() {
+        CompoundTag tag = new CompoundTag();
+        ListTag list = new ListTag();
+        factionDominions.forEach((key, value) -> {
+            CompoundTag entry = new CompoundTag();
+            entry.putString("faction", key.toString());
+            entry.putInt("dominion", value);
+            list.add(entry);
+        });
+        return tag;
+    }
+
+    @Override
+    public void deserializeNBT(CompoundTag tag) {
+        ListTag list = tag.getList("faction_dominions", 10);
+        list.forEach(inbt -> {
+            CompoundTag entry = (CompoundTag) inbt;
+            factionDominions.put(new ResourceLocation(entry.getString("faction")), entry.getInt("dominion"));
+        });
     }
 }

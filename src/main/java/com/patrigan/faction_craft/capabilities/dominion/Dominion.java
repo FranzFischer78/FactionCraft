@@ -5,12 +5,14 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.patrigan.faction_craft.FactionCraft;
+import com.patrigan.faction_craft.capabilities.playerfactions.PlayerFactions;
 import com.patrigan.faction_craft.config.FactionCraftConfig;
 import com.patrigan.faction_craft.data.CodecHelper;
 import com.patrigan.faction_craft.faction.Faction;
 import com.patrigan.faction_craft.faction.relations.FactionRelation;
 import com.patrigan.faction_craft.registry.Factions;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ChunkPos;
@@ -54,18 +56,31 @@ public class Dominion implements INBTSerializable<CompoundTag> {
     @Override
     public CompoundTag serializeNBT() {
         CompoundTag compoundTag = new CompoundTag();
-        CODEC.encodeStart(NbtOps.INSTANCE, this).resultOrPartial(FactionCraft.LOGGER::error).ifPresent((p_216906_) -> {
-            compoundTag.put("ChunkDominions", p_216906_);
-        });
+        ListTag list = new ListTag();
+        list.addAll(this.getChunkDominions().entrySet().stream().map(entry -> {
+            CompoundTag chunkDominionTag = new CompoundTag();
+            chunkDominionTag.put("ChunkPos", CodecHelper.CHUNKPOS_CODEC.encodeStart(NbtOps.INSTANCE, entry.getKey()).result().orElseThrow(RuntimeException::new));
+            chunkDominionTag.put("ChunkDominion", entry.getValue().serializeNBT());
+            return chunkDominionTag;
+        }).toList());
+        compoundTag.put("ChunkDominions", list);
         return compoundTag;
     }
 
     @Override
     public void deserializeNBT(CompoundTag pCompound) {
-        if (pCompound.contains("ChunkDominions", 10)) {
-            DataResult<Dominion> dataresult = Dominion.CODEC.parse(new Dynamic<>(NbtOps.INSTANCE, pCompound.get("ChunkDominions")));
-            dataresult.resultOrPartial(FactionCraft.LOGGER::error).ifPresent(dominion -> this.setChunkDominions(dominion.getChunkDominions()));
-        }
+        ListTag list = pCompound.getList("ChunkDominions", 10);
+        this.setChunkDominions(list.stream().map(inbt -> {
+            CompoundTag chunkDominionTag = (CompoundTag) inbt;
+            DataResult<ChunkPos> dataresult = CodecHelper.CHUNKPOS_CODEC.parse(new Dynamic<>(NbtOps.INSTANCE, chunkDominionTag.get("ChunkPos")));
+            ChunkPos chunkPos = new ChunkPos(0, 0);
+            if(dataresult.resultOrPartial(FactionCraft.LOGGER::error).isPresent()){
+                chunkPos = dataresult.resultOrPartial(FactionCraft.LOGGER::error).get();
+            }
+            ChunkDominion chunkDominion = new ChunkDominion(chunkPos);
+            chunkDominion.deserializeNBT(chunkDominionTag.getCompound("ChunkDominion"));
+            return new HashMap.SimpleEntry<>(chunkPos, chunkDominion);
+        }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
     }
 
     public void initChunkDominion(ChunkAccess chunk) {
