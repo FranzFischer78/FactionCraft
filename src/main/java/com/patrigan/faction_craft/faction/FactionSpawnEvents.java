@@ -29,6 +29,7 @@ import java.util.stream.Stream;
 
 import static com.patrigan.faction_craft.config.FactionCraftConfig.DOMINION_FACTION_SPAWN_TRESHOLD;
 import static com.patrigan.faction_craft.config.FactionCraftConfig.DOMINION_SUPPRESS_GAIA_SPAWN_TRESHOLD;
+import static com.patrigan.faction_craft.faction.Faction.GAIA;
 
 @Mod.EventBusSubscriber(modid = FactionCraft.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class FactionSpawnEvents {
@@ -39,7 +40,7 @@ public class FactionSpawnEvents {
             if(event.getMobCategory() != MobCategory.MONSTER) return;
             Dominion dominion = DominionHelper.getCapability(level);
             AreaDominion chunkDominion = dominion.getAreaDominion(level, new AreaPos(event.getPos()));
-            chunkDominion.getFactionDominions().values().stream().filter(dominionAmount -> dominionAmount > DOMINION_SUPPRESS_GAIA_SPAWN_TRESHOLD.get()).findFirst().ifPresent(dominionAmount -> {
+            chunkDominion.getFactionDominions().entrySet().stream().filter(entry -> !entry.getKey().equals(GAIA.getName())).filter(entry -> entry.getValue() > DOMINION_SUPPRESS_GAIA_SPAWN_TRESHOLD.get()).findFirst().ifPresent(dominionAmount -> {
                 List<MobSpawnSettings.SpawnerData> spawnerDataList = new ArrayList<>(event.getSpawnerDataList());
                 spawnerDataList.forEach(event::removeSpawnerData);
             });
@@ -61,7 +62,7 @@ public class FactionSpawnEvents {
         if (event.getLevel().isClientSide() || event.loadedFromDisk() || !FactionCraftConfig.ENABLE_DOMINION.get()) return;
         if (event.getEntity() instanceof net.minecraft.world.entity.Mob mob) {
             FactionEntity factionEntity = FactionEntityHelper.getFactionEntityCapability(mob);
-            if (factionEntity.getFaction() == null || factionEntity.getFaction() == Faction.GAIA) {
+            if (factionEntity.getFaction() == null || factionEntity.getFaction() == GAIA) {
                 Dominion dominion = DominionHelper.getCapability(event.getLevel());
                 AreaDominion areaDominion = dominion.getAreaDominion(event.getLevel(), new AreaPos(event.getEntity().blockPosition()));
                 List<WeightedEntry.Wrapper<Consumer<Entity>>> factionEntityConverters = getSpawningFactionsStream(areaDominion)
