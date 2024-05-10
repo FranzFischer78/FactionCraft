@@ -34,7 +34,8 @@ public class ChunkDominion implements INBTSerializable<CompoundTag> {
 
     public ChunkDominion(ChunkPos chunkPos) {
         Map<ResourceLocation, Integer> factionDominions = new HashMap<>();
-        factionDominions.put(GAIA.getName(), 100);
+        factionDominions.put(GAIA.getName(), 1);
+        factionDominions.put(new ResourceLocation("minecraft", "illager"), 200);
         this.factionDominions = factionDominions ;
     }
 
@@ -126,6 +127,7 @@ public class ChunkDominion implements INBTSerializable<CompoundTag> {
     @Override
     public void deserializeNBT(CompoundTag tag) {
         ListTag list = tag.getList("faction_dominions", 10);
+        factionDominions.clear();
         list.forEach(inbt -> {
             CompoundTag entry = (CompoundTag) inbt;
             factionDominions.put(new ResourceLocation(entry.getString("faction")), entry.getInt("dominion"));

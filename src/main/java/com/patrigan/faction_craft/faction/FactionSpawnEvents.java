@@ -12,15 +12,19 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.util.random.WeightedEntry;
 import net.minecraft.util.random.WeightedRandom;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import static com.patrigan.faction_craft.config.FactionCraftConfig.DOMINION_FACTION_SPAWN_TRESHOLD;
 import static com.patrigan.faction_craft.config.FactionCraftConfig.DOMINION_SUPPRESS_GAIA_SPAWN_TRESHOLD;
@@ -30,37 +34,36 @@ public class FactionSpawnEvents {
 
     @SubscribeEvent
     public static void addDominionSpawns(LevelEvent.PotentialSpawns event) {
-        if (!FactionCraftConfig.ENABLE_DOMINION.get() && event.getLevel() instanceof Level level) {
+        if (FactionCraftConfig.ENABLE_DOMINION.get() && event.getLevel() instanceof Level level) {
+            if(event.getMobCategory() != MobCategory.MONSTER) return;
             Dominion dominion = DominionHelper.getCapability(level);
             ChunkDominion chunkDominion = dominion.getChunkDominion(new ChunkPos(event.getPos()));
-            List<Faction> spawningFactions = getSpawningFactions(chunkDominion);
             chunkDominion.getFactionDominions().values().stream().filter(dominionAmount -> dominionAmount > DOMINION_SUPPRESS_GAIA_SPAWN_TRESHOLD.get()).findFirst().ifPresent(dominionAmount -> {
-                event.getSpawnerDataList().forEach(event::removeSpawnerData);
+                List<MobSpawnSettings.SpawnerData> spawnerDataList = new ArrayList<>(event.getSpawnerDataList());
+                spawnerDataList.forEach(event::removeSpawnerData);
             });
-            spawningFactions.forEach(faction -> {
+            getSpawningFactionsStream(chunkDominion).forEach(faction -> {
                 int dominionAmount = chunkDominion.getFactionDominion(faction);
                 faction.getDominionSpawners(event.getLevel(), event.getPos(), dominionAmount).forEach(event::addSpawnerData);
             });
         }
     }
 
-    private static List<Faction> getSpawningFactions(ChunkDominion chunkDominion) {
+    private static Stream<Faction> getSpawningFactionsStream(ChunkDominion chunkDominion) {
         return chunkDominion.getFactionDominions().entrySet().stream()
                 .filter(entry -> entry.getValue() > DOMINION_FACTION_SPAWN_TRESHOLD.get())
-                .map(entry -> Factions.getFaction(entry.getKey()))
-                .toList();
+                .map(entry -> Factions.getFaction(entry.getKey()));
     }
 
     @SubscribeEvent
     public static void onEntityJoinLevelEvent(EntityJoinLevelEvent event) {
-        if (event.getEntity().level.isClientSide() || event.loadedFromDisk()) return;
+        if (event.getEntity().level.isClientSide() || event.loadedFromDisk() || !FactionCraftConfig.ENABLE_DOMINION.get()) return;
         if (event.getEntity() instanceof net.minecraft.world.entity.Mob mob) {
             FactionEntity factionEntity = FactionEntityHelper.getFactionEntityCapability(mob);
             if (factionEntity.getFaction() == null || factionEntity.getFaction() == Faction.GAIA) {
                 Dominion dominion = DominionHelper.getCapability(event.getLevel());
                 ChunkDominion chunkDominion = dominion.getChunkDominion(new ChunkPos(event.getEntity().blockPosition()));
-                List<Faction> spawningFactions = getSpawningFactions(chunkDominion);
-                List<WeightedEntry.Wrapper<Consumer<Entity>>> factionEntityConverters = spawningFactions.stream()
+                List<WeightedEntry.Wrapper<Consumer<Entity>>> factionEntityConverters = getSpawningFactionsStream(chunkDominion)
                         .flatMap(faction -> getWeightedEntries(faction, event.getLevel(), event.getEntity().blockPosition(), chunkDominion.getFactionDominion(faction)).stream())
                         .toList();
                 WeightedRandom.getRandomItem(event.getLevel().getRandom(), factionEntityConverters).ifPresent(wrapper -> {

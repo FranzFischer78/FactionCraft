@@ -83,6 +83,7 @@ public class FactionEntityType {
     private final ResourceSet<Biome> biomeWhitelist;
     private final ResourceSet<Biome> biomeBlacklist;
     private final int dominionToSpawn;
+    private MobSpawnSettings.SpawnerData spawnerData;
 
     public FactionEntityType(ResourceLocation entityType, CompoundTag tag, boolean tagFirst, boolean shouldFinalizeSpawn, int weight, int strength, List<FactionEntityRank> ranks, EntityBoostConfig entityBoostConfig, IntRange waveRange, IntRange spawnedRange, int maxSpawnedPerX, IntRange omenRange, IntRange yRange, ResourceSet<Biome> biomeWhitelist, ResourceSet<Biome> biomeBlacklist, int dominionToSpawn) {
         this.entityType = entityType;
@@ -304,6 +305,8 @@ public class FactionEntityType {
     }
 
     public MobSpawnSettings.SpawnerData toSpawnerData() {
-        return new MobSpawnSettings.SpawnerData(getEntityType(), weight, 1, 1);
+        if(spawnerData != null) return spawnerData;
+        spawnerData = new MobSpawnSettings.SpawnerData(getEntityType(), weight, 1, 1);
+        return spawnerData;
     }
 }
