@@ -4,30 +4,19 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-import com.patrigan.faction_craft.capabilities.ModCapabilities;
 import com.patrigan.faction_craft.capabilities.dominion.AreaDominion;
 import com.patrigan.faction_craft.capabilities.dominion.AreaPos;
 import com.patrigan.faction_craft.capabilities.dominion.Dominion;
 import com.patrigan.faction_craft.capabilities.dominion.DominionHelper;
-import com.patrigan.faction_craft.capabilities.raidmanager.RaidManager;
-import com.patrigan.faction_craft.capabilities.raidmanager.RaidManagerHelper;
 import com.patrigan.faction_craft.commands.arguments.FactionArgument;
 import com.patrigan.faction_craft.faction.Faction;
-import com.patrigan.faction_craft.raid.Raid;
-import com.patrigan.faction_craft.raid.target.FactionBattleRaidTarget;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.phys.Vec3;
-
-import java.util.Arrays;
-import java.util.Optional;
 
 public class DominionCommand {
 
@@ -74,7 +63,7 @@ public class DominionCommand {
         Dominion dominion = DominionHelper.getCapability(level);
         AreaPos areaPos = new AreaPos(blockPos);
         dominion.adjust(level, areaPos, faction, adjustment);
-        source.sendSuccess(Component.translatable("commands.dominion.adjusted", adjustment, faction.getName(), blockPos), true);
+        source.sendSuccess(Component.translatable("commands.dominion.adjusted", faction.getName(), adjustment), true);
         return 1;
     }
 }

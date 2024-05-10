@@ -3,6 +3,7 @@
   "weight": 100,
   "strength": 4,
   "ranks": ["soldier","captain", "general", "leader"],
+  "dominion_to_spawn": 50,
   "boosts": {
     "mandatory": ["minecraft:special/leather_daylight_protection"],
     "rarity_overrides": [
