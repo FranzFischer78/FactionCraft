@@ -20,7 +20,7 @@ public class DominionEvents {
             Optional<Dominion> dominionOptional = serverLevel.getCapability(ModCapabilities.DOMINION_CAPABILITY).resolve();
             if (dominionOptional.isPresent()) {
                 Dominion dominion = dominionOptional.get();
-                dominion.initChunkDominion(event.getChunk());
+                dominion.initAreaDominion(serverLevel, new AreaPos(event.getChunk().getPos()));
             }
         }
     }

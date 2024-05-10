@@ -21,6 +21,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -119,11 +120,11 @@ public class Factions {
         return FACTION_DATA.getData().entrySet().stream().filter(entry -> entry.getValue().isActive()).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    private static Collection<Faction> getActiveFactions(ServerLevel level){
+    private static Collection<Faction> getActiveFactions(Level level){
         return FACTION_DATA.getData().values().stream().filter(faction -> faction.isActive(level)).collect(Collectors.toList());
     }
 
-    public static Faction getRandomFaction(ServerLevel level, RandomSource random, Predicate<Faction> predicate) {
+    public static Faction getRandomFaction(Level level, RandomSource random, Predicate<Faction> predicate) {
         List<Faction> possibleFactions = getActiveFactions(level).stream().filter(predicate).collect(Collectors.toList());
         return GeneralUtils.getRandomItem(possibleFactions, random);
     }

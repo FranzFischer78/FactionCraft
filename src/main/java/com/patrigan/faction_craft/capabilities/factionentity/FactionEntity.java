@@ -1,6 +1,7 @@
 package com.patrigan.faction_craft.capabilities.factionentity;
 
 
+import com.patrigan.faction_craft.capabilities.dominion.AreaPos;
 import com.patrigan.faction_craft.config.FactionCraftConfig;
 import com.patrigan.faction_craft.faction.Faction;
 import com.patrigan.faction_craft.faction.entity.FactionEntityRank;
@@ -147,7 +148,7 @@ public class FactionEntity implements INBTSerializable<CompoundTag> {
         if(faction != null && !faction.equals(Faction.GAIA) && entity.tickCount % 2400 == 0 && entity.getRandom().nextFloat() < getChanceForGrade(factionEntityRank.getGrade())) {
             entity.level.getCapability((DOMINION_CAPABILITY)).ifPresent(dominion -> {
                 if(faction != null && factionEntityRank.getGrade() > 0) {
-                    dominion.adjust(entity.level, new ChunkPos(entity.blockPosition()), faction, 1);
+                    dominion.adjust(entity.level, new AreaPos(entity.blockPosition()), faction, 1);
                 }
             });
         }
@@ -174,7 +175,7 @@ public class FactionEntity implements INBTSerializable<CompoundTag> {
         if(entity.level.isClientSide) return;
         entity.level.getCapability((DOMINION_CAPABILITY)).ifPresent(dominion -> {
             if (faction != null && !faction.equals(Faction.GAIA)) {
-                dominion.adjust(entity.level, new ChunkPos(entity.blockPosition()), faction, -factionEntityRank.getGrade());
+                dominion.adjust(entity.level, new AreaPos(entity.blockPosition()), faction, -factionEntityRank.getGrade());
             }
         });
     }

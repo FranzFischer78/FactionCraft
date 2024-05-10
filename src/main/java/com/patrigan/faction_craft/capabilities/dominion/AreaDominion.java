@@ -2,14 +2,13 @@ package com.patrigan.faction_craft.capabilities.dominion;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.patrigan.faction_craft.boost.Boost;
 import com.patrigan.faction_craft.config.FactionCraftConfig;
 import com.patrigan.faction_craft.faction.Faction;
 import com.patrigan.faction_craft.registry.Factions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.ChunkPos;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.INBTSerializable;
 
@@ -17,29 +16,40 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.patrigan.faction_craft.capabilities.ModCapabilities.APPLIED_BOOSTS_CAPABILITY;
 import static com.patrigan.faction_craft.faction.Faction.GAIA;
 import static com.patrigan.faction_craft.faction.Faction.VILLAGE_NAME;
 
-public class ChunkDominion implements INBTSerializable<CompoundTag> {
+public class AreaDominion implements INBTSerializable<CompoundTag> {
 
-    public static final Codec<ChunkDominion> CODEC = RecordCodecBuilder.create(builder ->
+    public static final Codec<AreaDominion> CODEC = RecordCodecBuilder.create(builder ->
             builder.group(
-                    Codec.unboundedMap(ResourceLocation.CODEC, Codec.INT).fieldOf("faction_dominions").forGetter(ChunkDominion::getFactionDominions),
-                    Codec.LONG.fieldOf("last_calibrate_tick").forGetter(ChunkDominion::getLastCalibrateTick)
-            ).apply(builder, ChunkDominion::new));
+                    Codec.unboundedMap(ResourceLocation.CODEC, Codec.INT).fieldOf("faction_dominions").forGetter(AreaDominion::getFactionDominions),
+                    Codec.LONG.fieldOf("last_calibrate_tick").forGetter(AreaDominion::getLastCalibrateTick)
+            ).apply(builder, AreaDominion::new));
 
     private final Map<ResourceLocation, Integer> factionDominions;
     private long lastCalibrateTick = 0;
 
-    public ChunkDominion(ChunkPos chunkPos) {
+    public AreaDominion(AreaPos areaPos) {
         Map<ResourceLocation, Integer> factionDominions = new HashMap<>();
-        factionDominions.put(GAIA.getName(), 1);
-        factionDominions.put(new ResourceLocation("minecraft", "illager"), 200);
+        RandomSource randomSource = RandomSource.create();
+        factionDominions.put(GAIA.getName(), 100);
+        this.factionDominions = factionDominions ;
+    }
+    public AreaDominion(Level level, AreaPos areaPos) {
+        Map<ResourceLocation, Integer> factionDominions = new HashMap<>();
+        RandomSource randomSource = RandomSource.create();
+        if(randomSource.nextFloat() <= 0.05F){
+            Faction randomFaction = Factions.getRandomFaction(level, randomSource, faction1 -> faction1.getRaidConfig().isEnabled());
+            factionDominions.put(GAIA.getName(), 1);
+            factionDominions.put(randomFaction.getName(), 100);
+        }else {
+            factionDominions.put(GAIA.getName(), 100);
+        }
         this.factionDominions = factionDominions ;
     }
 
-    public ChunkDominion(Map<ResourceLocation, Integer> factionDominions, long lastCalibrateTick) {
+    public AreaDominion(Map<ResourceLocation, Integer> factionDominions, long lastCalibrateTick) {
         this.factionDominions = factionDominions;
         this.lastCalibrateTick = lastCalibrateTick;
     }
@@ -52,25 +62,25 @@ public class ChunkDominion implements INBTSerializable<CompoundTag> {
         return lastCalibrateTick;
     }
 
-    public void adjust(Level level, ChunkPos chunkPos, Faction faction, int adjustment) {
+    public void adjust(Level level, AreaPos areaPos, Faction faction, int adjustment) {
         factionDominions.merge(faction.getName(), adjustment, Integer::sum);
-        update(level, chunkPos);
+        update(level, areaPos);
     }
 
-    private void update(Level level, ChunkPos chunkPos) {
+    private void update(Level level, AreaPos areaPos) {
         if(level.getGameTime() - lastCalibrateTick > 24000) {
             lastCalibrateTick = level.getGameTime();
-            propagate(level, chunkPos);
+            propagate(level, areaPos);
             normalize(level);
         }
     }
 
-    private void propagate(Level level, ChunkPos chunkPos) {
+    private void propagate(Level level, AreaPos areaPos) {
         Map<ResourceLocation, Integer> factionsWithDominion = factionDominions.entrySet().stream().filter(entry -> entry.getValue() > FactionCraftConfig.PROPAGATE_FACTION_DOMINION_TRESHOLD.get()).filter(entry -> !entry.equals(GAIA.getName())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         for(Map.Entry<ResourceLocation, Integer> entry : factionsWithDominion.entrySet()) {
-            for(ChunkDominion neighbourDominion : DominionHelper.getCapability(level).getNeighbourDominions(chunkPos)) {
+            for(AreaDominion neighbourDominion : DominionHelper.getCapability(level).getNeighbourDominions(level, areaPos)) {
                 if(neighbourDominion.getFactionDominion(entry.getKey()) < FactionCraftConfig.PROPAGATE_FACTION_DOMINION_TRESHOLD.get()) {
-                    neighbourDominion.adjust(level, chunkPos, Factions.getFaction(entry.getKey()), 1);
+                    neighbourDominion.adjust(level, areaPos, Factions.getFaction(entry.getKey()), 1);
                 }
             }
         }
@@ -121,6 +131,7 @@ public class ChunkDominion implements INBTSerializable<CompoundTag> {
             entry.putInt("dominion", value);
             list.add(entry);
         });
+        tag.put("faction_dominions", list);
         return tag;
     }
 

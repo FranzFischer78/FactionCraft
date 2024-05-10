@@ -6,7 +6,8 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.patrigan.faction_craft.capabilities.ModCapabilities;
-import com.patrigan.faction_craft.capabilities.dominion.ChunkDominion;
+import com.patrigan.faction_craft.capabilities.dominion.AreaDominion;
+import com.patrigan.faction_craft.capabilities.dominion.AreaPos;
 import com.patrigan.faction_craft.capabilities.dominion.Dominion;
 import com.patrigan.faction_craft.capabilities.dominion.DominionHelper;
 import com.patrigan.faction_craft.capabilities.raidmanager.RaidManager;
@@ -23,7 +24,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Arrays;
@@ -58,10 +58,10 @@ public class DominionCommand {
     private static int getDominion(CommandSourceStack source, BlockPos blockPos) {
         ServerLevel level = source.getLevel();
         Dominion dominion = DominionHelper.getCapability(level);
-        ChunkPos chunkPos = new ChunkPos(blockPos);
-        ChunkDominion chunkDominion = dominion.getChunkDominion(chunkPos);
-        if (chunkDominion != null) {
-            source.sendSuccess(Component.translatable("commands.dominion.factions", chunkDominion.getFactionDominions()), true);
+        AreaPos areaPos = new AreaPos(blockPos);
+        AreaDominion areaDominion = dominion.getAreaDominion(level, areaPos);
+        if (areaDominion != null) {
+            source.sendSuccess(Component.translatable("commands.dominion.factions", areaDominion.getFactionDominions()), true);
             return 1;
         } else {
             source.sendSuccess(Component.translatable("commands.dominion.no_faction"), true);
@@ -72,8 +72,8 @@ public class DominionCommand {
     private static int adjustDominion(CommandSourceStack source, Faction faction, int adjustment, BlockPos blockPos) {
         ServerLevel level = source.getLevel();
         Dominion dominion = DominionHelper.getCapability(level);
-        ChunkPos chunkPos = new ChunkPos(blockPos);
-        dominion.adjust(level, chunkPos, faction, adjustment);
+        AreaPos areaPos = new AreaPos(blockPos);
+        dominion.adjust(level, areaPos, faction, adjustment);
         source.sendSuccess(Component.translatable("commands.dominion.adjusted", adjustment, faction.getName(), blockPos), true);
         return 1;
     }
