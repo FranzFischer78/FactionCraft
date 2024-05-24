@@ -1,11 +1,11 @@
-package com.patrigan.faction_craft.util;
+package com.infamousmisadventures.factioncraft.util;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mojang.datafixers.util.Pair;
-import com.patrigan.faction_craft.entity.ai.brain.sensor.FactionSpecificSensor;
-import com.patrigan.faction_craft.mixin.BrainAccessor;
+import com.infamousmisadventures.factioncraft.entity.ai.brain.sensor.FactionSpecificSensor;
+import com.infamousmisadventures.factioncraft.mixin.BrainAccessor;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.Brain;

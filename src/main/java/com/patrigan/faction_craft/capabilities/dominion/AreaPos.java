@@ -1,4 +1,4 @@
-package com.patrigan.faction_craft.capabilities.dominion;
+package com.infamousmisadventures.factioncraft.capabilities.dominion;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.Util;

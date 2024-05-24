@@ -1,0 +1,114 @@
+package com.infamousmisadventures.factioncraft.faction;
+
+import com.infamousmisadventures.factioncraft.boost.Boost;
+import com.infamousmisadventures.factioncraft.boost.Boosts;
+import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntity;
+import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntityHelper;
+import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityType;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Mob;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static com.infamousmisadventures.factioncraft.util.GeneralUtils.getRandomItem;
+
+public class FactionBoostHelper {
+
+    public static int applyBoosts(int targetStrength, List<Mob> flatEntities, Faction faction, ServerLevel level) {
+        if(flatEntities.isEmpty()){
+            return 0;
+        }
+        switch(faction.getBoostConfig().getBoostDistributionType()){
+            case UNIFORM_ALL:
+                return applyUniformAll(targetStrength, flatEntities, level, faction);
+            case UNIFORM_TYPE:
+                return applyUniformType(targetStrength, flatEntities, level, faction);
+            case LEADER:
+            case STRONG_FAVOURED:
+            case WEAK_FAVOURED:
+            case RANDOM:
+            default:
+                return applyRandom(targetStrength, flatEntities, level, faction);
+        }
+    }
+
+    private static int applyUniformAll(int targetStrength, List<Mob> entities, ServerLevel level, Faction faction) {
+        int appliedStrength = 0;
+        RandomSource random = level.random;
+        while(appliedStrength+entities.size() <= targetStrength) {
+            Boost boost = Boosts.getRandomBoost(random, faction.getBoostConfig().getWhitelistBoosts(), faction.getBoostConfig().getBlacklistBoosts());
+            if(boost == null){
+                break;
+            }
+            Optional<Integer> reduce = entities.stream().map(boost::apply).reduce(Integer::sum);
+            if(reduce.isPresent()){
+                appliedStrength += reduce.get();
+            }
+        }
+        return appliedStrength;
+    }
+
+    private static int applyUniformType(int targetStrength, List<Mob> entities, ServerLevel level, Faction faction) {
+        int appliedStrength = 0;
+        RandomSource random = level.random;
+        Set<FactionEntityType> factionEntityTypes = entities.stream().map(mobEntity -> FactionEntityHelper.getFactionEntityCapability(mobEntity).getFactionEntityType()).collect(Collectors.toSet());
+        while(appliedStrength < targetStrength) {
+            FactionEntityType randomFactionEntityType = getRandomItem(new ArrayList<>(factionEntityTypes), random);
+            List<Mob> entitiesWithType = entities.stream().filter(mobEntity -> randomFactionEntityType.equals(FactionEntityHelper.getFactionEntityCapability(mobEntity).getFactionEntityType())).collect(Collectors.toList());
+            if(appliedStrength+entitiesWithType.size() > targetStrength){
+                break;
+            }
+            Mob randomEntity = entitiesWithType.get(0);
+            Boost boost = Boosts.getRandomBoostForEntity(random, randomEntity, getWhitelistBoosts(faction, randomFactionEntityType), getBlacklistBoosts(faction, randomFactionEntityType), getRarityOverrides(faction, randomFactionEntityType));
+            if(boost == null){
+                break;
+            }
+            Optional<Integer> reduce = entitiesWithType.stream().map(boost::apply).reduce(Integer::sum);
+            if(reduce.isPresent()){
+                appliedStrength += reduce.get();
+            }
+        }
+        return appliedStrength;
+    }
+
+    private static int applyRandom(int targetStrength, List<Mob> entities, ServerLevel level, Faction faction) {
+        int appliedStrength = 0;
+        RandomSource random = level.random;
+        while(appliedStrength < targetStrength) {
+            Mob randomEntity = getRandomItem(entities, random);
+            FactionEntity cap = FactionEntityHelper.getFactionEntityCapability(randomEntity);
+            FactionEntityType factionEntityType = cap.getFactionEntityType();
+            Boost boost = Boosts.getRandomBoostForEntity(random, randomEntity, getWhitelistBoosts(faction, factionEntityType), getBlacklistBoosts(faction, factionEntityType), getRarityOverrides(faction, factionEntityType));
+            if(boost == null){
+                break;
+            }
+            appliedStrength += boost.apply(randomEntity);
+        }
+        return appliedStrength;
+    }
+
+
+
+    public static List<Boost> getWhitelistBoosts(Faction faction, FactionEntityType factionEntityType){
+        List<Boost> resultList = new ArrayList<>();
+        resultList.addAll(faction.getBoostConfig().getWhitelistBoosts());
+        resultList.addAll(factionEntityType.getBoostConfig().getWhitelistBoosts());
+        return resultList;
+    }
+
+    public static List<Boost> getBlacklistBoosts(Faction faction, FactionEntityType factionEntityType){
+        List<Boost> resultList = new ArrayList<>();
+        resultList.addAll(faction.getBoostConfig().getBlacklistBoosts());
+        resultList.addAll(factionEntityType.getBoostConfig().getBlacklistBoosts());
+        return resultList;
+    }
+
+    public static Map<Boost, Boost.Rarity> getRarityOverrides(Faction faction, FactionEntityType factionEntityType){
+        Map<Boost, Boost.Rarity> resultMap = new HashMap<>();
+        resultMap.putAll(faction.getBoostConfig().getRarityOverrides());
+        resultMap.putAll(factionEntityType.getBoostConfig().getRarityOverrides());
+        return resultMap;
+    }
+}

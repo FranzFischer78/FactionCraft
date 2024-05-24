@@ -1,8 +1,8 @@
-package com.patrigan.faction_craft.compat;
+package com.infamousmisadventures.factioncraft.compat;
 
-import com.patrigan.faction_craft.capabilities.raider.Raider;
-import com.patrigan.faction_craft.capabilities.raider.RaiderHelper;
-import com.patrigan.faction_craft.event.CalculateStrengthEvent;
+import com.infamousmisadventures.factioncraft.capabilities.raider.Raider;
+import com.infamousmisadventures.factioncraft.capabilities.raider.RaiderHelper;
+import com.infamousmisadventures.factioncraft.event.CalculateStrengthEvent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -19,8 +19,8 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.function.Supplier;
 
-import static com.patrigan.faction_craft.FactionCraft.MODID;
-import static com.patrigan.faction_craft.config.FactionCraftConfig.VILLAGE_RAID_GUARD_VILLAGER_WEIGHT;
+import static com.infamousmisadventures.factioncraft.FactionCraft.MODID;
+import static com.infamousmisadventures.factioncraft.config.FactionCraftConfig.VILLAGE_RAID_GUARD_VILLAGER_WEIGHT;
 
 @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class GuardVillagerCompat {

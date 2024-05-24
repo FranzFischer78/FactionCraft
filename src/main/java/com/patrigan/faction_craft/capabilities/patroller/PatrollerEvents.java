@@ -1,11 +1,11 @@
-package com.patrigan.faction_craft.capabilities.patroller;
+package com.infamousmisadventures.factioncraft.capabilities.patroller;
 
-import com.patrigan.faction_craft.capabilities.factionentity.FactionEntity;
-import com.patrigan.faction_craft.capabilities.factionentity.FactionEntityHelper;
-import com.patrigan.faction_craft.capabilities.factioninteraction.FactionInteraction;
-import com.patrigan.faction_craft.capabilities.factioninteraction.FactionInteractionHelper;
-import com.patrigan.faction_craft.config.FactionCraftConfig;
-import com.patrigan.faction_craft.effect.ModMobEffects;
+import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntity;
+import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntityHelper;
+import com.infamousmisadventures.factioncraft.capabilities.factioninteraction.FactionInteraction;
+import com.infamousmisadventures.factioncraft.capabilities.factioninteraction.FactionInteractionHelper;
+import com.infamousmisadventures.factioncraft.config.FactionCraftConfig;
+import com.infamousmisadventures.factioncraft.effect.ModMobEffects;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
@@ -18,7 +18,7 @@ import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import static com.patrigan.faction_craft.FactionCraft.MODID;
+import static com.infamousmisadventures.factioncraft.FactionCraft.MODID;
 
 @Mod.EventBusSubscriber(modid = MODID)
 public class PatrollerEvents {

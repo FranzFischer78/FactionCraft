@@ -1,4 +1,4 @@
-package com.patrigan.faction_craft.commands;
+package com.infamousmisadventures.factioncraft.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.commands.CommandSourceStack;
@@ -6,7 +6,7 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import static com.patrigan.faction_craft.FactionCraft.MODID;
+import static com.infamousmisadventures.factioncraft.FactionCraft.MODID;
 
 @Mod.EventBusSubscriber(modid = MODID)
 public class CommandEvents {

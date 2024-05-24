@@ -1,9 +1,9 @@
-package com.patrigan.faction_craft.event;
+package com.infamousmisadventures.factioncraft.event;
 
-import com.patrigan.faction_craft.raid.Raid;
+import com.infamousmisadventures.factioncraft.raid.Raid;
 import net.minecraftforge.eventbus.api.Event;
 
-public abstract class FactionRaidEvent extends Event {
+public abstract class FactionRaidEvent {
 
         private final Raid raid;
 

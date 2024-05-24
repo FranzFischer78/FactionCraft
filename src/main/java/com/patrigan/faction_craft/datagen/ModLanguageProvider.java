@@ -1,6 +1,6 @@
-package com.patrigan.faction_craft.datagen;
+package com.infamousmisadventures.factioncraft.datagen;
 
-import com.patrigan.faction_craft.FactionCraft;
+import com.infamousmisadventures.factioncraft.FactionCraft;
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.common.data.LanguageProvider;
 

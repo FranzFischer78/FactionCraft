@@ -1,17 +1,17 @@
-package com.patrigan.faction_craft;
+package com.infamousmisadventures.factioncraft;
 
-import com.patrigan.faction_craft.registry.ModBlocks;
-import com.patrigan.faction_craft.registry.ModBlockEntityTypes;
-import com.patrigan.faction_craft.capabilities.ModCapabilities;
-import com.patrigan.faction_craft.commands.arguments.ModArgumentTypes;
-import com.patrigan.faction_craft.compat.GuardVillagerCompat;
-import com.patrigan.faction_craft.config.FactionCraftConfig;
-import com.patrigan.faction_craft.effect.ModMobEffects;
-import com.patrigan.faction_craft.entity.ai.brain.ModActivities;
-import com.patrigan.faction_craft.network.NetworkHandler;
-import com.patrigan.faction_craft.registry.ModMemoryModuleTypes;
-import com.patrigan.faction_craft.registry.ModSensorTypes;
-import com.patrigan.faction_craft.tags.EntityTags;
+import com.infamousmisadventures.factioncraft.registry.ModBlocks;
+import com.infamousmisadventures.factioncraft.registry.ModBlockEntityTypes;
+import com.infamousmisadventures.factioncraft.capabilities.ModCapabilities;
+import com.infamousmisadventures.factioncraft.commands.arguments.ModArgumentTypes;
+import com.infamousmisadventures.factioncraft.compat.GuardVillagerCompat;
+import com.infamousmisadventures.factioncraft.config.FactionCraftConfig;
+import com.infamousmisadventures.factioncraft.effect.ModMobEffects;
+import com.infamousmisadventures.factioncraft.registry.FCActivities;
+import com.infamousmisadventures.factioncraft.network.NetworkHandler;
+import com.infamousmisadventures.factioncraft.registry.FCMemoryModuleTypes;
+import com.infamousmisadventures.factioncraft.registry.FCSensorTypes;
+import com.infamousmisadventures.factioncraft.tags.EntityTags;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -44,9 +44,9 @@ public class FactionCraft
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
 
-        ModSensorTypes.SENSOR_TYPES.register(modEventBus);
-        ModMemoryModuleTypes.MEMORY_MODULE_TYPES.register(modEventBus);
-        ModActivities.ACTIVITIES.register(modEventBus);
+        FCSensorTypes.SENSOR_TYPES.register(modEventBus);
+        FCMemoryModuleTypes.MEMORY_MODULE_TYPES.register(modEventBus);
+        FCActivities.ACTIVITIES.register(modEventBus);
         ModBlocks.BLOCKS.register(modEventBus);
         ModMobEffects.MOB_EFFECTS.register(modEventBus);
         ModArgumentTypes.COMMAND_ARGUMENT_TYPES.register(modEventBus);

@@ -1,4 +1,4 @@
-package com.patrigan.faction_craft.entity.ai.goal;
+package com.infamousmisadventures.factioncraft.entity.ai.goal;
 
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;

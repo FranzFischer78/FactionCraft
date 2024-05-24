@@ -1,6 +1,6 @@
-package com.patrigan.faction_craft.capabilities.savedfactiondata;
+package com.infamousmisadventures.factioncraft.capabilities.savedfactiondata;
 
-import com.patrigan.faction_craft.capabilities.ModCapabilities;
+import com.infamousmisadventures.factioncraft.capabilities.ModCapabilities;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -8,12 +8,12 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.INBTSerializable;
+import com.infamousmisadventures.factioncraft.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import org.jetbrains.annotations.NotNull;
 
-import static com.patrigan.faction_craft.FactionCraft.MODID;
+import static com.infamousmisadventures.factioncraft.FactionCraft.MODID;
 
 public class AttacherSavedFactionData {
 

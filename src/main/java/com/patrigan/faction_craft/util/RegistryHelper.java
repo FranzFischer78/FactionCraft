@@ -1,4 +1,4 @@
-package com.patrigan.faction_craft.util;
+package com.infamousmisadventures.factioncraft.util;
 
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;

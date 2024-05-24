@@ -1,0 +1,16 @@
+package com.infamousmisadventures.factioncraft.util.data;
+
+import com.mojang.serialization.Codec;
+import net.minecraft.Util;
+import net.minecraft.world.level.ChunkPos;
+
+import java.util.stream.IntStream;
+
+public class CodecHelper {
+
+    public static final Codec<ChunkPos> CHUNKPOS_CODEC = Codec.INT_STREAM.comapFlatMap(
+            (p_121967_) -> Util.fixedSize(p_121967_, 2)
+                    .map((p_175270_) -> new ChunkPos(p_175270_[0], p_175270_[1])),
+            (p_121924_) -> IntStream.of(p_121924_.x, p_121924_.z))
+            .stable();
+}

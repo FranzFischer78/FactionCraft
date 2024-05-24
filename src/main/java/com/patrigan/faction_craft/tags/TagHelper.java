@@ -1,4 +1,4 @@
-package com.patrigan.faction_craft.tags;
+package com.infamousmisadventures.factioncraft.tags;
 
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;

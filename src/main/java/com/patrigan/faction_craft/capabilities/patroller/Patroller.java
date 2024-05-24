@@ -1,20 +1,20 @@
-package com.patrigan.faction_craft.capabilities.patroller;
+package com.infamousmisadventures.factioncraft.capabilities.patroller;
 
 
-import com.patrigan.faction_craft.capabilities.factionentity.FactionEntityHelper;
-import com.patrigan.faction_craft.capabilities.factionentity.FactionEntity;
-import com.patrigan.faction_craft.entity.ai.goal.PatrolGoal;
-import com.patrigan.faction_craft.registry.ModMemoryModuleTypes;
+import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntityHelper;
+import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntity;
+import com.infamousmisadventures.factioncraft.entity.ai.goal.PatrolGoal;
+import com.infamousmisadventures.factioncraft.registry.FCMemoryModuleTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
-import net.minecraftforge.common.util.INBTSerializable;
+import com.infamousmisadventures.factioncraft.util.INBTSerializable;
 
-import static com.patrigan.faction_craft.capabilities.ModCapabilities.PATROLLER_CAPABILITY;
-import static com.patrigan.faction_craft.util.BrainHelper.hasBrain;
+import static com.infamousmisadventures.factioncraft.capabilities.ModCapabilities.PATROLLER_CAPABILITY;
+import static com.infamousmisadventures.factioncraft.util.BrainHelper.hasBrain;
 
 public class Patroller implements INBTSerializable<CompoundTag> {
 
@@ -97,7 +97,7 @@ public class Patroller implements INBTSerializable<CompoundTag> {
     }
 
     private void updatePatrolBrain() {
-        this.entity.getBrain().setMemory(ModMemoryModuleTypes.PATROLLER.get(), this.patrolling);
+        this.entity.getBrain().setMemory(FCMemoryModuleTypes.PATROLLER.get(), this.patrolling);
     }
 
     private void updatePatrolGoals(){

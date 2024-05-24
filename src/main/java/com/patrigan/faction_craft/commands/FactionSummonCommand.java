@@ -1,16 +1,16 @@
-package com.patrigan.faction_craft.commands;
+package com.infamousmisadventures.factioncraft.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-import com.patrigan.faction_craft.capabilities.factionentity.FactionEntity;
-import com.patrigan.faction_craft.capabilities.factionentity.FactionEntityHelper;
-import com.patrigan.faction_craft.commands.arguments.FactionArgument;
-import com.patrigan.faction_craft.commands.arguments.FactionEntitySummonArgument;
-import com.patrigan.faction_craft.faction.Faction;
-import com.patrigan.faction_craft.faction.FactionBoostHelper;
-import com.patrigan.faction_craft.faction.entity.FactionEntityRank;
-import com.patrigan.faction_craft.faction.entity.FactionEntityType;
+import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntity;
+import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntityHelper;
+import com.infamousmisadventures.factioncraft.commands.arguments.FactionArgument;
+import com.infamousmisadventures.factioncraft.commands.arguments.FactionEntitySummonArgument;
+import com.infamousmisadventures.factioncraft.faction.Faction;
+import com.infamousmisadventures.factioncraft.faction.FactionBoostHelper;
+import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityRank;
+import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityType;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.coordinates.Vec3Argument;

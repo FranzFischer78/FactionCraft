@@ -1,17 +1,17 @@
-package com.patrigan.faction_craft.commands;
+package com.infamousmisadventures.factioncraft.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.patrigan.faction_craft.FactionCraft;
-import com.patrigan.faction_craft.capabilities.dominion.AreaDominion;
-import com.patrigan.faction_craft.capabilities.dominion.AreaPos;
-import com.patrigan.faction_craft.capabilities.dominion.Dominion;
-import com.patrigan.faction_craft.capabilities.dominion.DominionHelper;
-import com.patrigan.faction_craft.commands.arguments.FactionArgument;
-import com.patrigan.faction_craft.config.FactionCraftConfig;
-import com.patrigan.faction_craft.faction.Faction;
+import com.infamousmisadventures.factioncraft.FactionCraft;
+import com.infamousmisadventures.factioncraft.capabilities.dominion.AreaDominion;
+import com.infamousmisadventures.factioncraft.capabilities.dominion.AreaPos;
+import com.infamousmisadventures.factioncraft.capabilities.dominion.Dominion;
+import com.infamousmisadventures.factioncraft.capabilities.dominion.DominionHelper;
+import com.infamousmisadventures.factioncraft.commands.arguments.FactionArgument;
+import com.infamousmisadventures.factioncraft.config.FactionCraftConfig;
+import com.infamousmisadventures.factioncraft.faction.Faction;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;

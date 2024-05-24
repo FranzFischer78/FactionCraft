@@ -1,23 +1,23 @@
-package com.patrigan.faction_craft.capabilities.dominion;
+package com.infamousmisadventures.factioncraft.capabilities.dominion;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.patrigan.faction_craft.config.FactionCraftConfig;
-import com.patrigan.faction_craft.faction.Faction;
-import com.patrigan.faction_craft.registry.Factions;
+import com.infamousmisadventures.factioncraft.config.FactionCraftConfig;
+import com.infamousmisadventures.factioncraft.faction.Faction;
+import com.infamousmisadventures.factioncraft.registry.Factions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.util.INBTSerializable;
+import com.infamousmisadventures.factioncraft.util.INBTSerializable;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.patrigan.faction_craft.faction.Faction.GAIA;
-import static com.patrigan.faction_craft.faction.Faction.VILLAGE_NAME;
+import static com.infamousmisadventures.factioncraft.faction.Faction.GAIA;
+import static com.infamousmisadventures.factioncraft.faction.Faction.VILLAGE_NAME;
 
 public class AreaDominion implements INBTSerializable<CompoundTag> {
 

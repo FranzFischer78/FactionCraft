@@ -1,6 +1,6 @@
-package com.patrigan.faction_craft.capabilities.raider;
+package com.infamousmisadventures.factioncraft.capabilities.raider;
 
-import com.patrigan.faction_craft.raid.Raid;
+import com.infamousmisadventures.factioncraft.raid.Raid;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -11,7 +11,7 @@ import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import static com.patrigan.faction_craft.FactionCraft.MODID;
+import static com.infamousmisadventures.factioncraft.FactionCraft.MODID;
 
 @Mod.EventBusSubscriber(modid = MODID)
 public class RaiderEvents {

@@ -1,23 +1,23 @@
-package com.patrigan.faction_craft.capabilities;
+package com.infamousmisadventures.factioncraft.capabilities;
 
-import com.patrigan.faction_craft.capabilities.appliedboosts.AppliedBoosts;
-import com.patrigan.faction_craft.capabilities.appliedboosts.AttacherAppliedBoosts;
-import com.patrigan.faction_craft.capabilities.dominion.AttacherDominion;
-import com.patrigan.faction_craft.capabilities.dominion.Dominion;
-import com.patrigan.faction_craft.capabilities.factionentity.AttacherFactionEntity;
-import com.patrigan.faction_craft.capabilities.factionentity.FactionEntity;
-import com.patrigan.faction_craft.capabilities.factioninteraction.AttacherFactionInteraction;
-import com.patrigan.faction_craft.capabilities.factioninteraction.FactionInteraction;
-import com.patrigan.faction_craft.capabilities.playerfactions.AttacherPlayerFactions;
-import com.patrigan.faction_craft.capabilities.playerfactions.PlayerFactions;
-import com.patrigan.faction_craft.capabilities.savedfactiondata.AttacherSavedFactionData;
-import com.patrigan.faction_craft.capabilities.patroller.AttacherPatroller;
-import com.patrigan.faction_craft.capabilities.patroller.Patroller;
-import com.patrigan.faction_craft.capabilities.raider.AttacherRaider;
-import com.patrigan.faction_craft.capabilities.raider.Raider;
-import com.patrigan.faction_craft.capabilities.raidmanager.AttacherRaidManager;
-import com.patrigan.faction_craft.capabilities.raidmanager.RaidManager;
-import com.patrigan.faction_craft.capabilities.savedfactiondata.SavedFactionData;
+import com.infamousmisadventures.factioncraft.capabilities.appliedboosts.AppliedBoosts;
+import com.infamousmisadventures.factioncraft.capabilities.appliedboosts.AttacherAppliedBoosts;
+import com.infamousmisadventures.factioncraft.capabilities.dominion.AttacherDominion;
+import com.infamousmisadventures.factioncraft.capabilities.dominion.Dominion;
+import com.infamousmisadventures.factioncraft.capabilities.factionentity.AttacherFactionEntity;
+import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntity;
+import com.infamousmisadventures.factioncraft.capabilities.factioninteraction.AttacherFactionInteraction;
+import com.infamousmisadventures.factioncraft.capabilities.factioninteraction.FactionInteraction;
+import com.infamousmisadventures.factioncraft.capabilities.playerfactions.AttacherPlayerFactions;
+import com.infamousmisadventures.factioncraft.capabilities.playerfactions.PlayerFactions;
+import com.infamousmisadventures.factioncraft.capabilities.savedfactiondata.AttacherSavedFactionData;
+import com.infamousmisadventures.factioncraft.capabilities.patroller.AttacherPatroller;
+import com.infamousmisadventures.factioncraft.capabilities.patroller.Patroller;
+import com.infamousmisadventures.factioncraft.capabilities.raider.AttacherRaider;
+import com.infamousmisadventures.factioncraft.capabilities.raider.Raider;
+import com.infamousmisadventures.factioncraft.capabilities.raidmanager.AttacherRaidManager;
+import com.infamousmisadventures.factioncraft.capabilities.raidmanager.RaidManager;
+import com.infamousmisadventures.factioncraft.capabilities.savedfactiondata.SavedFactionData;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
@@ -29,7 +29,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import static com.patrigan.faction_craft.FactionCraft.MODID;
+import static com.infamousmisadventures.factioncraft.FactionCraft.MODID;
 
 @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModCapabilities {

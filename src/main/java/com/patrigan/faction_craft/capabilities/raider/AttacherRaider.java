@@ -1,6 +1,6 @@
-package com.patrigan.faction_craft.capabilities.raider;
+package com.infamousmisadventures.factioncraft.capabilities.raider;
 
-import com.patrigan.faction_craft.capabilities.ModCapabilities;
+import com.infamousmisadventures.factioncraft.capabilities.ModCapabilities;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -8,12 +8,12 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.INBTSerializable;
+import com.infamousmisadventures.factioncraft.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import org.jetbrains.annotations.NotNull;
 
-import static com.patrigan.faction_craft.FactionCraft.MODID;
+import static com.infamousmisadventures.factioncraft.FactionCraft.MODID;
 
 public class AttacherRaider {
 

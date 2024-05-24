@@ -1,6 +1,6 @@
-package com.patrigan.faction_craft.capabilities.dominion;
+package com.infamousmisadventures.factioncraft.capabilities.dominion;
 
-import com.patrigan.faction_craft.capabilities.ModCapabilities;
+import com.infamousmisadventures.factioncraft.capabilities.ModCapabilities;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraftforge.event.level.ChunkEvent;
@@ -9,7 +9,7 @@ import net.minecraftforge.fml.common.Mod;
 
 import java.util.Optional;
 
-import static com.patrigan.faction_craft.FactionCraft.MODID;
+import static com.infamousmisadventures.factioncraft.FactionCraft.MODID;
 
 @Mod.EventBusSubscriber(modid = MODID)
 public class DominionEvents {

@@ -1,18 +1,18 @@
-package com.patrigan.faction_craft.entity;
+package com.infamousmisadventures.factioncraft.entity;
 
-import com.patrigan.faction_craft.capabilities.dominion.AreaDominion;
-import com.patrigan.faction_craft.capabilities.dominion.AreaPos;
-import com.patrigan.faction_craft.capabilities.dominion.DominionHelper;
-import com.patrigan.faction_craft.capabilities.factionentity.FactionEntity;
-import com.patrigan.faction_craft.capabilities.factionentity.FactionEntityHelper;
-import com.patrigan.faction_craft.capabilities.patroller.Patroller;
-import com.patrigan.faction_craft.capabilities.patroller.PatrollerHelper;
-import com.patrigan.faction_craft.capabilities.raider.Raider;
-import com.patrigan.faction_craft.capabilities.raider.RaiderHelper;
-import com.patrigan.faction_craft.config.FactionCraftConfig;
-import com.patrigan.faction_craft.faction.Faction;
-import com.patrigan.faction_craft.mixin.LivingEntityAccessor;
-import com.patrigan.faction_craft.registry.Factions;
+import com.infamousmisadventures.factioncraft.capabilities.dominion.AreaDominion;
+import com.infamousmisadventures.factioncraft.capabilities.dominion.AreaPos;
+import com.infamousmisadventures.factioncraft.capabilities.dominion.DominionHelper;
+import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntity;
+import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntityHelper;
+import com.infamousmisadventures.factioncraft.capabilities.patroller.Patroller;
+import com.infamousmisadventures.factioncraft.capabilities.patroller.PatrollerHelper;
+import com.infamousmisadventures.factioncraft.capabilities.raider.Raider;
+import com.infamousmisadventures.factioncraft.capabilities.raider.RaiderHelper;
+import com.infamousmisadventures.factioncraft.config.FactionCraftConfig;
+import com.infamousmisadventures.factioncraft.faction.Faction;
+import com.infamousmisadventures.factioncraft.mixin.LivingEntityAccessor;
+import com.infamousmisadventures.factioncraft.registry.Factions;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
@@ -32,7 +32,7 @@ import net.minecraftforge.fml.common.Mod;
 
 import java.util.List;
 
-import static com.patrigan.faction_craft.FactionCraft.MODID;
+import static com.infamousmisadventures.factioncraft.FactionCraft.MODID;
 import static net.minecraft.sounds.SoundEvents.SHIELD_BLOCK;
 
 @Mod.EventBusSubscriber(modid = MODID)

@@ -1,12 +1,12 @@
-package com.patrigan.faction_craft.capabilities.playerfactions;
+package com.infamousmisadventures.factioncraft.capabilities.playerfactions;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
-import static com.patrigan.faction_craft.capabilities.ModCapabilities.PLAYER_FACTIONS_CAPABILITY;
-import static com.patrigan.faction_craft.capabilities.ModCapabilities.SAVED_FACTION_DATA_CAPABILITY;
+import static com.infamousmisadventures.factioncraft.capabilities.ModCapabilities.PLAYER_FACTIONS_CAPABILITY;
+import static com.infamousmisadventures.factioncraft.capabilities.ModCapabilities.SAVED_FACTION_DATA_CAPABILITY;
 
 
 public class PlayerFactionsHelper {

@@ -1,4 +1,4 @@
-package com.patrigan.faction_craft.datagen;
+package com.infamousmisadventures.factioncraft.datagen;
 
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.data.event.GatherDataEvent;

@@ -1,9 +1,9 @@
-package com.patrigan.faction_craft.capabilities.raider;
+package com.infamousmisadventures.factioncraft.capabilities.raider;
 
 import net.minecraft.world.entity.Mob;
 import net.minecraftforge.common.util.LazyOptional;
 
-import static com.patrigan.faction_craft.capabilities.ModCapabilities.RAIDER_CAPABILITY;
+import static com.infamousmisadventures.factioncraft.capabilities.ModCapabilities.RAIDER_CAPABILITY;
 
 
 public class RaiderHelper {

@@ -1,18 +1,18 @@
-package com.patrigan.faction_craft.capabilities.playerfactions;
+package com.infamousmisadventures.factioncraft.capabilities.playerfactions;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.patrigan.faction_craft.FactionCraft;
-import com.patrigan.faction_craft.faction.Faction;
-import com.patrigan.faction_craft.faction.relations.FactionRelation;
-import com.patrigan.faction_craft.registry.Factions;
+import com.infamousmisadventures.factioncraft.FactionCraft;
+import com.infamousmisadventures.factioncraft.faction.Faction;
+import com.infamousmisadventures.factioncraft.faction.relations.FactionRelation;
+import com.infamousmisadventures.factioncraft.registry.Factions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.common.util.INBTSerializable;
+import com.infamousmisadventures.factioncraft.util.INBTSerializable;
 
 import java.util.*;
 import java.util.stream.Collectors;

@@ -1,6 +1,6 @@
-package com.patrigan.faction_craft.tags;
+package com.infamousmisadventures.factioncraft.tags;
 
-import com.patrigan.faction_craft.FactionCraft;
+import com.infamousmisadventures.factioncraft.FactionCraft;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;

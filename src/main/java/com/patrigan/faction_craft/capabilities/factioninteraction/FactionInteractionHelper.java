@@ -1,9 +1,9 @@
-package com.patrigan.faction_craft.capabilities.factioninteraction;
+package com.infamousmisadventures.factioncraft.capabilities.factioninteraction;
 
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.util.LazyOptional;
 
-import static com.patrigan.faction_craft.capabilities.ModCapabilities.FACTION_INTERACTION_CAPABILITY;
+import static com.infamousmisadventures.factioncraft.capabilities.ModCapabilities.FACTION_INTERACTION_CAPABILITY;
 
 
 public class FactionInteractionHelper {

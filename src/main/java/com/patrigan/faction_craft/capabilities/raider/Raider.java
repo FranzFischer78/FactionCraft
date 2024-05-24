@@ -1,13 +1,13 @@
-package com.patrigan.faction_craft.capabilities.raider;
+package com.infamousmisadventures.factioncraft.capabilities.raider;
 
 
-import com.patrigan.faction_craft.capabilities.raidmanager.RaidManager;
-import com.patrigan.faction_craft.capabilities.raidmanager.RaidManagerHelper;
-import com.patrigan.faction_craft.entity.ai.goal.MoveTowardsRaidGoal;
-import com.patrigan.faction_craft.entity.ai.goal.RaidOpenDoorGoal;
-import com.patrigan.faction_craft.entity.ai.goal.RaiderMoveThroughVillageGoal;
-import com.patrigan.faction_craft.raid.Raid;
-import com.patrigan.faction_craft.registry.ModMemoryModuleTypes;
+import com.infamousmisadventures.factioncraft.capabilities.raidmanager.RaidManager;
+import com.infamousmisadventures.factioncraft.capabilities.raidmanager.RaidManagerHelper;
+import com.infamousmisadventures.factioncraft.entity.ai.goal.MoveTowardsRaidGoal;
+import com.infamousmisadventures.factioncraft.entity.ai.goal.RaidOpenDoorGoal;
+import com.infamousmisadventures.factioncraft.entity.ai.goal.RaiderMoveThroughVillageGoal;
+import com.infamousmisadventures.factioncraft.raid.Raid;
+import com.infamousmisadventures.factioncraft.registry.FCMemoryModuleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Mob;
@@ -16,13 +16,13 @@ import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.util.GoalUtils;
 import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.schedule.Activity;
-import net.minecraftforge.common.util.INBTSerializable;
+import com.infamousmisadventures.factioncraft.util.INBTSerializable;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.patrigan.faction_craft.capabilities.ModCapabilities.RAIDER_CAPABILITY;
-import static com.patrigan.faction_craft.util.BrainHelper.hasBrain;
+import static com.infamousmisadventures.factioncraft.capabilities.ModCapabilities.RAIDER_CAPABILITY;
+import static com.infamousmisadventures.factioncraft.util.BrainHelper.hasBrain;
 
 public class Raider implements INBTSerializable<CompoundTag> {
 
@@ -100,9 +100,9 @@ public class Raider implements INBTSerializable<CompoundTag> {
 
     private void updateRaidBrain() {
         if(this.raid != null){
-            this.entity.getBrain().setMemory(ModMemoryModuleTypes.RAID.get(), this.raid);
+            this.entity.getBrain().setMemory(FCMemoryModuleTypes.RAID.get(), this.raid);
         }else{
-            this.entity.getBrain().eraseMemory(ModMemoryModuleTypes.RAID.get());
+            this.entity.getBrain().eraseMemory(FCMemoryModuleTypes.RAID.get());
         }
     }
 

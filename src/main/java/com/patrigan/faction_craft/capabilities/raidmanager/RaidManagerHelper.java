@@ -1,10 +1,10 @@
-package com.patrigan.faction_craft.capabilities.raidmanager;
+package com.infamousmisadventures.factioncraft.capabilities.raidmanager;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.LazyOptional;
 
-import static com.patrigan.faction_craft.capabilities.ModCapabilities.RAID_MANAGER_CAPABILITY;
+import static com.infamousmisadventures.factioncraft.capabilities.ModCapabilities.RAID_MANAGER_CAPABILITY;
 
 
 public class RaidManagerHelper {

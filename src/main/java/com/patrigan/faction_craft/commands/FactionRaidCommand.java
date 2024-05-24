@@ -1,18 +1,18 @@
-package com.patrigan.faction_craft.commands;
+package com.infamousmisadventures.factioncraft.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-import com.patrigan.faction_craft.capabilities.raidmanager.RaidManager;
-import com.patrigan.faction_craft.capabilities.raidmanager.RaidManagerHelper;
-import com.patrigan.faction_craft.commands.arguments.FactionArgument;
-import com.patrigan.faction_craft.faction.Faction;
-import com.patrigan.faction_craft.raid.Raid;
-import com.patrigan.faction_craft.raid.target.PlayerRaidTarget;
-import com.patrigan.faction_craft.raid.target.RaidTarget;
-import com.patrigan.faction_craft.raid.target.VillageRaidTarget;
+import com.infamousmisadventures.factioncraft.capabilities.raidmanager.RaidManager;
+import com.infamousmisadventures.factioncraft.capabilities.raidmanager.RaidManagerHelper;
+import com.infamousmisadventures.factioncraft.commands.arguments.FactionArgument;
+import com.infamousmisadventures.factioncraft.faction.Faction;
+import com.infamousmisadventures.factioncraft.raid.Raid;
+import com.infamousmisadventures.factioncraft.raid.target.PlayerRaidTarget;
+import com.infamousmisadventures.factioncraft.raid.target.RaidTarget;
+import com.infamousmisadventures.factioncraft.raid.target.VillageRaidTarget;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;

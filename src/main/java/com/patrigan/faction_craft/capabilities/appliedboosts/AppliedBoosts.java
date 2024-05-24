@@ -1,16 +1,16 @@
-package com.patrigan.faction_craft.capabilities.appliedboosts;
+package com.infamousmisadventures.factioncraft.capabilities.appliedboosts;
 
 
-import com.patrigan.faction_craft.boost.Boost;
+import com.infamousmisadventures.factioncraft.boost.Boost;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraftforge.common.util.INBTSerializable;
+import com.infamousmisadventures.factioncraft.util.INBTSerializable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.patrigan.faction_craft.capabilities.ModCapabilities.APPLIED_BOOSTS_CAPABILITY;
+import static com.infamousmisadventures.factioncraft.capabilities.ModCapabilities.APPLIED_BOOSTS_CAPABILITY;
 
 public class AppliedBoosts implements INBTSerializable<CompoundTag> {
 

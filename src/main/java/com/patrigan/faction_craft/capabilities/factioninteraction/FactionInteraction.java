@@ -1,17 +1,17 @@
-package com.patrigan.faction_craft.capabilities.factioninteraction;
+package com.infamousmisadventures.factioncraft.capabilities.factioninteraction;
 
 
-import com.patrigan.faction_craft.faction.Faction;
-import com.patrigan.faction_craft.registry.Factions;
+import com.infamousmisadventures.factioncraft.faction.Faction;
+import com.infamousmisadventures.factioncraft.registry.Factions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.util.INBTSerializable;
+import com.infamousmisadventures.factioncraft.util.INBTSerializable;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.patrigan.faction_craft.capabilities.ModCapabilities.FACTION_ENTITY_CAPABILITY;
+import static com.infamousmisadventures.factioncraft.capabilities.ModCapabilities.FACTION_ENTITY_CAPABILITY;
 
 public class FactionInteraction implements INBTSerializable<CompoundTag> {
 

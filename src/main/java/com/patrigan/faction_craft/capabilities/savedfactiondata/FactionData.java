@@ -1,8 +1,8 @@
-package com.patrigan.faction_craft.capabilities.savedfactiondata;
+package com.infamousmisadventures.factioncraft.capabilities.savedfactiondata;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.patrigan.faction_craft.faction.relations.FactionRelations;
+import com.infamousmisadventures.factioncraft.faction.relations.FactionRelations;
 import net.minecraft.resources.ResourceLocation;
 
 public class FactionData {

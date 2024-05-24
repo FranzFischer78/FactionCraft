@@ -1,9 +1,9 @@
-package com.patrigan.faction_craft.capabilities.patroller;
+package com.infamousmisadventures.factioncraft.capabilities.patroller;
 
 import net.minecraft.world.entity.Mob;
 import net.minecraftforge.common.util.LazyOptional;
 
-import static com.patrigan.faction_craft.capabilities.ModCapabilities.PATROLLER_CAPABILITY;
+import static com.infamousmisadventures.factioncraft.capabilities.ModCapabilities.PATROLLER_CAPABILITY;
 
 
 public class PatrollerHelper {

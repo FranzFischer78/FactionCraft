@@ -1,15 +1,15 @@
-package com.patrigan.faction_craft.entity.ai.goal;
+package com.infamousmisadventures.factioncraft.entity.ai.goal;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.patrigan.faction_craft.capabilities.factionentity.FactionEntity;
-import com.patrigan.faction_craft.capabilities.factionentity.FactionEntityHelper;
-import com.patrigan.faction_craft.capabilities.raider.Raider;
-import com.patrigan.faction_craft.capabilities.raider.RaiderHelper;
-import com.patrigan.faction_craft.capabilities.raidmanager.RaidManager;
-import com.patrigan.faction_craft.config.FactionCraftConfig;
-import com.patrigan.faction_craft.faction.Faction;
-import com.patrigan.faction_craft.raid.Raid;
+import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntity;
+import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntityHelper;
+import com.infamousmisadventures.factioncraft.capabilities.raider.Raider;
+import com.infamousmisadventures.factioncraft.capabilities.raider.RaiderHelper;
+import com.infamousmisadventures.factioncraft.capabilities.raidmanager.RaidManager;
+import com.infamousmisadventures.factioncraft.config.FactionCraftConfig;
+import com.infamousmisadventures.factioncraft.faction.Faction;
+import com.infamousmisadventures.factioncraft.raid.Raid;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Mob;
@@ -26,7 +26,7 @@ import net.minecraft.world.phys.Vec3;
 import java.util.*;
 import java.util.function.BooleanSupplier;
 
-import static com.patrigan.faction_craft.util.GeneralUtils.vec3ToBlockPos;
+import static com.infamousmisadventures.factioncraft.util.GeneralUtils.vec3ToBlockPos;
 
 public class RaiderMoveThroughVillageGoal extends Goal {
     private final Mob mob;

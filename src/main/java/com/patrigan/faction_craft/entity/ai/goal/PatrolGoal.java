@@ -1,8 +1,8 @@
-package com.patrigan.faction_craft.entity.ai.goal;
+package com.infamousmisadventures.factioncraft.entity.ai.goal;
 
 
-import com.patrigan.faction_craft.capabilities.patroller.Patroller;
-import com.patrigan.faction_craft.capabilities.patroller.PatrollerHelper;
+import com.infamousmisadventures.factioncraft.capabilities.patroller.Patroller;
+import com.infamousmisadventures.factioncraft.capabilities.patroller.PatrollerHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Mob;

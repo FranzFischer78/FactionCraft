@@ -1,11 +1,11 @@
-package com.patrigan.faction_craft.entity.ai.brain;
+package com.infamousmisadventures.factioncraft.entity.ai.brain;
 
 import net.minecraft.world.entity.schedule.Activity;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
-import static com.patrigan.faction_craft.FactionCraft.MODID;
+import static com.infamousmisadventures.factioncraft.FactionCraft.MODID;
 
 public class ModActivities {
     public static final DeferredRegister<Activity> ACTIVITIES = DeferredRegister.create(ForgeRegistries.ACTIVITIES, MODID);

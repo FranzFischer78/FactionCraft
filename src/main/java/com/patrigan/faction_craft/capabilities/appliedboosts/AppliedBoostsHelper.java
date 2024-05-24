@@ -1,9 +1,9 @@
-package com.patrigan.faction_craft.capabilities.appliedboosts;
+package com.infamousmisadventures.factioncraft.capabilities.appliedboosts;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.common.util.LazyOptional;
 
-import static com.patrigan.faction_craft.capabilities.ModCapabilities.APPLIED_BOOSTS_CAPABILITY;
+import static com.infamousmisadventures.factioncraft.capabilities.ModCapabilities.APPLIED_BOOSTS_CAPABILITY;
 
 public class AppliedBoostsHelper {
 

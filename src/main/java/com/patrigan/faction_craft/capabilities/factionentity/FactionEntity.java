@@ -1,24 +1,24 @@
-package com.patrigan.faction_craft.capabilities.factionentity;
+package com.infamousmisadventures.factioncraft.capabilities.factionentity;
 
 
-import com.patrigan.faction_craft.capabilities.dominion.AreaPos;
-import com.patrigan.faction_craft.config.FactionCraftConfig;
-import com.patrigan.faction_craft.faction.Faction;
-import com.patrigan.faction_craft.faction.entity.FactionEntityRank;
-import com.patrigan.faction_craft.faction.entity.LegacyFactionEntityTypeLoader;
-import com.patrigan.faction_craft.registry.Factions;
-import com.patrigan.faction_craft.faction.entity.FactionEntityType;
+import com.infamousmisadventures.factioncraft.capabilities.dominion.AreaPos;
+import com.infamousmisadventures.factioncraft.config.FactionCraftConfig;
+import com.infamousmisadventures.factioncraft.faction.Faction;
+import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityRank;
+import com.infamousmisadventures.factioncraft.faction.entity.LegacyFactionEntityTypeLoader;
+import com.infamousmisadventures.factioncraft.registry.Factions;
+import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraftforge.common.util.INBTSerializable;
+import com.infamousmisadventures.factioncraft.util.INBTSerializable;
 
 import java.util.Objects;
 
-import static com.patrigan.faction_craft.capabilities.ModCapabilities.DOMINION_CAPABILITY;
-import static com.patrigan.faction_craft.capabilities.ModCapabilities.FACTION_ENTITY_CAPABILITY;
+import static com.infamousmisadventures.factioncraft.capabilities.ModCapabilities.DOMINION_CAPABILITY;
+import static com.infamousmisadventures.factioncraft.capabilities.ModCapabilities.FACTION_ENTITY_CAPABILITY;
 
 public class FactionEntity implements INBTSerializable<CompoundTag> {
 

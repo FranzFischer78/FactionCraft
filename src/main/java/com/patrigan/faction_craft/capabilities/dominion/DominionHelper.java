@@ -1,8 +1,8 @@
-package com.patrigan.faction_craft.capabilities.dominion;
+package com.infamousmisadventures.factioncraft.capabilities.dominion;
 
 import net.minecraft.world.level.Level;
 
-import static com.patrigan.faction_craft.capabilities.ModCapabilities.DOMINION_CAPABILITY;
+import static com.infamousmisadventures.factioncraft.capabilities.ModCapabilities.DOMINION_CAPABILITY;
 
 
 public class DominionHelper {

@@ -1,13 +1,13 @@
-package com.patrigan.faction_craft.capabilities.raidmanager;
+package com.infamousmisadventures.factioncraft.capabilities.raidmanager;
 
 import com.google.common.collect.Maps;
-import com.patrigan.faction_craft.capabilities.factioninteraction.FactionInteraction;
-import com.patrigan.faction_craft.capabilities.factioninteraction.FactionInteractionHelper;
-import com.patrigan.faction_craft.config.FactionCraftConfig;
-import com.patrigan.faction_craft.effect.ModMobEffects;
-import com.patrigan.faction_craft.faction.Faction;
-import com.patrigan.faction_craft.raid.Raid;
-import com.patrigan.faction_craft.raid.target.RaidTarget;
+import com.infamousmisadventures.factioncraft.capabilities.factioninteraction.FactionInteraction;
+import com.infamousmisadventures.factioncraft.capabilities.factioninteraction.FactionInteractionHelper;
+import com.infamousmisadventures.factioncraft.config.FactionCraftConfig;
+import com.infamousmisadventures.factioncraft.effect.ModMobEffects;
+import com.infamousmisadventures.factioncraft.faction.Faction;
+import com.infamousmisadventures.factioncraft.raid.Raid;
+import com.infamousmisadventures.factioncraft.raid.target.RaidTarget;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -19,12 +19,12 @@ import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.raid.Raider;
 import net.minecraft.world.level.GameRules;
-import net.minecraftforge.common.util.INBTSerializable;
+import com.infamousmisadventures.factioncraft.util.INBTSerializable;
 
 import java.util.*;
 
-import static com.patrigan.faction_craft.capabilities.ModCapabilities.RAID_MANAGER_CAPABILITY;
-import static com.patrigan.faction_craft.config.FactionCraftConfig.RAID_MAX_FACTIONS;
+import static com.infamousmisadventures.factioncraft.capabilities.ModCapabilities.RAID_MANAGER_CAPABILITY;
+import static com.infamousmisadventures.factioncraft.config.FactionCraftConfig.RAID_MAX_FACTIONS;
 
 public class RaidManager implements INBTSerializable<CompoundTag> {
     private final Map<Integer, Raid> raidMap = Maps.newHashMap();

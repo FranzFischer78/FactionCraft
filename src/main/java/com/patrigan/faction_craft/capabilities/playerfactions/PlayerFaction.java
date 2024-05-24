@@ -1,8 +1,8 @@
-package com.patrigan.faction_craft.capabilities.playerfactions;
+package com.infamousmisadventures.factioncraft.capabilities.playerfactions;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.patrigan.faction_craft.faction.Faction;
+import com.infamousmisadventures.factioncraft.faction.Faction;
 
 import java.util.UUID;
 
