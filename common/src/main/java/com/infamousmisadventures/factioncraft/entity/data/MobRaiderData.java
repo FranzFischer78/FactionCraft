@@ -3,7 +3,7 @@ package com.infamousmisadventures.factioncraft.entity.data;
 import com.infamousmisadventures.factioncraft.entity.ai.goal.MoveTowardsRaidGoal;
 import com.infamousmisadventures.factioncraft.entity.ai.goal.RaidOpenDoorGoal;
 import com.infamousmisadventures.factioncraft.entity.ai.goal.RaiderMoveThroughVillageGoal;
-import com.infamousmisadventures.factioncraft.level.data.RaidManager;
+import com.infamousmisadventures.factioncraft.level.saveddata.RaidManager;
 import com.infamousmisadventures.factioncraft.mixins.MobAccessor;
 import com.infamousmisadventures.factioncraft.raid.Raid;
 import com.infamousmisadventures.factioncraft.registry.FCMemoryModuleTypes;

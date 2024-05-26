@@ -1,14 +1,11 @@
-package com.infamousmisadventures.factioncraft.level.data;
+package com.infamousmisadventures.factioncraft.level.saveddata;
 
 import com.google.common.collect.Maps;
-import com.infamousmisadventures.factioncraft.capabilities.factioninteraction.FactionInteraction;
-import com.infamousmisadventures.factioncraft.capabilities.factioninteraction.FactionInteractionHelper;
 import com.infamousmisadventures.factioncraft.config.FactionCraftConfig;
-import com.infamousmisadventures.factioncraft.effect.ModMobEffects;
 import com.infamousmisadventures.factioncraft.faction.Faction;
 import com.infamousmisadventures.factioncraft.raid.Raid;
 import com.infamousmisadventures.factioncraft.raid.target.RaidTarget;
-import com.infamousmisadventures.factioncraft.util.INBTSerializable;
+import com.infamousmisadventures.factioncraft.registry.FCMobEffects;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -19,16 +16,35 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.saveddata.SavedData;
 
 import java.util.*;
 
+import static com.infamousmisadventures.factioncraft.FCConstants.MOD_ID;
 import static com.infamousmisadventures.factioncraft.config.FactionCraftConfig.RAID_MAX_FACTIONS;
 
-public class RaidManager implements INBTSerializable<CompoundTag> {
+public class RaidManager extends SavedData {
     private final Map<Integer, Raid> raidMap = Maps.newHashMap();
     private final ServerLevel level;
     private int nextAvailableID = 1;
     private int tick;
+
+    public static RaidManager getOrCreate(ServerLevel level)
+    {
+        return level.getDataStorage().computeIfAbsent((tag) -> load(tag, level), () -> create(level), MOD_ID + "-raid_manager");
+    }
+
+    public static RaidManager load(CompoundTag tag, ServerLevel level)
+    {
+        RaidManager raidManager = create(level);
+        raidManager.load(tag);
+        return raidManager;
+    }
+
+    public static RaidManager create(ServerLevel level)
+    {
+        return new RaidManager(level);
+    }
 
     public RaidManager(ServerLevel level) {
         this.level = level;
@@ -111,11 +127,10 @@ public class RaidManager implements INBTSerializable<CompoundTag> {
             return null;
         } else {
             Raid raid = this.getRaidAt(raidTarget.getTargetBlockPos());
-            FactionInteraction cap = FactionInteractionHelper.getFactionInteractionCapability(player);
-            List<Faction> badOmenFactions = cap.getBadOmenFactions();
+            List<Faction> badOmenFactions = new ArrayList<>();
             if (raid == null) {
                 raid = createRaid(new ArrayList<>(badOmenFactions), raidTarget);
-                clearBadOmen(cap, player, raid, true);
+                clearBadOmen(player, raid, true);
             } else if (raid.getFactions().size() <= RAID_MAX_FACTIONS.get()) {
                 if (raid.getFactions().size() + badOmenFactions.size() <= RAID_MAX_FACTIONS.get()) {
                     raid.addFactions(badOmenFactions);
@@ -126,17 +141,16 @@ public class RaidManager implements INBTSerializable<CompoundTag> {
                         }
                     }
                 }
-                clearBadOmen(cap, player, raid, true);
+                clearBadOmen(player, raid, true);
             } else {
-                clearBadOmen(cap, player, raid, false);
+                clearBadOmen(player, raid, false);
             }
             return raid;
         }
     }
 
-    private void clearBadOmen(FactionInteraction cap, ServerPlayer player, Raid raid, boolean contributed) {
-        cap.clearBadOmenFactions();
-        player.removeEffect(ModMobEffects.FACTION_BAD_OMEN.get());
+    private void clearBadOmen(ServerPlayer player, Raid raid, boolean contributed) {
+        player.removeEffect(FCMobEffects.FACTION_BAD_OMEN.get());
         player.connection.send(new ClientboundEntityEventPacket(player, (byte) 43));
         if (contributed && !raid.hasFirstWaveSpawned()) {
             player.awardStat(Stats.RAID_TRIGGER);
@@ -145,8 +159,7 @@ public class RaidManager implements INBTSerializable<CompoundTag> {
     }
 
     @Override
-    public CompoundTag serializeNBT() {
-        CompoundTag tag = new CompoundTag();
+    public CompoundTag save(CompoundTag tag) {
         tag.putInt("NextAvailableID", this.nextAvailableID);
         tag.putInt("Tick", this.tick);
         ListTag listnbt = new ListTag();
@@ -161,8 +174,7 @@ public class RaidManager implements INBTSerializable<CompoundTag> {
         return tag;
     }
 
-    @Override
-    public void deserializeNBT(CompoundTag tag) {
+    public void load(CompoundTag tag) {
         this.nextAvailableID = tag.getInt("NextAvailableID");
         this.tick = tag.getInt("Tick");
         ListTag listnbt = tag.getList("Raids", 10);
