@@ -139,7 +139,7 @@ public class MobRaiderData implements INBTSerializable<CompoundTag> {
         this.canJoinRaid = tag.getBoolean("CanJoinRaid");
         if (tag.contains("RaidId", 3)) {
             if (this.entity.level() instanceof ServerLevel level) {
-                RaidManager raidManagerCapability = ((IRaidManagerHolder) level).getRaidManager();
+                RaidManager raidManagerCapability = RaidManager.getOrCreate(level);
                 this.setRaid(raidManagerCapability.getRaids().get(tag.getInt("RaidId")));
             }
 

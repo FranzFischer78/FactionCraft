@@ -1,7 +1,7 @@
 package com.infamousmisadventures.factioncraft.raid.target;
 
-import com.infamousmisadventures.factioncraft.FactionCraft;
 import com.infamousmisadventures.factioncraft.event.CalculateStrengthEvent;
+import com.infamousmisadventures.factioncraft.platform.Services;
 import com.infamousmisadventures.factioncraft.raid.Raid;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
@@ -42,7 +42,7 @@ public class VillageRaidTarget implements RaidTarget {
                 new AABB(blockPos).inflate(100),
                 ironGolemEntity -> true).size() * VILLAGE_RAID_IRON_GOLEM_WEIGHT.get();
         CalculateStrengthEvent event = new CalculateStrengthEvent(VILLAGE, blockPos, level, strength, strength);
-        net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(event);
+        Services.EVENT_BUS.post(event);
         return (int) Math.floor(event.getStrength()*VILLAGE_RAID_TARGET_STRENGTH_MULTIPLIER.get());
     }
 

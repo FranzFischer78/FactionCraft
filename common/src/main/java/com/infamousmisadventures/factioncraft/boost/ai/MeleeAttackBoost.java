@@ -1,9 +1,12 @@
 package com.infamousmisadventures.factioncraft.boost.ai;
 
+import com.infamousmisadventures.factioncraft.boost.Boost;
+import com.infamousmisadventures.factioncraft.boost.BoostType;
+import com.infamousmisadventures.factioncraft.entity.ai.goal.GoalHelper;
+import com.infamousmisadventures.factioncraft.mixins.MobAccessor;
+import com.infamousmisadventures.factioncraft.registry.FCBoostTypes;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.infamousmisadventures.factioncraft.boost.Boost;
-import com.infamousmisadventures.factioncraft.entity.ai.goal.GoalHelper;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
@@ -14,7 +17,7 @@ import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.infamousmisadventures.factioncraft.boost.Boost.BoostType.*;
+import static com.infamousmisadventures.factioncraft.boost.Boost.BoostGroup.SPECIAL;
 import static com.infamousmisadventures.factioncraft.boost.Boost.Rarity.NONE;
 
 public class MeleeAttackBoost extends Boost {
@@ -40,8 +43,13 @@ public class MeleeAttackBoost extends Boost {
     }
 
     @Override
-    public BoostType getType() {
+    public BoostGroup getBoostGroup() {
         return SPECIAL;
+    }
+
+    @Override
+    public BoostType<? extends Boost> type() {
+        return FCBoostTypes.MELEE_ATTACK.get();
     }
 
     @Override
@@ -72,7 +80,7 @@ public class MeleeAttackBoost extends Boost {
             List<Goal> meleeGoals = GoalHelper.getAvailableGoals(pathfinder).stream().map(WrappedGoal::getGoal).filter(goal -> goal instanceof MeleeAttackGoal).collect(Collectors.toList());
             if(meleeGoals.isEmpty()) {
                 MeleeAttackGoal meleeGoal = new MeleeAttackGoal(pathfinder, 1.2D, false);
-                mobEntity.goalSelector.addGoal(3, meleeGoal);
+                ((MobAccessor) mobEntity).getGoalSelector().addGoal(3, meleeGoal);
             }
         }
     }

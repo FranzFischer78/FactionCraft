@@ -1,8 +1,8 @@
 package com.infamousmisadventures.factioncraft.entity.ai.brain.task.raider;
 
 import com.google.common.collect.ImmutableMap;
-import com.infamousmisadventures.factioncraft.capabilities.patroller.Patroller;
-import com.infamousmisadventures.factioncraft.capabilities.patroller.PatrollerHelper;
+import com.infamousmisadventures.factioncraft.entity.data.MobPatrollerData;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IMobPatrollerDataHolder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.server.level.ServerLevel;
@@ -38,21 +38,21 @@ public class AcquirePatrolTarget<E extends LivingEntity> extends Behavior<E> {
     }
 
     protected boolean checkExtraStartConditions(ServerLevel pLevel, PathfinderMob pEntity) {
-        return PatrollerHelper.getPatrollerCapability(pEntity).isPatrolling();
+        return ((IMobPatrollerDataHolder) pEntity).getOrCreateMobPatrollerData().isPatrolling();
     }
 
 
     @Override
     protected void start(ServerLevel pLevel, E pEntity, long pGameTime) {
         if(pEntity instanceof Mob mob) {
-            Patroller cap = PatrollerHelper.getPatrollerCapability(mob);
+            MobPatrollerData cap = ((IMobPatrollerDataHolder) mob).getOrCreateMobPatrollerData();
             boolean flag = cap.isPatrolLeader();
             List<Mob> list = this.findPatrolCompanions(pEntity);
             if(cap.getPatrolTarget() == null) {
                 if (flag) {
                     cap.findPatrolTarget();
                     for (Mob patrollerentity : list) {
-                        Patroller patrollerCap = PatrollerHelper.getPatrollerCapability(patrollerentity);
+                        MobPatrollerData patrollerCap = ((IMobPatrollerDataHolder) patrollerentity).getOrCreateMobPatrollerData();
                         patrollerCap.setPatrolTarget(cap.getPatrolTarget());
                     }
                 }
@@ -75,8 +75,8 @@ public class AcquirePatrolTarget<E extends LivingEntity> extends Behavior<E> {
         Vec3 vector3d2 = vector3d1.subtract(vector3d);
         vector3d = vector3d2.yRot(90.0F).scale(0.4D).add(vector3d);
         Vec3 vector3d3 = vector3d.subtract(vector3d1).normalize().scale(10.0D).add(vector3d1);
-        BlockPos blockpos = new BlockPos(vector3d3);
-        blockpos = pEntity.level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, blockpos);
+        BlockPos blockpos = BlockPos.containing(vector3d3);
+        blockpos = pEntity.level().getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, blockpos);
         pEntity.getBrain().setMemory(this.memoryToAcquire, GlobalPos.of(pLevel.dimension(), blockpos));
     }
 
@@ -85,15 +85,15 @@ public class AcquirePatrolTarget<E extends LivingEntity> extends Behavior<E> {
     }
 
     private List<Mob> findPatrolCompanions(E pEntity) {
-        return pEntity.level.getEntitiesOfClass(Mob.class, pEntity.getBoundingBox().inflate(32.0D), (p_226543_1_) -> {
-            Patroller cap = PatrollerHelper.getPatrollerCapability(p_226543_1_);
+        return pEntity.level().getEntitiesOfClass(Mob.class, pEntity.getBoundingBox().inflate(32.0D), (p_226543_1_) -> {
+            MobPatrollerData cap = ((IMobPatrollerDataHolder) p_226543_1_).getOrCreateMobPatrollerData();
             return pEntity instanceof Mob && cap.canJoinPatrol((Mob) pEntity) && !p_226543_1_.is(pEntity);
         });
     }
 
     private void moveRandomly(ServerLevel pLevel, E mob) {
         RandomSource random = mob.getRandom();
-        BlockPos blockpos = mob.level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, mob.blockPosition().offset(-8 + random.nextInt(16), 0, -8 + random.nextInt(16)));
+        BlockPos blockpos = mob.level().getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, mob.blockPosition().offset(-8 + random.nextInt(16), 0, -8 + random.nextInt(16)));
         mob.getBrain().setMemory(this.memoryToAcquire, GlobalPos.of(pLevel.dimension(), blockpos));
     }
 }

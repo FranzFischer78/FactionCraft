@@ -3,7 +3,7 @@ package com.infamousmisadventures.factioncraft.datapack;
 import com.infamousmisadventures.factioncraft.util.data.CodecDataManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.common.MinecraftForge;
+import Services;
 import net.minecraftforge.event.OnDatapackSyncEvent;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;

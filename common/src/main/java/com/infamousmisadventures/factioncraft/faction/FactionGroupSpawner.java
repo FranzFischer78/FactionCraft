@@ -1,10 +1,9 @@
 package com.infamousmisadventures.factioncraft.faction;
 
-import com.mojang.datafixers.util.Pair;
-import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntity;
-import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntityHelper;
-import com.infamousmisadventures.factioncraft.capabilities.raider.Raider;
-import com.infamousmisadventures.factioncraft.capabilities.raider.RaiderHelper;
+import com.infamousmisadventures.factioncraft.entity.data.FactionEntityData;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IFactionEntityDataHolder;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IMobRaiderDataHolder;
+import com.infamousmisadventures.factioncraft.entity.data.MobRaiderData;
 import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityRank;
 import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityType;
 import com.infamousmisadventures.factioncraft.util.GeneralUtils;
@@ -17,7 +16,6 @@ import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.level.biome.Biome;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -75,7 +73,7 @@ public class FactionGroupSpawner {
     private void addToEntities(Faction faction, Mob baseEntity) {
         baseEntity.getRootVehicle().getSelfAndPassengers().forEach(entity -> {
             if (entity instanceof Mob mob && !entities.contains(mob)) {
-                FactionEntity factionEntityCapability = FactionEntityHelper.getFactionEntityCapability(mob);
+                FactionEntityData factionEntityCapability = ((IFactionEntityDataHolder) mob).getOrCreateFactionEntityData();
                 if (factionEntityCapability != null && faction.equals(factionEntityCapability.getFaction())) {
                     entities.add(mob);
                 }
@@ -84,13 +82,13 @@ public class FactionGroupSpawner {
     }
 
     private void createCaptain() {
-        List<Mob> captainEntities = entities.stream().filter(mobEntity -> FactionEntityHelper.getFactionEntityCapability(mobEntity).getFactionEntityType().canBeBannerHolder()).toList();
+        List<Mob> captainEntities = entities.stream().filter(mob -> ((IFactionEntityDataHolder) mob).getOrCreateFactionEntityData().getFactionEntityType().canBeBannerHolder()).toList();
         Mob randomItem = GeneralUtils.getRandomItem(captainEntities, level.getRandom());
         if (randomItem != null) {
             faction.makeBannerHolder(randomItem);
-            Raider raiderCapability = RaiderHelper.getRaiderCapability(randomItem);
+            MobRaiderData raiderCapability = ((IMobRaiderDataHolder) randomItem).getOrCreateMobRaiderData();
             raiderCapability.setWaveLeader(true);
-            FactionEntityHelper.getFactionEntityCapability(randomItem).setFactionEntityRank(FactionEntityRank.CAPTAIN);
+            ((IFactionEntityDataHolder) randomItem).getOrCreateFactionEntityData().setFactionEntityRank(FactionEntityRank.CAPTAIN);
         }
     }
 
@@ -102,7 +100,7 @@ public class FactionGroupSpawner {
 
     private Map<FactionEntityType, Integer> getWeightMap(int waveNumber, Faction faction, BlockPos spawnBlockPos) {
         Holder<Biome> biome = this.level.getBiome(spawnBlockPos);
-        EntityWeightMapProperties entityWeightMapProperties = new EntityWeightMapProperties().setWave(waveNumber).setBiome(biome.get()).setBlockPos(spawnBlockPos);
+        EntityWeightMapProperties entityWeightMapProperties = new EntityWeightMapProperties().setWave(waveNumber).setBiome(biome.value()).setBlockPos(spawnBlockPos);
         return faction.getWeightMap(entityWeightMapProperties);
     }
 

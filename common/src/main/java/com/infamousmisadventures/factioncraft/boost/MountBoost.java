@@ -1,16 +1,18 @@
 package com.infamousmisadventures.factioncraft.boost;
 
+import com.infamousmisadventures.factioncraft.registry.FCBoostTypes;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.world.entity.*;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.animal.horse.AbstractHorse;
-import net.minecraft.world.entity.animal.horse.Horse;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.animal.horse.AbstractHorse;
+import net.minecraft.world.phys.Vec3;
 
-import static com.infamousmisadventures.factioncraft.boost.BoostProviders.MOUNT;
-import static net.minecraftforge.registries.ForgeRegistries.ENTITY_TYPES;
+import static net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE;
 
 public class MountBoost extends Boost {
     public static final Codec<MountBoost> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -44,8 +46,13 @@ public class MountBoost extends Boost {
     }
 
     @Override
-    public BoostType getType() {
-        return BoostType.MOUNT;
+    public BoostGroup getBoostGroup() {
+        return BoostGroup.MOUNT;
+    }
+
+    @Override
+    public BoostType<? extends Boost> type() {
+        return FCBoostTypes.MOUNT.get();
     }
 
     @Override
@@ -58,9 +65,8 @@ public class MountBoost extends Boost {
         if(livingEntity.isPassenger()){
             return 0;
         }
-        if(livingEntity.level instanceof ServerLevel) {
-            ServerLevel level = (ServerLevel) livingEntity.level;
-            Entity mount = ENTITY_TYPES.getValue(entityTypeLocation).create(level);
+        if(livingEntity.level() instanceof ServerLevel level) {
+            Entity mount = ENTITY_TYPE.get(entityTypeLocation).create(level);
             if (mount != null) {
                 Vec3 pos = livingEntity.position();
                 mount.setPos(pos.x, pos.y, pos.z);

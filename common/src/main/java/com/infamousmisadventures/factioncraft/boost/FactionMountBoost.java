@@ -1,15 +1,16 @@
 package com.infamousmisadventures.factioncraft.boost;
 
+import com.infamousmisadventures.factioncraft.entity.data.FactionEntityData;
+import com.infamousmisadventures.factioncraft.entity.data.MobRaiderData;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IFactionEntityDataHolder;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IMobRaiderDataHolder;
+import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityRank;
+import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityType;
+import com.infamousmisadventures.factioncraft.registry.FCBoostTypes;
+import com.infamousmisadventures.factioncraft.util.GeneralUtils;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntityHelper;
-import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntity;
-import com.infamousmisadventures.factioncraft.capabilities.raider.Raider;
-import com.infamousmisadventures.factioncraft.capabilities.raider.RaiderHelper;
-import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityType;
-import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityRank;
-import com.infamousmisadventures.factioncraft.util.GeneralUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -46,9 +47,15 @@ public class FactionMountBoost extends Boost {
     }
 
     @Override
-    public BoostType getType() {
-        return BoostType.MOUNT;
+    public BoostGroup getBoostGroup() {
+        return BoostGroup.MOUNT;
     }
+
+    @Override
+    public BoostType<? extends Boost> type() {
+        return FCBoostTypes.FACTION_MOUNT.get();
+    }
+
 
     @Override
     public Rarity getRarity() {
@@ -60,18 +67,18 @@ public class FactionMountBoost extends Boost {
         if(livingEntity.isPassenger()){
             return 0;
         }
-        if(livingEntity.level instanceof ServerLevel level && livingEntity instanceof Mob mob) {
-            FactionEntity cap = FactionEntityHelper.getFactionEntityCapability(mob);
-            if (cap.getFaction() == null) {
+        if(livingEntity.level() instanceof ServerLevel level && livingEntity instanceof Mob mob) {
+            FactionEntityData factionEntity = ((IFactionEntityDataHolder) mob).getOrCreateFactionEntityData();
+            if (factionEntity.getFaction() == null) {
                 return 0;
             } else {
-                List<Pair<FactionEntityType, Integer>> weightMap = cap.getFaction().getWeightMapForRank(FactionEntityRank.MOUNT).stream().filter(pair -> pair.getFirst().getEntityTypeName().equals(entityTypeLocation)).collect(Collectors.toList());
-                Raider raiderCap = RaiderHelper.getRaiderCapability(mob);
+                List<Pair<FactionEntityType, Integer>> weightMap = factionEntity.getFaction().getWeightMapForRank(FactionEntityRank.MOUNT).stream().filter(pair -> pair.getFirst().getEntityTypeName().equals(entityTypeLocation)).collect(Collectors.toList());
+                MobRaiderData raiderCap = ((IMobRaiderDataHolder)mob).getOrCreateMobRaiderData();
                 if (raiderCap.hasActiveRaid()) {
                     weightMap = weightMap.stream()
                             .filter(pair -> pair.getFirst().canSpawnInWave(raiderCap.getWave()))
                             .filter(pair -> pair.getFirst().getMaxSpawnedInGroup(raiderCap.getRaid().getRaidersInWave(raiderCap.getWave()).size()) > raiderCap.getRaid().getRaidersInWave(raiderCap.getWave()).stream()
-                                    .filter(entity -> FactionEntityHelper.getFactionEntityCapability(entity).getFactionEntityType() != null && FactionEntityHelper.getFactionEntityCapability(entity).getFactionEntityType().equals(pair.getFirst()))
+                                    .filter(entity -> ((IFactionEntityDataHolder) entity).getOrCreateFactionEntityData().getFactionEntityType() != null && ((IFactionEntityDataHolder) entity).getOrCreateFactionEntityData().getFactionEntityType().equals(pair.getFirst()))
                                     .count())
                             .collect(Collectors.toList());
                 }
@@ -79,7 +86,7 @@ public class FactionMountBoost extends Boost {
                     return 0;
                 }
                 FactionEntityType randomEntry = GeneralUtils.getRandomEntry(weightMap, mob.getRandom());
-                Entity entity = randomEntry.createEntity(level, cap.getFaction(), livingEntity.blockPosition(), false, FactionEntityRank.MOUNT, MobSpawnType.JOCKEY);
+                Entity entity = randomEntry.createEntity(level, factionEntity.getFaction(), livingEntity.blockPosition(), false, FactionEntityRank.MOUNT, MobSpawnType.JOCKEY);
                 if(raiderCap.hasActiveRaid() && entity instanceof Mob mountMob){
                     raiderCap.getRaid().addWaveMob(raiderCap.getWave(), mountMob, true);
                 }
@@ -102,19 +109,19 @@ public class FactionMountBoost extends Boost {
     private boolean factionHasMount(LivingEntity livingEntity) {
         if(livingEntity instanceof Mob) {
             Mob mob = (Mob) livingEntity;
-            FactionEntity cap = FactionEntityHelper.getFactionEntityCapability(mob);
-            if(cap.getFaction() == null){
+            FactionEntityData factionEntity = ((IFactionEntityDataHolder) mob).getOrCreateFactionEntityData();
+            if(factionEntity.getFaction() == null){
                 return false;
             }
-            List<Pair<FactionEntityType, Integer>> weightMap = cap.getFaction().getWeightMapForRank(FactionEntityRank.MOUNT).stream().filter(pair -> pair.getFirst().getEntityTypeName().equals(entityTypeLocation)).collect(Collectors.toList());
-            Raider raiderCap = RaiderHelper.getRaiderCapability(mob);
+            List<Pair<FactionEntityType, Integer>> weightMap = factionEntity.getFaction().getWeightMapForRank(FactionEntityRank.MOUNT).stream().filter(pair -> pair.getFirst().getEntityTypeName().equals(entityTypeLocation)).collect(Collectors.toList());
+            MobRaiderData raiderCap = ((IMobRaiderDataHolder)mob).getOrCreateMobRaiderData();
             if (raiderCap.hasActiveRaid()) {
                 weightMap = weightMap.stream()
                         .filter(pair -> pair.getFirst().canSpawnInWave(raiderCap.getWave()))
                         .filter(pair -> pair.getFirst().getMaxSpawnedInGroup(raiderCap.getRaid().getRaidersInWave(raiderCap.getWave()).size()) > raiderCap.getRaid().getRaidersInWave(raiderCap.getWave()).stream()
-                                .filter(entity -> FactionEntityHelper.getFactionEntityCapability(entity).getFactionEntityType() != null && FactionEntityHelper.getFactionEntityCapability(entity).getFactionEntityType().equals(pair.getFirst()))
+                                .filter(entity -> ((IFactionEntityDataHolder) entity).getOrCreateFactionEntityData().getFactionEntityType() != null && ((IFactionEntityDataHolder) entity).getOrCreateFactionEntityData().getFactionEntityType().equals(pair.getFirst()))
                                 .count())
-                        .collect(Collectors.toList());
+                        .toList();
             }
             return !weightMap.isEmpty();
         }

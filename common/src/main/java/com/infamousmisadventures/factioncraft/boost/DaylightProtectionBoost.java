@@ -1,8 +1,10 @@
 package com.infamousmisadventures.factioncraft.boost;
 
+import com.infamousmisadventures.factioncraft.entity.ai.goal.GoalHelper;
+import com.infamousmisadventures.factioncraft.mixins.MobAccessor;
+import com.infamousmisadventures.factioncraft.registry.FCBoostTypes;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.infamousmisadventures.factioncraft.entity.ai.goal.GoalHelper;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.FleeSunGoal;
@@ -12,10 +14,8 @@ import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static com.infamousmisadventures.factioncraft.boost.Boost.BoostType.SPECIAL;
-import static com.infamousmisadventures.factioncraft.boost.BoostProviders.DAYLIGHT_PROTECTION;
+import static com.infamousmisadventures.factioncraft.boost.Boost.BoostGroup.SPECIAL;
 
 public class DaylightProtectionBoost extends Boost {
 
@@ -47,8 +47,13 @@ public class DaylightProtectionBoost extends Boost {
     }
 
     @Override
-    public BoostType getType() {
+    public BoostGroup getBoostGroup() {
         return SPECIAL;
+    }
+
+    @Override
+    public BoostType<? extends Boost> type() {
+        return FCBoostTypes.DAYLIGHT_PROTECTION.get();
     }
 
     @Override
@@ -75,8 +80,8 @@ public class DaylightProtectionBoost extends Boost {
         List<Goal> toRemove = GoalHelper.getAvailableGoals(mobEntity).stream()
                 .filter(prioritizedGoal -> prioritizedGoal.getGoal() instanceof FleeSunGoal || prioritizedGoal.getGoal() instanceof RestrictSunGoal)
                 .map(WrappedGoal::getGoal)
-                .collect(Collectors.toList());
-        toRemove.forEach(mobEntity.goalSelector::removeGoal);
+                .toList();
+        toRemove.forEach(((MobAccessor) mobEntity).getGoalSelector()::removeGoal);
         super.applyAIChanges(mobEntity);
     }
 

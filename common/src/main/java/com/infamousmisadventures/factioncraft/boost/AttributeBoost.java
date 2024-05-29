@@ -1,20 +1,17 @@
 package com.infamousmisadventures.factioncraft.boost;
 
+import com.infamousmisadventures.factioncraft.entity.data.AppliedBoostsData;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IAppliedBoostsDataHolder;
+import com.infamousmisadventures.factioncraft.registry.FCBoostTypes;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.infamousmisadventures.factioncraft.capabilities.appliedboosts.AppliedBoosts;
-import com.infamousmisadventures.factioncraft.capabilities.appliedboosts.AppliedBoostsHelper;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraftforge.common.util.LazyOptional;
-
-import static com.infamousmisadventures.factioncraft.boost.BoostProviders.ATTRIBUTE;
-import static net.minecraft.core.registries.BuiltInRegistries.ATTRIBUTE;
-import static net.minecraftforge.registries.ForgeRegistries.ATTRIBUTES;
 
 public class AttributeBoost extends Boost {
 
@@ -40,7 +37,7 @@ public class AttributeBoost extends Boost {
     public AttributeBoost(ResourceLocation attributeLocation, double adjustment, double maxApplications, int strengthAdjustment, AttributeModifier.Operation operation, Rarity rarity) {
         super();
         this.attributeLocation = attributeLocation;
-        this.attribute = ATTRIBUTE.get(attributeLocation);
+        this.attribute = BuiltInRegistries.ATTRIBUTE.get(attributeLocation);
         this.adjustment = adjustment;
         this.maxApplications = maxApplications;
         this.strengthAdjustment = strengthAdjustment;
@@ -78,8 +75,13 @@ public class AttributeBoost extends Boost {
     }
 
     @Override
-    public BoostType getType() {
-        return BoostType.ATTRIBUTE;
+    public BoostGroup getBoostGroup() {
+        return BoostGroup.ATTRIBUTE;
+    }
+
+    @Override
+    public BoostType<? extends Boost> type() {
+        return FCBoostTypes.ATTRIBUTE.get();
     }
 
     @Override
@@ -103,7 +105,7 @@ public class AttributeBoost extends Boost {
 
     @Override
     public boolean canApply(LivingEntity livingEntity) {
-        AppliedBoosts cap = AppliedBoostsHelper.getAppliedBoostsCapability(livingEntity);
+        AppliedBoostsData cap = ((IAppliedBoostsDataHolder) livingEntity).getOrCreateAppliedBoostsData();
         return livingEntity.getAttributes().hasAttribute(attribute)  && cap.getAppliedBoosts().stream().filter(boost -> boost.equals(this)).count() < maxApplications;
     }
 }

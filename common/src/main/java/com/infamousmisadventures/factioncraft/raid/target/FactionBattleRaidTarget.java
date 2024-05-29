@@ -1,9 +1,11 @@
 package com.infamousmisadventures.factioncraft.raid.target;
 
+import com.infamousmisadventures.factioncraft.FCConstants;
 import com.infamousmisadventures.factioncraft.FactionCraft;
 import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntityHelper;
 import com.infamousmisadventures.factioncraft.event.CalculateStrengthEvent;
 import com.infamousmisadventures.factioncraft.faction.Faction;
+import com.infamousmisadventures.factioncraft.platform.Services;
 import com.infamousmisadventures.factioncraft.raid.Raid;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -46,8 +48,8 @@ public class FactionBattleRaidTarget implements RaidTarget {
     private int calculateTargetStrength(ServerLevel level, int startingWave) {
         int strength = FACTION_BATTLE_RAID_TARGET_BASE_STRENGTH_PER_WAVE.get() * startingWave;
         CalculateStrengthEvent event = new CalculateStrengthEvent.FactionBattle(BATTLE, targetBlockPos, level, strength, strength, faction1, faction2);
-        net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(event);
-        FactionCraft.LOGGER.info("Strength = " + strength);
+        Services.EVENT_BUS.post(event);
+        FCConstants.LOGGER.info("Strength = " + strength);
         return (int) Math.floor(event.getStrength()*FACTION_BATTLE_RAID_TARGET_STRENGTH_MULTIPLIER.get());
     }
 

@@ -1,18 +1,18 @@
 package com.infamousmisadventures.factioncraft.faction;
 
+import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityRank;
+import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityType;
+import com.infamousmisadventures.factioncraft.faction.relations.FactionRelations;
+import com.infamousmisadventures.factioncraft.faction.spawning.DominionSpawner;
+import com.infamousmisadventures.factioncraft.level.saveddata.FactionData;
+import com.infamousmisadventures.factioncraft.util.data.ResourceSet;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.infamousmisadventures.factioncraft.capabilities.savedfactiondata.FactionData;
-import com.infamousmisadventures.factioncraft.data.ResourceSet;
-import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityType;
-import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityRank;
-import com.infamousmisadventures.factioncraft.faction.relations.FactionRelations;
-import com.infamousmisadventures.factioncraft.faction.spawning.DominionSpawner;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -22,20 +22,20 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.infamousmisadventures.factioncraft.FactionCraft.MODID;
+import static com.infamousmisadventures.factioncraft.FCConstants.MOD_ID;
 import static com.infamousmisadventures.factioncraft.config.FactionCraftConfig.DISABLED_FACTIONS;
+import static com.infamousmisadventures.factioncraft.util.ResourceLocationHelper.modLoc;
 import static net.minecraft.world.level.Level.OVERWORLD;
 
 public class Faction {
-    public static final Faction DEFAULT = new Faction(new ResourceLocation("faction/default"), false, FactionType.MONSTER, new CompoundTag(), FactionRaidConfig.DEFAULT, FactionBoostConfig.DEFAULT, FactionRelations.DEFAULT, Collections.emptyList(), new ResourceLocation(MODID, "default"), List.of(OVERWORLD.location()), ResourceSet.getEmpty(Registry.ENTITY_TYPE_REGISTRY));
-    public static final Faction GAIA = new Faction(new ResourceLocation("faction/gaia"), false, FactionType.GAIA, new CompoundTag(), FactionRaidConfig.DEFAULT, FactionBoostConfig.DEFAULT, FactionRelations.DEFAULT, Collections.emptyList(), new ResourceLocation(MODID, "default"), List.of(OVERWORLD.location()), ResourceSet.getEmpty(Registry.ENTITY_TYPE_REGISTRY));
+    public static final Faction DEFAULT = new Faction(new ResourceLocation("faction/default"), false, FactionType.MONSTER, new CompoundTag(), FactionRaidConfig.DEFAULT, FactionBoostConfig.DEFAULT, FactionRelations.DEFAULT, Collections.emptyList(), modLoc("default"), List.of(OVERWORLD.location()), ResourceSet.getEmpty(Registries.ENTITY_TYPE));
+    public static final Faction GAIA = new Faction(new ResourceLocation("faction/gaia"), false, FactionType.GAIA, new CompoundTag(), FactionRaidConfig.DEFAULT, FactionBoostConfig.DEFAULT, FactionRelations.DEFAULT, Collections.emptyList(), modLoc("default"), List.of(OVERWORLD.location()), ResourceSet.getEmpty(Registries.ENTITY_TYPE));
     public static final ResourceLocation VILLAGE_NAME = new ResourceLocation("faction/village");
 
     public static final Codec<Faction> CODEC = RecordCodecBuilder.create(builder ->
@@ -48,9 +48,9 @@ public class Faction {
                     FactionBoostConfig.CODEC.optionalFieldOf("boosts", FactionBoostConfig.DEFAULT).forGetter(Faction::getBoostConfig),
                     FactionRelations.CODEC_OLD.optionalFieldOf("relations", FactionRelations.DEFAULT).forGetter(Faction::getRelations),
                     FactionEntityType.CODEC_OLD.listOf().optionalFieldOf("entities", new ArrayList<>()).forGetter(Faction::getEntityTypes),
-                    ResourceLocation.CODEC.optionalFieldOf("activation_advancement", new ResourceLocation(MODID, "activation_advancement")).forGetter(Faction::getActivationAdvancement),
+                    ResourceLocation.CODEC.optionalFieldOf("activation_advancement", modLoc("activation_advancement")).forGetter(Faction::getActivationAdvancement),
                     ResourceLocation.CODEC.listOf().optionalFieldOf("home_dimensions", List.of(OVERWORLD.location())).forGetter(Faction::getHomeDimensions),
-                    ResourceSet.getCodec(Registry.ENTITY_TYPE_REGISTRY).optionalFieldOf("default_entities", ResourceSet.getEmpty(Registry.ENTITY_TYPE_REGISTRY)).forGetter(data -> data.defaultEntities)
+                    ResourceSet.getCodec(Registries.ENTITY_TYPE).optionalFieldOf("default_entities", ResourceSet.getEmpty(Registries.ENTITY_TYPE)).forGetter(data -> data.defaultEntities)
             ).apply(builder, Faction::new));
 
     private final ResourceLocation name;

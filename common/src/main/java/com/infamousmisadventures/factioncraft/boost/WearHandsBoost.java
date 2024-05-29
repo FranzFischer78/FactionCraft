@@ -1,49 +1,47 @@
 package com.infamousmisadventures.factioncraft.boost;
 
+import com.infamousmisadventures.factioncraft.mixins.MobAccessor;
+import com.infamousmisadventures.factioncraft.registry.FCBoostTypes;
+import com.infamousmisadventures.factioncraft.util.data.ResourceSet;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.infamousmisadventures.factioncraft.data.ResourceSet;
-import net.minecraft.core.Registry;
-import net.minecraft.world.Difficulty;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
-import net.minecraft.world.entity.ai.goal.RangedBowAttackGoal;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
-import net.minecraft.world.entity.monster.AbstractSkeleton;
 import net.minecraft.world.entity.monster.RangedAttackMob;
-import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.infamousmisadventures.factioncraft.boost.Boost.BoostType.MAINHAND;
-import static com.infamousmisadventures.factioncraft.boost.Boost.BoostType.OFFHAND;
-import static com.infamousmisadventures.factioncraft.boost.BoostProviders.WEAR_HANDS;
+import static com.infamousmisadventures.factioncraft.boost.Boost.BoostGroup.MAINHAND;
+import static com.infamousmisadventures.factioncraft.boost.Boost.BoostGroup.OFFHAND;
+import static net.minecraft.world.InteractionHand.MAIN_HAND;
 
 public class WearHandsBoost extends Boost {
 
     public static final Codec<WearHandsBoost> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             ItemStack.CODEC.optionalFieldOf("item", null).forGetter(WearHandsBoost::getItem),
             Codec.INT.optionalFieldOf("strength_adjustment", 1).forGetter(WearHandsBoost::getStrengthAdjustment),
-            BoostType.CODEC.optionalFieldOf("boost_type", MAINHAND).forGetter(WearHandsBoost::getType),
+            BoostGroup.CODEC.optionalFieldOf("boost_type", MAINHAND).forGetter(WearHandsBoost::getBoostGroup),
             Rarity.CODEC.fieldOf("rarity").forGetter(WearHandsBoost::getRarity),
-            ResourceSet.getCodec(Registry.ENTITY_TYPE_REGISTRY).optionalFieldOf("allowed_entities", ResourceSet.getEmpty(Registry.ENTITY_TYPE_REGISTRY)).forGetter(WearHandsBoost::getAllowedEntities)
+            ResourceSet.getCodec(Registries.ENTITY_TYPE).optionalFieldOf("allowed_entities", ResourceSet.getEmpty(Registries.ENTITY_TYPE)).forGetter(WearHandsBoost::getAllowedEntities)
     ).apply(instance, WearHandsBoost::new));
 
     private final ItemStack item;
     private final int strengthAdjustment;
-    private final BoostType boostType;
+    private final BoostGroup boostGroup;
     private final Rarity rarity;
     private final ResourceSet<EntityType<?>> allowedEntities;
 
-    public WearHandsBoost(ItemStack item, int strengthAdjustment, BoostType boostType, Rarity rarity, ResourceSet<EntityType<?>> allowedEntities) {
+    public WearHandsBoost(ItemStack item, int strengthAdjustment, BoostGroup boostGroup, Rarity rarity, ResourceSet<EntityType<?>> allowedEntities) {
         super();
         this.item = item;
         this.strengthAdjustment = strengthAdjustment;
-        this.boostType = boostType;
+        this.boostGroup = boostGroup;
         this.rarity = rarity;
         this.allowedEntities = allowedEntities;
     }
@@ -62,8 +60,13 @@ public class WearHandsBoost extends Boost {
     }
 
     @Override
-    public BoostType getType() {
-        return boostType;
+    public BoostGroup getBoostGroup() {
+        return boostGroup;
+    }
+
+    @Override
+    public BoostType<? extends Boost> type() {
+        return FCBoostTypes.WEAR_HANDS.get();
     }
 
     @Override
@@ -80,7 +83,7 @@ public class WearHandsBoost extends Boost {
         if (!canApply(livingEntity)) {
             return 0;
         }
-        if(boostType.equals(OFFHAND)){
+        if(boostGroup.equals(OFFHAND)){
             livingEntity.setItemSlot(EquipmentSlot.OFFHAND, item);
         }else {
             livingEntity.setItemSlot(EquipmentSlot.MAINHAND, item);
@@ -99,7 +102,7 @@ public class WearHandsBoost extends Boost {
 
     @Override
     public void applyAIChanges(Mob mobEntity) {
-        ItemStack itemstack = mobEntity.getItemInHand(ProjectileUtil.getWeaponHoldingHand(mobEntity, item -> item instanceof net.minecraft.world.item.BowItem));
+        ItemStack itemstack = mobEntity.getItemInHand(MAIN_HAND);
         if (itemstack.is(Items.BOW) && mobEntity instanceof RangedAttackMob) {
 //                RangedBowAttackGoal<RangedAttackMob> bowGoal = new RangedBowAttackGoal<>(mobEntity, 1.0D, 20, 15.0F);
 //                int i = 20;
@@ -108,13 +111,13 @@ public class WearHandsBoost extends Boost {
 //                }
 //
 //                mobEntity.bowGoal.setMinAttackInterval(i);
-//                mobEntity.goalSelector.addGoal(4, mobEntity.bowGoal);
+//                ((MobAccessor) mobEntity).getGoalSelector().addGoal(4, mobEntity.bowGoal);
         } else {
             if(mobEntity instanceof PathfinderMob pathfinder) {
-                List<Goal> meleeGoals = pathfinder.goalSelector.getAvailableGoals().stream().map(WrappedGoal::getGoal).filter(goal -> goal instanceof MeleeAttackGoal).collect(Collectors.toList());
+                List<Goal> meleeGoals = ((MobAccessor) pathfinder).getGoalSelector().getAvailableGoals().stream().map(WrappedGoal::getGoal).filter(goal -> goal instanceof MeleeAttackGoal).collect(Collectors.toList());
                 if(meleeGoals.isEmpty()) {
                     MeleeAttackGoal meleeGoal = new MeleeAttackGoal(pathfinder, 1.2D, false);
-                    mobEntity.goalSelector.addGoal(4, meleeGoal);
+                    ((MobAccessor) mobEntity).getGoalSelector().addGoal(4, meleeGoal);
                 }
             }
         }

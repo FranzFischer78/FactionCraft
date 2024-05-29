@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntity;
 import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntityHelper;
-import com.infamousmisadventures.factioncraft.data.ResourceSet;
+import com.infamousmisadventures.factioncraft.util.data.ResourceSet;
 import com.infamousmisadventures.factioncraft.faction.Faction;
 import com.infamousmisadventures.factioncraft.util.IntRange;
 import net.minecraft.core.BlockPos;

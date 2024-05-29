@@ -1,6 +1,6 @@
 package com.infamousmisadventures.factioncraft.faction.entity;
 
-import com.infamousmisadventures.factioncraft.data.ResourceSet;
+import com.infamousmisadventures.factioncraft.util.data.ResourceSet;
 import com.infamousmisadventures.factioncraft.registry.FCFactionEntityTypes;
 import com.infamousmisadventures.factioncraft.util.IntRange;
 import net.minecraft.core.Registry;

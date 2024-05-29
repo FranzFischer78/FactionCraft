@@ -1,9 +1,8 @@
 package com.infamousmisadventures.factioncraft.event;
 
 import com.infamousmisadventures.factioncraft.raid.Raid;
-import net.minecraftforge.eventbus.api.Event;
 
-public abstract class FactionRaidEvent extends Event {
+public abstract class FactionRaidEvent implements FCEvent {
 
         private final Raid raid;
 

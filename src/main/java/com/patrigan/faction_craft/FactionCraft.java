@@ -12,7 +12,7 @@ import com.infamousmisadventures.factioncraft.network.NetworkHandler;
 import com.infamousmisadventures.factioncraft.registry.FCMemoryModuleTypes;
 import com.infamousmisadventures.factioncraft.registry.FCSensorTypes;
 import com.infamousmisadventures.factioncraft.tags.EntityTags;
-import net.minecraftforge.common.MinecraftForge;
+import Services;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;

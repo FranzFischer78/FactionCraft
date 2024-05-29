@@ -2,11 +2,13 @@ package com.infamousmisadventures.factioncraft.boost.ai;
 
 import com.google.common.collect.ImmutableList;
 import com.infamousmisadventures.factioncraft.boost.Boost;
+import com.infamousmisadventures.factioncraft.boost.BoostType;
 import com.infamousmisadventures.factioncraft.config.FactionCraftConfig;
-import com.infamousmisadventures.factioncraft.registry.FCActivities;
 import com.infamousmisadventures.factioncraft.entity.ai.brain.task.raider.DigTask;
 import com.infamousmisadventures.factioncraft.entity.ai.goal.FactionDigGoal;
 import com.infamousmisadventures.factioncraft.mixins.MobAccessor;
+import com.infamousmisadventures.factioncraft.registry.FCActivities;
+import com.infamousmisadventures.factioncraft.registry.FCBoostTypes;
 import com.infamousmisadventures.factioncraft.util.BrainHelper;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
@@ -21,7 +23,7 @@ import net.minecraft.world.entity.ai.memory.MemoryStatus;
 
 import java.util.Set;
 
-import static com.infamousmisadventures.factioncraft.boost.Boost.BoostType.SPECIAL;
+import static com.infamousmisadventures.factioncraft.boost.Boost.BoostGroup.SPECIAL;
 import static com.infamousmisadventures.factioncraft.boost.Boost.Rarity.NONE;
 import static com.infamousmisadventures.factioncraft.registry.FCMemoryModuleTypes.IS_STUCK;
 
@@ -75,13 +77,18 @@ public class DiggerBoost extends Boost {
     }
 
     @Override
-    public BoostType getType() {
+    public BoostGroup getBoostGroup() {
         return SPECIAL;
     }
 
     @Override
     public Rarity getRarity() {
         return rarity;
+    }
+
+    @Override
+    public BoostType<? extends Boost> type() {
+        return FCBoostTypes.DIGGER.get();
     }
 
     @Override

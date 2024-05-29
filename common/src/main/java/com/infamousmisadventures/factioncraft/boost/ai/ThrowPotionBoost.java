@@ -1,25 +1,28 @@
 package com.infamousmisadventures.factioncraft.boost.ai;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.infamousmisadventures.factioncraft.boost.Boost;
-import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntity;
-import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntityHelper;
+import com.infamousmisadventures.factioncraft.boost.BoostType;
 import com.infamousmisadventures.factioncraft.entity.ai.goal.NearestFactionAllyTargetGoal;
 import com.infamousmisadventures.factioncraft.entity.ai.goal.ThrowPotionGoal;
-import net.minecraft.core.Registry;
+import com.infamousmisadventures.factioncraft.entity.data.FactionEntityData;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IFactionEntityDataHolder;
+import com.infamousmisadventures.factioncraft.mixins.MobAccessor;
+import com.infamousmisadventures.factioncraft.registry.FCBoostTypes;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.Potions;
 
-import static com.infamousmisadventures.factioncraft.boost.Boost.BoostType.AI;
+import static com.infamousmisadventures.factioncraft.boost.Boost.BoostGroup.AI;
 import static com.infamousmisadventures.factioncraft.boost.Boost.Rarity.NONE;
+import static net.minecraft.core.registries.BuiltInRegistries.POTION;
 
 public class ThrowPotionBoost extends Boost {
 
     public static final Codec<ThrowPotionBoost> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Registry.POTION.byNameCodec().optionalFieldOf("potion", Potions.HARMING).forGetter(ThrowPotionBoost::getPotion),
+            POTION.byNameCodec().optionalFieldOf("potion", Potions.HARMING).forGetter(ThrowPotionBoost::getPotion),
             Codec.BOOL.optionalFieldOf("beneficial", false).forGetter(ThrowPotionBoost::isBeneficial),
             Codec.BOOL.optionalFieldOf("requires_damaged", false).forGetter(ThrowPotionBoost::isRequiresDamaged),
             Codec.INT.optionalFieldOf("strength_adjustment", 1).forGetter(ThrowPotionBoost::getStrengthAdjustment),
@@ -62,8 +65,13 @@ public class ThrowPotionBoost extends Boost {
     }
 
     @Override
-    public BoostType getType() {
+    public BoostGroup getBoostGroup() {
         return AI;
+    }
+
+    @Override
+    public BoostType<? extends Boost> type() {
+        return FCBoostTypes.THROW_POTION.get();
     }
 
     @Override
@@ -90,12 +98,12 @@ public class ThrowPotionBoost extends Boost {
 
     @Override
     public void applyAIChanges(Mob mobEntity) {
-        FactionEntity factionEntity = FactionEntityHelper.getFactionEntityCapability(mobEntity);
+        FactionEntityData factionEntity = ((IFactionEntityDataHolder) mobEntity).getOrCreateFactionEntityData();
         ThrowPotionGoal throwPotionGoal = new ThrowPotionGoal(mobEntity, 1.0D, 60, 10.0F, potion, this.isBeneficial() ? factionEntity::getNearestDamagedFactionAlly : mobEntity::getTarget);
-        mobEntity.goalSelector.addGoal(2, throwPotionGoal);
+        ((MobAccessor) mobEntity).getGoalSelector().addGoal(2, throwPotionGoal);
         if(isBeneficial()) {
             NearestFactionAllyTargetGoal<LivingEntity> nearestFactionAllyTargetGoal = new NearestFactionAllyTargetGoal<>(mobEntity, LivingEntity.class, true, isRequiresDamaged() ? ThrowPotionBoost::requiresDamagedSelector : ThrowPotionBoost::anySelector);
-            mobEntity.targetSelector.addGoal(1, nearestFactionAllyTargetGoal);
+            ((MobAccessor) mobEntity).getTargetSelector().addGoal(1, nearestFactionAllyTargetGoal);
         }
     }
 

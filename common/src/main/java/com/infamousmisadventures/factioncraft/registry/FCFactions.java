@@ -1,19 +1,19 @@
 package com.infamousmisadventures.factioncraft.registry;
 
-import com.mojang.datafixers.util.Pair;
 import com.infamousmisadventures.factioncraft.boost.Boost;
 import com.infamousmisadventures.factioncraft.capabilities.playerfactions.PlayerFaction;
 import com.infamousmisadventures.factioncraft.capabilities.playerfactions.PlayerFactions;
 import com.infamousmisadventures.factioncraft.capabilities.playerfactions.PlayerFactionsHelper;
-import com.infamousmisadventures.factioncraft.util.data.ResourceSet;
-import com.infamousmisadventures.factioncraft.util.data.MergeableCodecDataManager;
 import com.infamousmisadventures.factioncraft.faction.Faction;
 import com.infamousmisadventures.factioncraft.faction.FactionBoostConfig;
 import com.infamousmisadventures.factioncraft.faction.FactionRaidConfig;
 import com.infamousmisadventures.factioncraft.faction.FactionType;
-import com.infamousmisadventures.factioncraft.faction.relations.FactionRelations;
 import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityType;
+import com.infamousmisadventures.factioncraft.faction.relations.FactionRelations;
 import com.infamousmisadventures.factioncraft.util.GeneralUtils;
+import com.infamousmisadventures.factioncraft.util.data.MergeableCodecDataManager;
+import com.infamousmisadventures.factioncraft.util.data.ResourceSet;
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -28,8 +28,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.infamousmisadventures.factioncraft.FCConstants.MOD_ID;
 import static com.infamousmisadventures.factioncraft.FCConstants.LOGGER;
+import static com.infamousmisadventures.factioncraft.FCConstants.MOD_ID;
 import static com.infamousmisadventures.factioncraft.faction.relations.FactionRelation.ENEMY_THRESHOLD;
 import static com.infamousmisadventures.factioncraft.faction.relations.FactionRelation.NEUTRAL;
 import static com.infamousmisadventures.factioncraft.util.ResourceLocationHelper.modLoc;
@@ -41,14 +41,13 @@ public class FCFactions {
     public static final MergeableCodecDataManager<Faction, Faction> FACTION_DATA = new MergeableCodecDataManager<>("faction", Faction.CODEC, FCFactions::factionMerger);
     public static final Map<UUID, Faction> PLAYER_FACTIONS = new HashMap<>();
 
-    public static Faction factionMerger(List<Faction> raws, ResourceLocation id){
+    public static Faction factionMerger(List<Faction> raws){
         ResourceLocation name = null;
         FactionType factionType = null;
         CompoundTag banner = null;
         FactionRaidConfig factionRaidConfig = null;
         FactionBoostConfig boostConfig = null;
         FactionRelations factionRelations = null;
-        Set<FactionEntityType> entities = new HashSet<>();
         ResourceLocation activationAdvancement = null;
         List<ResourceLocation> homeDimensions = new ArrayList<>();
         ResourceSet<EntityType<?>> defaultEntities = new ResourceSet<>(ENTITY_TYPE, new ArrayList<>());
@@ -60,7 +59,6 @@ public class FCFactions {
                 factionRaidConfig = raw.getRaidConfig();
                 boostConfig = null;
                 factionRelations = null;
-                entities = new HashSet<>();
                 homeDimensions.clear();
                 activationAdvancement = raw.getActivationAdvancement();
             }
@@ -95,14 +93,10 @@ public class FCFactions {
                 List<ResourceLocation> enemies = Stream.concat(factionRelations.getEnemies().stream(), raw.getRelations().getEnemies().stream()).collect(Collectors.toList());
                 factionRelations = new FactionRelations(allies, enemies);
             }
-            entities.addAll(raw.getEntityTypes());
             homeDimensions.addAll(raw.getHomeDimensions());
             defaultEntities = defaultEntities.merge(raw.getDefaultEntities());
         }
-        if(!entities.isEmpty()){
-            LOGGER.info("Entity types within the faction file is deprecated. They should now be in separate files in the faction_entity_type/<factionname>/ folder. For faction: " + id);
-        }
-        return new Faction(name,false, factionType, banner, factionRaidConfig, boostConfig, factionRelations, new ArrayList<>(entities), activationAdvancement, homeDimensions, defaultEntities);
+        return new Faction(name,false, factionType, banner, factionRaidConfig, boostConfig, factionRelations, new ArrayList<>(), activationAdvancement, homeDimensions, defaultEntities);
     }
 
 
@@ -158,7 +152,7 @@ public class FCFactions {
     }
 
     public static Faction createPlayerFaction(Player player){
-        Faction faction = new Faction(new ResourceLocation(MOD_ID, "player/" + player.getName().getString().toLowerCase()), false, FactionType.PLAYER, new CompoundTag(), FactionRaidConfig.PLAYER, FactionBoostConfig.DEFAULT, FactionRelations.DEFAULT, Collections.emptyList(), modLoc("default"), new ArrayList<>(), ResourceSet.getEmpty(Registry.ENTITY_TYPE_REGISTRY));
+        Faction faction = new Faction(new ResourceLocation(MOD_ID, "player/" + player.getName().getString().toLowerCase()), false, FactionType.PLAYER, new CompoundTag(), FactionRaidConfig.PLAYER, FactionBoostConfig.DEFAULT, FactionRelations.DEFAULT, Collections.emptyList(), modLoc("default"), new ArrayList<>(), ResourceSet.getEmpty(Registries.ENTITY_TYPE));
         for (Faction faction1 : getFactionData().values()) {
             if(!faction.getRelations().getEnemies().contains(getKey(faction))){
                 if(faction1.getFactionType().equals(FactionType.MONSTER)) {

@@ -2,17 +2,13 @@ package com.infamousmisadventures.factioncraft.raid;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntity;
-import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntityHelper;
-import com.infamousmisadventures.factioncraft.capabilities.raider.Raider;
-import com.infamousmisadventures.factioncraft.capabilities.raider.RaiderHelper;
-import com.infamousmisadventures.factioncraft.capabilities.raidmanager.RaidManager;
 import com.infamousmisadventures.factioncraft.event.FactionRaidEvent;
 import com.infamousmisadventures.factioncraft.faction.EntityWeightMapProperties;
 import com.infamousmisadventures.factioncraft.faction.Faction;
 import com.infamousmisadventures.factioncraft.faction.FactionGroupSpawner;
-import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityType;
 import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityRank;
+import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityType;
+import com.infamousmisadventures.factioncraft.platform.Services;
 import com.infamousmisadventures.factioncraft.raid.target.RaidTarget;
 import com.infamousmisadventures.factioncraft.raid.target.RaidTargetHelper;
 import com.infamousmisadventures.factioncraft.registry.FCFactions;
@@ -48,7 +44,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.infamousmisadventures.factioncraft.capabilities.raidmanager.RaidManagerHelper.getRaidManagerCapability;
 import static com.infamousmisadventures.factioncraft.config.FactionCraftConfig.*;
 import static com.infamousmisadventures.factioncraft.util.GeneralUtils.getRandomEntry;
 
@@ -176,7 +171,7 @@ public class Raid {
                 if (raidTarget.isDefeat(this, level)) {
                     if (this.groupsSpawned > 0) {
                         FactionRaidEvent.Defeat event = new FactionRaidEvent.Defeat(this);
-                        net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(event);
+                        Services.EVENT_BUS.post(event);
                         this.status = Status.LOSS;
                         this.playSound(raidTarget.getTargetBlockPos(), factions.get(0).getRaidConfig().getDefeatSoundEvent());
                         this.raidEvent.setName(getRaidEventNameDefeat(raidTarget));
@@ -229,7 +224,7 @@ public class Raid {
                         this.spawnGroup();
                         if (!flag3) {
                             FactionRaidEvent.Wave event = new FactionRaidEvent.Wave(this);
-                            net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(event);
+                            Services.EVENT_BUS.post(event);
                             flag3 = true;
                         }
                     } else {
@@ -248,7 +243,7 @@ public class Raid {
                     } else {
                         this.status = Status.VICTORY;
                         FactionRaidEvent.Victory event = new FactionRaidEvent.Victory(this);
-                        net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(event);
+                        Services.EVENT_BUS.post(event);
                         this.playSound(raidTarget.getTargetBlockPos(), factions.get(0).getRaidConfig().getVictorySoundEvent());
                         this.raidEvent.setName(getRaidEventNameVictory(raidTarget));
 

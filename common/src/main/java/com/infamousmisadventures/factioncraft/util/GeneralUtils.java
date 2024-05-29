@@ -5,19 +5,18 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
-import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
 import java.util.Map;
 
 public class GeneralUtils {
     public static <E> Codec<Either<TagKey<E>, List<E>>> getRegistryCodec(ResourceKey<? extends Registry<E>> resourceKey){
-        return Codec.either(TagKey.hashedCodec(resourceKey), ((Registry<E>) BuiltinRegistries.REGISTRY.get(resourceKey.location())).byNameCodec().listOf());
+        return Codec.either(TagKey.hashedCodec(resourceKey), ((Registry<E>) BuiltInRegistries.REGISTRY.get(resourceKey.location())).byNameCodec().listOf());
     }
 
     public static <T> T getRandomEntry(Map<T, Integer> rlList, RandomSource random) {
@@ -50,7 +49,7 @@ public class GeneralUtils {
     }
 
     public static BlockPos vec3ToBlockPos(Vec3 vec3) {
-        return new BlockPos(vec3.x, vec3.y, vec3.z);
+        return new BlockPos((int) vec3.x, (int) vec3.y, (int) vec3.z);
     }
 
     public static Vec3 blockPosToVec3(BlockPos blockPos) {

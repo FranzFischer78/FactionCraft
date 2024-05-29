@@ -1,5 +1,6 @@
 package com.infamousmisadventures.factioncraft.boost;
 
+import com.infamousmisadventures.factioncraft.registry.FCBoosts;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.resources.ResourceLocation;
@@ -17,21 +18,21 @@ public class RoleBoost extends Boost {
             ResourceLocation.CODEC.listOf().fieldOf("boosts").forGetter(RoleBoost::getBoosts),
             ResourceLocation.CODEC.listOf().optionalFieldOf("fallback_boosts", new ArrayList<>()).forGetter(RoleBoost::getFallbackBoosts),
             Codec.INT.optionalFieldOf("strength_adjustment", 0).forGetter(RoleBoost::getStrengthAdjustment),
-            BoostType.CODEC.optionalFieldOf("boost_type", BoostType.ROLE).forGetter(RoleBoost::getType),
+            BoostGroup.CODEC.optionalFieldOf("boost_type", BoostGroup.ROLE).forGetter(RoleBoost::getBoostGroup),
             Rarity.CODEC.fieldOf("rarity").forGetter(RoleBoost::getRarity)
     ).apply(instance, RoleBoost::new));
 
     private final List<ResourceLocation> boosts;
     private final List<ResourceLocation> fallbackBoosts;
     private final int strengthAdjustment;
-    private final BoostType boostType;
+    private final BoostGroup boostGroup;
     private final Rarity rarity;
 
-    public RoleBoost(List<ResourceLocation> boosts, List<ResourceLocation> fallbackBoosts, int strengthAdjustment, BoostType boostType, Rarity rarity) {
+    public RoleBoost(List<ResourceLocation> boosts, List<ResourceLocation> fallbackBoosts, int strengthAdjustment, BoostGroup boostGroup, Rarity rarity) {
         this.boosts = boosts;
         this.fallbackBoosts = fallbackBoosts;
         this.strengthAdjustment = strengthAdjustment;
-        this.boostType = boostType;
+        this.boostGroup = boostGroup;
         this.rarity = rarity;
     }
 
@@ -47,8 +48,8 @@ public class RoleBoost extends Boost {
         return strengthAdjustment;
     }
 
-    public BoostType getBoostType() {
-        return boostType;
+    public BoostGroup getBoostType() {
+        return boostGroup;
     }
 
     @Override
@@ -57,8 +58,8 @@ public class RoleBoost extends Boost {
     }
 
     @Override
-    public BoostType getType() {
-        return boostType;
+    public BoostGroup getBoostGroup() {
+        return boostGroup;
     }
 
 
@@ -71,8 +72,8 @@ public class RoleBoost extends Boost {
         if (!canApply(livingEntity)) {
             return 0;
         }
-        List<Boost> fallbacks = boosts.stream().map(Boosts::getBoost).filter(Objects::nonNull).toList();
-        Integer boostsStrength = boosts.stream().map(Boosts::getBoost).filter(Objects::nonNull).flatMap(boost -> boost.canApply(livingEntity) ? Stream.of(boost) : fallbacks.stream()).map(boost -> boost.apply(livingEntity)).reduce(0, Integer::sum);
+        List<Boost> fallbacks = boosts.stream().map(FCBoosts::getBoost).filter(Objects::nonNull).toList();
+        Integer boostsStrength = boosts.stream().map(FCBoosts::getBoost).filter(Objects::nonNull).flatMap(boost -> boost.canApply(livingEntity) ? Stream.of(boost) : fallbacks.stream()).map(boost -> boost.apply(livingEntity)).reduce(0, Integer::sum);
         super.apply(livingEntity);
         return boostsStrength + strengthAdjustment;
     }

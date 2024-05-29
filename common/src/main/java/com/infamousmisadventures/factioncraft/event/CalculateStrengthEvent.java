@@ -2,12 +2,11 @@ package com.infamousmisadventures.factioncraft.event;
 
 import com.infamousmisadventures.factioncraft.faction.Faction;
 import com.infamousmisadventures.factioncraft.raid.target.RaidTarget;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraft.server.level.ServerPlayer;
 
-public class CalculateStrengthEvent extends Event {
+public class CalculateStrengthEvent implements FCEvent {
     RaidTarget.Type type;
     BlockPos blockPos;
     ServerLevel level;

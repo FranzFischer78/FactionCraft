@@ -4,7 +4,7 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.infamousmisadventures.factioncraft.boost.Boost;
-import com.infamousmisadventures.factioncraft.boost.Boosts;
+import com.infamousmisadventures.factioncraft.registry.FCBoosts;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
@@ -64,7 +64,7 @@ public class EntityBoostConfig {
     }
 
     public List<Boost> getMandatoryBoosts(){
-        return mandatoryResourceLocations.stream().map(Boosts::getBoost).collect(Collectors.toList());
+        return mandatoryResourceLocations.stream().map(FCBoosts::getBoost).collect(Collectors.toList());
     }
 
     public List<ResourceLocation> getWhitelistResourceLocations() {
@@ -72,7 +72,7 @@ public class EntityBoostConfig {
     }
 
     public List<Boost> getWhitelistBoosts(){
-        return whitelistResourceLocations.stream().map(Boosts::getBoost).collect(Collectors.toList());
+        return whitelistResourceLocations.stream().map(FCBoosts::getBoost).collect(Collectors.toList());
     }
 
     public List<ResourceLocation> getBlacklistResourceLocations() {
@@ -80,7 +80,7 @@ public class EntityBoostConfig {
     }
 
     public List<Boost> getBlacklistBoosts(){
-        return blacklistResourceLocations.stream().map(Boosts::getBoost).collect(Collectors.toList());
+        return blacklistResourceLocations.stream().map(FCBoosts::getBoost).collect(Collectors.toList());
     }
 
     public List<Pair<ResourceLocation, Boost.Rarity>> getRarityOverridesLocations() {
@@ -88,7 +88,7 @@ public class EntityBoostConfig {
     }
 
     public Map<Boost, Boost.Rarity> getRarityOverrides() {
-        return rarityOverridesLocations.stream().collect(Collectors.toMap(pair -> Boosts.getBoost(pair.getFirst()), Pair::getSecond));
+        return rarityOverridesLocations.stream().collect(Collectors.toMap(pair -> FCBoosts.getBoost(pair.getFirst()), Pair::getSecond));
     }
 
     public CompoundTag save(CompoundTag compoundNbt){

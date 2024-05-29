@@ -1,7 +1,9 @@
 package com.infamousmisadventures.factioncraft.raid.target;
 
+import com.infamousmisadventures.factioncraft.FCConstants;
 import com.infamousmisadventures.factioncraft.FactionCraft;
 import com.infamousmisadventures.factioncraft.event.CalculateStrengthEvent;
+import com.infamousmisadventures.factioncraft.platform.Services;
 import com.infamousmisadventures.factioncraft.raid.Raid;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -30,8 +32,8 @@ public class PlayerRaidTarget implements RaidTarget {
     private int calculateTargetStrength(ServerPlayer player, ServerLevel level) {
         int strength = PLAYER_RAID_TARGET_BASE_STRENGTH.get();
         CalculateStrengthEvent event = new CalculateStrengthEvent.Player(PLAYER, player, level, strength, strength);
-        net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(event);
-        FactionCraft.LOGGER.info("Strength = " + strength);
+        Services.EVENT_BUS.post(event);
+        FCConstants.LOGGER.info("Strength = " + strength);
         return (int) Math.floor(event.getStrength()*PLAYER_RAID_TARGET_STRENGTH_MULTIPLIER.get());
     }
 

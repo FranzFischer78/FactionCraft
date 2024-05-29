@@ -5,11 +5,10 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.infamousmisadventures.factioncraft.boost.Boost;
-import com.infamousmisadventures.factioncraft.boost.Boosts;
+import com.infamousmisadventures.factioncraft.registry.FCBoosts;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -50,7 +49,7 @@ public class FactionBoostConfig {
     }
 
     public List<Boost> getMandatoryBoosts(){
-        return mandatoryResourceLocations.stream().map(Boosts::getBoost).collect(Collectors.toList());
+        return mandatoryResourceLocations.stream().map(FCBoosts::getBoost).collect(Collectors.toList());
     }
 
     public List<ResourceLocation> getWhitelistResourceLocations() {
@@ -58,7 +57,7 @@ public class FactionBoostConfig {
     }
 
     public List<Boost> getWhitelistBoosts(){
-        return whitelistResourceLocations.stream().map(Boosts::getBoost).collect(Collectors.toList());
+        return whitelistResourceLocations.stream().map(FCBoosts::getBoost).collect(Collectors.toList());
     }
 
     public List<ResourceLocation> getBlacklistResourceLocations() {
@@ -66,7 +65,7 @@ public class FactionBoostConfig {
     }
 
     public List<Boost> getBlacklistBoosts(){
-        return blacklistResourceLocations.stream().map(Boosts::getBoost).collect(Collectors.toList());
+        return blacklistResourceLocations.stream().map(FCBoosts::getBoost).collect(Collectors.toList());
     }
 
     public List<Pair<ResourceLocation, Boost.Rarity>> getRarityOverridesLocations() {
@@ -75,7 +74,7 @@ public class FactionBoostConfig {
 
     public Map<Boost, Boost.Rarity> getRarityOverrides() {
         return rarityOverridesLocations.stream()
-                .collect(Collectors.toMap(pair -> Boosts.getBoost(pair.getFirst()), Pair::getSecond, (rarity1, rarity2) -> rarity2));
+                .collect(Collectors.toMap(pair -> FCBoosts.getBoost(pair.getFirst()), Pair::getSecond, (rarity1, rarity2) -> rarity2));
     }
 
 

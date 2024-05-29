@@ -1,7 +1,7 @@
 package com.infamousmisadventures.factioncraft.faction;
 
 import com.infamousmisadventures.factioncraft.boost.Boost;
-import com.infamousmisadventures.factioncraft.boost.Boosts;
+import com.infamousmisadventures.factioncraft.registry.FCBoosts;
 import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntity;
 import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntityHelper;
 import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityType;
@@ -38,7 +38,7 @@ public class FactionBoostHelper {
         int appliedStrength = 0;
         RandomSource random = level.random;
         while(appliedStrength+entities.size() <= targetStrength) {
-            Boost boost = Boosts.getRandomBoost(random, faction.getBoostConfig().getWhitelistBoosts(), faction.getBoostConfig().getBlacklistBoosts());
+            Boost boost = FCBoosts.getRandomBoost(random, faction.getBoostConfig().getWhitelistBoosts(), faction.getBoostConfig().getBlacklistBoosts());
             if(boost == null){
                 break;
             }
@@ -61,7 +61,7 @@ public class FactionBoostHelper {
                 break;
             }
             Mob randomEntity = entitiesWithType.get(0);
-            Boost boost = Boosts.getRandomBoostForEntity(random, randomEntity, getWhitelistBoosts(faction, randomFactionEntityType), getBlacklistBoosts(faction, randomFactionEntityType), getRarityOverrides(faction, randomFactionEntityType));
+            Boost boost = FCBoosts.getRandomBoostForEntity(random, randomEntity, getWhitelistBoosts(faction, randomFactionEntityType), getBlacklistBoosts(faction, randomFactionEntityType), getRarityOverrides(faction, randomFactionEntityType));
             if(boost == null){
                 break;
             }
@@ -80,7 +80,7 @@ public class FactionBoostHelper {
             Mob randomEntity = getRandomItem(entities, random);
             FactionEntity cap = FactionEntityHelper.getFactionEntityCapability(randomEntity);
             FactionEntityType factionEntityType = cap.getFactionEntityType();
-            Boost boost = Boosts.getRandomBoostForEntity(random, randomEntity, getWhitelistBoosts(faction, factionEntityType), getBlacklistBoosts(faction, factionEntityType), getRarityOverrides(faction, factionEntityType));
+            Boost boost = FCBoosts.getRandomBoostForEntity(random, randomEntity, getWhitelistBoosts(faction, factionEntityType), getBlacklistBoosts(faction, factionEntityType), getRarityOverrides(faction, factionEntityType));
             if(boost == null){
                 break;
             }

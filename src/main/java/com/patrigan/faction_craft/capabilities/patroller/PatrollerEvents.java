@@ -28,7 +28,7 @@ public class PatrollerEvents {
         LivingEntity livingEntity = event.getEntity();
         Entity sourceEntity = event.getSource().getEntity();
         if (!livingEntity.level.isClientSide() && livingEntity instanceof Mob mob && sourceEntity instanceof Player playerEntity) {
-            Patroller cap = PatrollerHelper.getPatrollerCapability(mob);
+            Patroller cap = ((IMobPatrollerDataHolder) mob).getOrCreateMobPatrollerData();
             if (cap.isPatrolLeader()) {
                 MobEffectInstance effectinstance1 = playerEntity.getEffect(ModMobEffects.FACTION_BAD_OMEN.get());
                 int i = 1;

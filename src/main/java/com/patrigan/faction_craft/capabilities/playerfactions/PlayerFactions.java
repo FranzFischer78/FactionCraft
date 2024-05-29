@@ -59,7 +59,7 @@ public class PlayerFactions implements INBTSerializable<CompoundTag> {
     @Override
     public CompoundTag serializeNBT() {
         CompoundTag compoundTag = new CompoundTag();
-        CODEC.encodeStart(NbtOps.INSTANCE, this).resultOrPartial(FactionCraft.LOGGER::error).ifPresent((p_216906_) -> {
+        CODEC.encodeStart(NbtOps.INSTANCE, this).resultOrPartial(FCConstants.LOGGER::error).ifPresent((p_216906_) -> {
             compoundTag.put("PlayerFactions", p_216906_);
         });
         return compoundTag;
@@ -69,7 +69,7 @@ public class PlayerFactions implements INBTSerializable<CompoundTag> {
     public void deserializeNBT(CompoundTag pCompound) {
         if (pCompound.contains("PlayerFactions", 10)) {
             DataResult<PlayerFactions> dataresult = PlayerFactions.CODEC.parse(new Dynamic<>(NbtOps.INSTANCE, pCompound.get("PlayerFactions")));
-            dataresult.resultOrPartial(FactionCraft.LOGGER::error).ifPresent(playerFactions -> this.setPlayerFactions(playerFactions.getPlayerFactions()));
+            dataresult.resultOrPartial(FCConstants.LOGGER::error).ifPresent(playerFactions -> this.setPlayerFactions(playerFactions.getPlayerFactions()));
         }
     }
 

@@ -1,9 +1,10 @@
 package com.infamousmisadventures.factioncraft.boost;
 
+import com.infamousmisadventures.factioncraft.registry.FCBoostTypes;
 import com.mojang.serialization.Codec;
 import net.minecraft.world.entity.LivingEntity;
 
-import static com.infamousmisadventures.factioncraft.boost.Boost.BoostType.SPECIAL;
+import static com.infamousmisadventures.factioncraft.boost.Boost.BoostGroup.SPECIAL;
 
 public class NoBoost extends Boost {
 
@@ -21,8 +22,13 @@ public class NoBoost extends Boost {
     }
 
     @Override
-    public BoostType getType() {
+    public BoostGroup getBoostGroup() {
         return SPECIAL;
+    }
+
+    @Override
+    public BoostType<? extends Boost> type() {
+        return FCBoostTypes.NO_BOOST.get();
     }
 
     @Override

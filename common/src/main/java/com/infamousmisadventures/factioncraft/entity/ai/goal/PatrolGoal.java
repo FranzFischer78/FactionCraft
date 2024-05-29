@@ -75,7 +75,7 @@ public class PatrolGoal<T extends Mob> extends Goal {
                     this.cooldownUntil = this.mob.level.getGameTime() + 200L;
                 } else if (flag) {
                     for(Mob patrollerentity : list) {
-                        Patroller patrollerCap = PatrollerHelper.getPatrollerCapability(patrollerentity);
+                        Patroller patrollerCap = ((IMobPatrollerDataHolder) patrollerentity).getOrCreateMobPatrollerData();
                         patrollerCap.setPatrolTarget(blockpos);
                     }
                 }
@@ -86,7 +86,7 @@ public class PatrolGoal<T extends Mob> extends Goal {
 
     private List<Mob> findPatrolCompanions() {
         return this.mob.level.getEntitiesOfClass(Mob.class, this.mob.getBoundingBox().inflate(32.0D), (p_226543_1_) -> {
-            Patroller cap = PatrollerHelper.getPatrollerCapability(p_226543_1_);
+            Patroller cap = ((IMobPatrollerDataHolder) p_226543_1_).getOrCreateMobPatrollerData();
             if(cap == null) return false;
             return cap.canJoinPatrol(this.mob) && !p_226543_1_.is(this.mob);
         });

@@ -1,6 +1,9 @@
 package com.infamousmisadventures.factioncraft.entity;
 
 import com.google.common.collect.ImmutableList;
+import com.infamousmisadventures.factioncraft.entity.data.MobPatrollerData;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IMobPatrollerDataHolder;
+import com.infamousmisadventures.factioncraft.mixins.MobAccessor;
 import com.mojang.datafixers.util.Pair;
 import com.infamousmisadventures.factioncraft.capabilities.patroller.Patroller;
 import com.infamousmisadventures.factioncraft.capabilities.patroller.PatrollerHelper;
@@ -48,8 +51,8 @@ public class EntityAIEvents {
             addVillagerTasks((Villager) event.getEntity());
         }else if(event.getEntity() instanceof Mob mob){
             if(!hasBrain(mob)){
-                mob.targetSelector.addGoal(2, new NearestFactionEnemyTargetGoal(mob, 10, true, false));
-                mob.targetSelector.addGoal(2, new FactionAllyHurtTargetGoal(mob, 10, true, false));
+                ((MobAccessor) mob).getTargetSelector().addGoal(2, new NearestFactionEnemyTargetGoal(mob, 10, true, false));
+                ((MobAccessor) mob).getTargetSelector().addGoal(2, new FactionAllyHurtTargetGoal(mob, 10, true, false));
             }else if(brainValid(mob)){
                 // Add Brain faction targets
                 BrainHelper.addMemory(mob.getBrain(), FCMemoryModuleTypes.NEAREST_VISIBLE_FACTION_ENEMY.get());
@@ -59,7 +62,7 @@ public class EntityAIEvents {
                 BrainHelper.addMemory(mob.getBrain(), FCMemoryModuleTypes.RAIDED_VILLAGE_POI.get());
                 BrainHelper.addMemory(mob.getBrain(), FCMemoryModuleTypes.RAID.get());
                 BrainHelper.addMemory(mob.getBrain(), FCMemoryModuleTypes.PATROLLER.get());
-                Patroller patrollerCapability = PatrollerHelper.getPatrollerCapability(mob);
+                MobPatrollerData patrollerCapability = ((IMobPatrollerDataHolder) mob).getOrCreateMobPatrollerData();
                 if(patrollerCapability.isPatrolling()){
                     mob.getBrain().setMemory(FCMemoryModuleTypes.PATROLLER.get(), true);
                 }

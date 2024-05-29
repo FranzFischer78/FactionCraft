@@ -1,16 +1,18 @@
 package com.infamousmisadventures.factioncraft.boost.ai;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.infamousmisadventures.factioncraft.boost.Boost;
+import com.infamousmisadventures.factioncraft.boost.BoostType;
 import com.infamousmisadventures.factioncraft.config.FactionCraftConfig;
 import com.infamousmisadventures.factioncraft.entity.ai.goal.UseShieldGoal;
+import com.infamousmisadventures.factioncraft.mixins.MobAccessor;
+import com.infamousmisadventures.factioncraft.registry.FCBoostTypes;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
-import net.minecraftforge.registries.ForgeRegistries;
 
-import static com.infamousmisadventures.factioncraft.boost.Boost.BoostType.AI;
+import static com.infamousmisadventures.factioncraft.boost.Boost.BoostGroup.AI;
 import static com.infamousmisadventures.factioncraft.boost.Boost.Rarity.NONE;
 import static com.infamousmisadventures.factioncraft.tags.EntityTags.CAN_USE_SHIELD;
 
@@ -39,8 +41,13 @@ public class ShieldAIBoost extends Boost {
     }
 
     @Override
-    public BoostType getType() {
+    public BoostGroup getBoostGroup() {
         return AI;
+    }
+
+    @Override
+    public BoostType<? extends Boost> type() {
+        return FCBoostTypes.SHIELD_AI.get();
     }
 
     @Override
@@ -62,13 +69,13 @@ public class ShieldAIBoost extends Boost {
 
     @Override
     public boolean canApply(LivingEntity livingEntity) {
-        return FactionCraftConfig.ENABLE_EXPERIMENTAL_FEATURES.get() && livingEntity instanceof PathfinderMob && ForgeRegistries.ENTITY_TYPES.tags().getTag(CAN_USE_SHIELD).contains(livingEntity.getType());
+        return FactionCraftConfig.ENABLE_EXPERIMENTAL_FEATURES.get() && livingEntity instanceof PathfinderMob && livingEntity.getType().is(CAN_USE_SHIELD);
     }
 
     @Override
     public void applyAIChanges(Mob mobEntity) {
         UseShieldGoal useShieldGoal = new UseShieldGoal((PathfinderMob) mobEntity, 7.5D, 60, 160, 15, 1, false);
-        mobEntity.goalSelector.addGoal(0, useShieldGoal);
+        ((MobAccessor) mobEntity).getGoalSelector().addGoal(0, useShieldGoal);
     }
 
     private static boolean requiresDamagedSelector(LivingEntity livingEntity) {

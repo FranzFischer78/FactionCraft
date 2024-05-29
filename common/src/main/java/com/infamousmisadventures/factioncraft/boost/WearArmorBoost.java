@@ -1,41 +1,38 @@
 package com.infamousmisadventures.factioncraft.boost;
 
+import com.infamousmisadventures.factioncraft.registry.FCBoostTypes;
+import com.infamousmisadventures.factioncraft.util.data.ResourceSet;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.infamousmisadventures.factioncraft.data.ResourceSet;
-import com.infamousmisadventures.factioncraft.tags.EntityTags;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
-
-import static com.infamousmisadventures.factioncraft.boost.BoostProviders.WEAR_ARMOR;
 
 public class WearArmorBoost extends Boost {
 
     public static final Codec<WearArmorBoost> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             ItemStack.CODEC.listOf().fieldOf("item_stacks").forGetter(WearArmorBoost::getItemStacks),
             Codec.INT.optionalFieldOf("strength_adjustment", 1).forGetter(WearArmorBoost::getStrengthAdjustment),
-            BoostType.CODEC.optionalFieldOf("boost_type", BoostType.ARMOR).forGetter(WearArmorBoost::getType),
+            BoostGroup.CODEC.optionalFieldOf("boost_type", BoostGroup.ARMOR).forGetter(WearArmorBoost::getBoostGroup),
             Rarity.CODEC.fieldOf("rarity").forGetter(WearArmorBoost::getRarity),
-            ResourceSet.getCodec(Registry.ENTITY_TYPE_REGISTRY).optionalFieldOf("allowed_entities", ResourceSet.getEmpty(Registry.ENTITY_TYPE_REGISTRY)).forGetter(WearArmorBoost::getAllowedEntities)
+            ResourceSet.getCodec(Registries.ENTITY_TYPE).optionalFieldOf("allowed_entities", ResourceSet.getEmpty(Registries.ENTITY_TYPE)).forGetter(WearArmorBoost::getAllowedEntities)
     ).apply(instance, WearArmorBoost::new));
 
     private final List<ItemStack> itemStacks;
     private final int strengthAdjustment;
-    private final BoostType boostType;
+    private final BoostGroup boostGroup;
     private final Rarity rarity;
     private final ResourceSet<EntityType<?>> allowedEntities;
 
-    public WearArmorBoost(List<ItemStack> itemStacks, int strengthAdjustment, BoostType boostType, Rarity rarity, ResourceSet<EntityType<?>> allowedEntities) {
+    public WearArmorBoost(List<ItemStack> itemStacks, int strengthAdjustment, BoostGroup boostGroup, Rarity rarity, ResourceSet<EntityType<?>> allowedEntities) {
         super();
         this.itemStacks = itemStacks;
         this.strengthAdjustment = strengthAdjustment;
-        this.boostType = boostType;
+        this.boostGroup = boostGroup;
         this.rarity = rarity;
         this.allowedEntities = allowedEntities;
     }
@@ -53,8 +50,13 @@ public class WearArmorBoost extends Boost {
     }
 
     @Override
-    public BoostType getType() {
-        return boostType;
+    public BoostGroup getBoostGroup() {
+        return boostGroup;
+    }
+
+    @Override
+    public BoostType<? extends Boost> type() {
+        return FCBoostTypes.WEAR_ARMOR.get();
     }
 
     @Override

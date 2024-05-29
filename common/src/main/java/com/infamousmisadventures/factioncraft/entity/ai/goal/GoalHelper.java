@@ -9,7 +9,7 @@ import java.util.Set;
 
 public class GoalHelper {
     public static Set<WrappedGoal> getAvailableGoals(Mob mobEntity){
-        return castToAccessor(mobEntity.goalSelector).getAvailableGoals();
+        return castToAccessor(((MobAccessor) mobEntity).getGoalSelector()).getAvailableGoals();
     }
     public static GoalSelectorAccessor castToAccessor(GoalSelector goalSelector) {
         //noinspection unchecked

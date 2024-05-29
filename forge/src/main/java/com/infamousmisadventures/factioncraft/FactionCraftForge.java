@@ -1,7 +1,7 @@
 package com.infamousmisadventures.factioncraft;
 
 import com.infamousmisadventures.factioncraft.datapack.DatapackReloadListener;
-import net.minecraftforge.common.MinecraftForge;
+import Services;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod(FCConstants.MOD_ID)

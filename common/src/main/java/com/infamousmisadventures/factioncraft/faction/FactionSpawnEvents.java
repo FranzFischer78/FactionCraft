@@ -1,15 +1,15 @@
 package com.infamousmisadventures.factioncraft.faction;
 
 import com.infamousmisadventures.factioncraft.FactionCraft;
-import com.infamousmisadventures.factioncraft.capabilities.dominion.AreaDominion;
-import com.infamousmisadventures.factioncraft.capabilities.dominion.AreaPos;
-import com.infamousmisadventures.factioncraft.capabilities.dominion.Dominion;
-import com.infamousmisadventures.factioncraft.capabilities.dominion.DominionHelper;
 import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntity;
 import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntityHelper;
 import com.infamousmisadventures.factioncraft.config.FactionCraftConfig;
+import com.infamousmisadventures.factioncraft.dominion.AreaDominion;
+import com.infamousmisadventures.factioncraft.dominion.AreaPos;
+import com.infamousmisadventures.factioncraft.level.saveddata.Dominion;
 import com.infamousmisadventures.factioncraft.registry.FCFactions;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.random.WeightedEntry;
 import net.minecraft.util.random.WeightedRandom;
 import net.minecraft.world.entity.Entity;
@@ -35,9 +35,9 @@ public class FactionSpawnEvents {
 
     @SubscribeEvent
     public static void addDominionSpawns(LevelEvent.PotentialSpawns event) {
-        if (FactionCraftConfig.ENABLE_DOMINION.get() && event.getLevel() instanceof Level level) {
+        if (FactionCraftConfig.ENABLE_DOMINION.get() && event.getLevel() instanceof ServerLevel level) {
             if(event.getMobCategory() != MobCategory.MONSTER) return;
-            Dominion dominion = DominionHelper.getCapability(level);
+            Dominion dominion = Dominion.getOrCreate(level);
             AreaDominion chunkDominion = dominion.getAreaDominion(level, new AreaPos(event.getPos()));
             chunkDominion.getFactionDominions().entrySet().stream().filter(entry -> !entry.getKey().equals(GAIA.getName())).filter(entry -> entry.getValue() > DOMINION_SUPPRESS_GAIA_SPAWN_TRESHOLD.get()).findFirst().ifPresent(dominionAmount -> {
                 List<MobSpawnSettings.SpawnerData> spawnerDataList = new ArrayList<>(event.getSpawnerDataList());
@@ -62,7 +62,7 @@ public class FactionSpawnEvents {
         if (event.getEntity() instanceof net.minecraft.world.entity.Mob mob) {
             FactionEntity factionEntity = FactionEntityHelper.getFactionEntityCapability(mob);
             if (factionEntity.getFaction() == null || factionEntity.getFaction() == GAIA) {
-                Dominion dominion = DominionHelper.getCapability(event.getLevel());
+                Dominion dominion = Dominion.getOrCreate(event.getLevel());
                 AreaDominion areaDominion = dominion.getAreaDominion(event.getLevel(), new AreaPos(event.getEntity().blockPosition()));
                 List<WeightedEntry.Wrapper<Consumer<Entity>>> factionEntityConverters = getSpawningFactionsStream(areaDominion)
                         .flatMap(faction -> getWeightedEntries(faction, event.getLevel(), event.getEntity().blockPosition(), areaDominion.getFactionDominion(faction)).stream())

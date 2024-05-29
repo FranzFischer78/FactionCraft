@@ -25,17 +25,12 @@ SOFTWARE.
  */
 package com.infamousmisadventures.factioncraft.util;
 
+import com.mojang.serialization.Codec;
+import net.minecraft.resources.ResourceLocation;
+
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-
-import com.mojang.serialization.Codec;
-
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.RegistryBuilder;
 
 /**
  * Helper for creating a deferred register and dispatch codec for a custom registry of serializer types.

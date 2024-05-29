@@ -7,6 +7,7 @@
   "mixins": [
     "BrainAccessor",
     "MobAccessor",
+    "MobMixin",
     "ServerLevelMixin"
   ],
   "client": [
