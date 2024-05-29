@@ -40,7 +40,7 @@ public class FactionSpecificSensor extends Sensor<LivingEntity> {
          return p_186157_ instanceof Mob;
       })) {
          if(pEntity instanceof Mob mob) {
-            FactionEntity thisFactionEntityCapability = FactionEntityHelper.getFactionEntityCapability(mob);
+            FactionEntity thisFactionEntityCapability = ((IFactionEntityDataHolder) mob).getOrCreateFactionEntityData();
             Faction thisEntityFaction = thisFactionEntityCapability.getFaction();
             if(thisEntityFaction != null) {
                FactionEntity factionEntityCapability = FactionEntityHelper.getFactionEntityCapability((Mob) livingentity);

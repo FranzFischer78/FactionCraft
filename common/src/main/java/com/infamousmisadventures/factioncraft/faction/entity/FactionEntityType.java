@@ -282,7 +282,7 @@ public class FactionEntityType {
         entity.getRootVehicle().getSelfAndPassengers()
                 .forEach(stackedEntity -> {
                     if (stackedEntity instanceof Mob mob) {
-                        FactionEntity cap = FactionEntityHelper.getFactionEntityCapability(mob);
+                        FactionEntity cap = ((IFactionEntityDataHolder) mob).getOrCreateFactionEntityData();
                         cap.setFaction(faction);
                         cap.setFactionEntityType(this);
                         cap.getFaction().getBoostConfig().getMandatoryBoosts().forEach(boost -> boost.apply(mob));

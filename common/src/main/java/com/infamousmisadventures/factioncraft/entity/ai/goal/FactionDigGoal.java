@@ -55,7 +55,7 @@ public class FactionDigGoal extends Goal {
 
     public FactionDigGoal(Mob mob, boolean requiresTool, boolean requiresProperTool, EquipmentSlot hand) {
         this.mob = mob;
-        this.factionEntityCapability = FactionEntityHelper.getFactionEntityCapability(mob);
+        this.factionEntityCapability = ((IFactionEntityDataHolder) mob).getOrCreateFactionEntityData();
         this.requiresTool = requiresTool;
         this.requiresProperTool = requiresProperTool;
         this.hand = hand;

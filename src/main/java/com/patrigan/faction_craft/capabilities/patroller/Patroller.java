@@ -65,7 +65,7 @@ public class Patroller implements INBTSerializable<CompoundTag> {
 
     public boolean canJoinPatrol(Mob mob) {
         FactionEntity thisCap = FactionEntityHelper.getFactionEntityCapability(this.entity);
-        FactionEntity otherCap = FactionEntityHelper.getFactionEntityCapability(mob);
+        FactionEntity otherCap = ((IFactionEntityDataHolder) mob).getOrCreateFactionEntityData();
         return thisCap.getFaction() != null && thisCap.getFaction().equals(otherCap.getFaction());
     }
 

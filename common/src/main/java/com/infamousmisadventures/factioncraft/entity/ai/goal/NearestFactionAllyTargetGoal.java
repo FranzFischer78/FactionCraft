@@ -66,7 +66,7 @@ public class NearestFactionAllyTargetGoal<T extends LivingEntity> extends Target
          livingentity = this.targetMob;
       }
       if(! (livingentity instanceof Mob Mob)) return false;
-      FactionEntity targetFactionEntityCapability = FactionEntityHelper.getFactionEntityCapability(mob);
+      FactionEntity targetFactionEntityCapability = ((IFactionEntityDataHolder) mob).getOrCreateFactionEntityData();
 
       if (livingentity == null) {
          return false;

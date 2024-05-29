@@ -45,7 +45,7 @@ public class PatrollerEvents {
                 if (!FactionCraftConfig.DISABLE_FACTION_RAIDS.get()) {
                     FactionInteraction factionInteractionCapability = FactionInteractionHelper.getFactionInteractionCapability(playerEntity);
                     if (factionInteractionCapability.getBadOmenFactions().size() < FactionCraftConfig.RAID_MAX_FACTIONS.get()) {
-                        FactionEntity factionEntityCapability = FactionEntityHelper.getFactionEntityCapability(mob);
+                        FactionEntity factionEntityCapability = ((IFactionEntityDataHolder) mob).getOrCreateFactionEntityData();
                         if (factionEntityCapability.getFaction() != null) {
                             factionInteractionCapability.addBadOmenFaction(factionEntityCapability.getFaction());
                         }

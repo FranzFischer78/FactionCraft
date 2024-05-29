@@ -1,12 +1,12 @@
 package com.infamousmisadventures.factioncraft.commands;
 
+import com.infamousmisadventures.factioncraft.commands.arguments.FactionArgument;
+import com.infamousmisadventures.factioncraft.faction.Faction;
+import com.infamousmisadventures.factioncraft.level.spawner.PatrolSpawner;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-import com.infamousmisadventures.factioncraft.commands.arguments.FactionArgument;
-import com.infamousmisadventures.factioncraft.faction.Faction;
-import com.infamousmisadventures.factioncraft.level.spawner.PatrolSpawner;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -48,7 +48,7 @@ public class FactionPatrolCommand {
         if (spawns <= 0) {
             throw ERROR_START_FAILED.create();
         } else {
-            source.sendSuccess(Component.translatable ("commands.patrol.success", spawns, blockPos), true);
+            source.sendSuccess(() -> Component.translatable ("commands.patrol.success", spawns, blockPos), true);
         }
         return 1;
     }

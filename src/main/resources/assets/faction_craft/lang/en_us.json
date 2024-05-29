@@ -11,7 +11,7 @@
   "commands.raid.increase.success": "Increased strength of raid target at %s by %s",
   "commands.raid.glow.failed": "Could not glow any raiders",
   "commands.raid.glow.success": "Glowed %s raiders at %s",
-  "commands.batle.failed": "Could not spawn a batle",
+  "commands.battle.failed": "Could not spawn a batle",
   "commands.battle.success": "Spawned a battle between %s and %s at %s",
   "commands.factionsummon.failed": "Could not spawn a faction entity",
   "commands.factionsummon.success": "Spawned a faction entity at %s",

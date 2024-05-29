@@ -1,17 +1,15 @@
 package com.infamousmisadventures.factioncraft.commands;
 
+import com.infamousmisadventures.factioncraft.commands.arguments.FactionArgument;
+import com.infamousmisadventures.factioncraft.config.FactionCraftConfig;
+import com.infamousmisadventures.factioncraft.dominion.AreaDominion;
+import com.infamousmisadventures.factioncraft.dominion.AreaPos;
+import com.infamousmisadventures.factioncraft.faction.Faction;
+import com.infamousmisadventures.factioncraft.level.saveddata.Dominion;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.infamousmisadventures.factioncraft.FactionCraft;
-import com.infamousmisadventures.factioncraft.capabilities.dominion.AreaDominion;
-import com.infamousmisadventures.factioncraft.capabilities.dominion.AreaPos;
-import com.infamousmisadventures.factioncraft.capabilities.dominion.Dominion;
-import com.infamousmisadventures.factioncraft.capabilities.dominion.DominionHelper;
-import com.infamousmisadventures.factioncraft.commands.arguments.FactionArgument;
-import com.infamousmisadventures.factioncraft.config.FactionCraftConfig;
-import com.infamousmisadventures.factioncraft.faction.Faction;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
@@ -32,9 +30,9 @@ public class DominionCommand {
                         getDominion(sourceCommandContext.getSource(), BlockPosArgument.getLoadedBlockPos(sourceCommandContext, "location"))
                 )))
                 .then(Commands.literal("adjust").then(Commands.argument("faction", FactionArgument.factions()).executes(sourceCommandContext ->
-                        adjustDominion(sourceCommandContext.getSource(), FactionArgument.getFaction(sourceCommandContext, "faction"), 1, new BlockPos(sourceCommandContext.getSource().getPosition()))
+                        adjustDominion(sourceCommandContext.getSource(), FactionArgument.getFaction(sourceCommandContext, "faction"), 1, BlockPos.containing(sourceCommandContext.getSource().getPosition()))
                 ).then(Commands.argument("adjustment", IntegerArgumentType.integer()).executes(sourceCommandContext ->
-                        adjustDominion(sourceCommandContext.getSource(), FactionArgument.getFaction(sourceCommandContext, "faction"), IntegerArgumentType.getInteger(sourceCommandContext, "adjustment"), new BlockPos(sourceCommandContext.getSource().getPosition()))
+                        adjustDominion(sourceCommandContext.getSource(), FactionArgument.getFaction(sourceCommandContext, "faction"), IntegerArgumentType.getInteger(sourceCommandContext, "adjustment"), BlockPos.containing(sourceCommandContext.getSource().getPosition()))
                 ).then(Commands.argument("location", BlockPosArgument.blockPos()).executes(sourceCommandContext ->
                         adjustDominion(sourceCommandContext.getSource(), FactionArgument.getFaction(sourceCommandContext, "faction"), IntegerArgumentType.getInteger(sourceCommandContext, "adjustment"), BlockPosArgument.getLoadedBlockPos(sourceCommandContext, "location")))))));
 
@@ -48,32 +46,32 @@ public class DominionCommand {
 
     private static int getDominion(CommandSourceStack source, BlockPos blockPos) {
         if(FactionCraftConfig.ENABLE_DOMINION.get() == false) {
-            source.sendSuccess(Component.translatable("commands.dominion.disabled"), true);
+            source.sendSuccess(() -> Component.translatable("commands.dominion.disabled"), true);
             return 0;
         }
         ServerLevel level = source.getLevel();
-        Dominion dominion = DominionHelper.getCapability(level);
+        Dominion dominion = Dominion.getOrCreate(level);
         AreaPos areaPos = new AreaPos(blockPos);
         AreaDominion areaDominion = dominion.getAreaDominion(level, areaPos);
         if (areaDominion != null) {
-            source.sendSuccess(Component.translatable("commands.dominion.factions", areaDominion.getFactionDominions()), true);
+            source.sendSuccess(() -> Component.translatable("commands.dominion.factions", areaDominion.getFactionDominions()), true);
             return 1;
         } else {
-            source.sendSuccess(Component.translatable("commands.dominion.no_faction"), true);
+            source.sendSuccess(() -> Component.translatable("commands.dominion.no_faction"), true);
             return 0;
         }
     }
 
     private static int adjustDominion(CommandSourceStack source, Faction faction, int adjustment, BlockPos blockPos) {
         if(FactionCraftConfig.ENABLE_DOMINION.get() == false) {
-            source.sendSuccess(Component.translatable("commands.dominion.disabled"), true);
+            source.sendSuccess(() -> Component.translatable("commands.dominion.disabled"), true);
             return 0;
         }
         ServerLevel level = source.getLevel();
-        Dominion dominion = DominionHelper.getCapability(level);
+        Dominion dominion = Dominion.getOrCreate(level);
         AreaPos areaPos = new AreaPos(blockPos);
         dominion.adjust(level, areaPos, faction, adjustment);
-        source.sendSuccess(Component.translatable("commands.dominion.adjusted", faction.getName(), adjustment), true);
+        source.sendSuccess(() -> Component.translatable("commands.dominion.adjusted", faction.getName(), adjustment), true);
         return 1;
     }
 }

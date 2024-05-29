@@ -660,7 +660,7 @@ public class Raid {
     }
 
     public void spawnDigger(Faction faction, BlockPos spawnBlockPos, Mob mob) {
-        if(FactionEntityHelper.getFactionEntityCapability(mob).getFactionEntityType().hasRank(FactionEntityRank.DIGGER)) return;
+        if(((IFactionEntityDataHolder) mob).getOrCreateFactionEntityData().getFactionEntityType().hasRank(FactionEntityRank.DIGGER)) return;
         this.spawnDigger(faction, spawnBlockPos);
     }
 

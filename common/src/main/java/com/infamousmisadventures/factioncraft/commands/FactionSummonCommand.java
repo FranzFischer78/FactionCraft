@@ -1,16 +1,16 @@
 package com.infamousmisadventures.factioncraft.commands;
 
-import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntity;
-import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntityHelper;
 import com.infamousmisadventures.factioncraft.commands.arguments.FactionArgument;
 import com.infamousmisadventures.factioncraft.commands.arguments.FactionEntitySummonArgument;
+import com.infamousmisadventures.factioncraft.entity.data.FactionEntityData;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IFactionEntityDataHolder;
 import com.infamousmisadventures.factioncraft.faction.Faction;
 import com.infamousmisadventures.factioncraft.faction.FactionBoostHelper;
 import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityRank;
 import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityType;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.coordinates.Vec3Argument;
@@ -40,16 +40,16 @@ public class FactionSummonCommand {
     }
 
     private static int spawnEntity(CommandSourceStack source, Faction faction, FactionEntityType factionEntityType, Vec3 pos, int boostStrength) {
-        Entity entity = factionEntityType.createEntity(source.getLevel(), faction, new BlockPos(pos), false, FactionEntityRank.SOLDIER, MobSpawnType.PATROL);
+        Entity entity = factionEntityType.createEntity(source.getLevel(), faction, BlockPos.containing(pos), false, FactionEntityRank.SOLDIER, MobSpawnType.PATROL);
         if(entity instanceof Mob mob) {
-            FactionEntity entityCapability = FactionEntityHelper.getFactionEntityCapability(mob);
+            FactionEntityData entityCapability = ((IFactionEntityDataHolder) mob).getOrCreateFactionEntityData();
             entityCapability.getFaction().getBoostConfig().getMandatoryBoosts().forEach(boost -> boost.apply(mob));
             entityCapability.getFactionEntityType().getBoostConfig().getMandatoryBoosts().forEach(boost -> boost.apply(mob));
             if(boostStrength > 0) {
                 FactionBoostHelper.applyBoosts(boostStrength, List.of(mob), faction, source.getLevel());
             }
         }
-        source.sendSuccess(Component.translatable ("commands.factionsummon.success", pos.toString()), true);
+        source.sendSuccess(() -> Component.translatable ("commands.factionsummon.success", pos.toString()), true);
         return 0;
     }
 

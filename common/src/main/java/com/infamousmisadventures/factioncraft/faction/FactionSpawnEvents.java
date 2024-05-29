@@ -60,7 +60,7 @@ public class FactionSpawnEvents {
     public static void onEntityJoinLevelEvent(EntityJoinLevelEvent event) {
         if (event.getLevel().isClientSide() || event.loadedFromDisk() || !FactionCraftConfig.ENABLE_DOMINION.get()) return;
         if (event.getEntity() instanceof net.minecraft.world.entity.Mob mob) {
-            FactionEntity factionEntity = FactionEntityHelper.getFactionEntityCapability(mob);
+            FactionEntity factionEntity = ((IFactionEntityDataHolder) mob).getOrCreateFactionEntityData();
             if (factionEntity.getFaction() == null || factionEntity.getFaction() == GAIA) {
                 Dominion dominion = Dominion.getOrCreate(event.getLevel());
                 AreaDominion areaDominion = dominion.getAreaDominion(event.getLevel(), new AreaPos(event.getEntity().blockPosition()));

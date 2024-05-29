@@ -1,15 +1,14 @@
 package com.infamousmisadventures.factioncraft.commands;
 
+import com.infamousmisadventures.factioncraft.commands.arguments.FactionArgument;
+import com.infamousmisadventures.factioncraft.faction.Faction;
+import com.infamousmisadventures.factioncraft.level.saveddata.RaidManager;
+import com.infamousmisadventures.factioncraft.raid.Raid;
+import com.infamousmisadventures.factioncraft.raid.target.FactionBattleRaidTarget;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-import com.infamousmisadventures.factioncraft.capabilities.raidmanager.RaidManager;
-import com.infamousmisadventures.factioncraft.capabilities.raidmanager.RaidManagerHelper;
-import com.infamousmisadventures.factioncraft.commands.arguments.FactionArgument;
-import com.infamousmisadventures.factioncraft.faction.Faction;
-import com.infamousmisadventures.factioncraft.raid.Raid;
-import com.infamousmisadventures.factioncraft.raid.target.FactionBattleRaidTarget;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -50,12 +49,12 @@ public class FactionBattleCommand {
     private static int spawnBattle(CommandSourceStack source, Faction faction1, Faction faction2, BlockPos blockPos) throws CommandSyntaxException {
         ServerLevel level = source.getLevel();
         FactionBattleRaidTarget raidTarget = new FactionBattleRaidTarget(blockPos, faction1, faction2, level);
-        RaidManager raidManagerCapability = RaidManagerHelper.getRaidManagerCapability(level);
+        RaidManager raidManagerCapability = RaidManager.getOrCreate(level);
         Raid raid = raidManagerCapability.createRaid(Arrays.asList(faction1, faction2), raidTarget);
         if (raid == null) {
             throw ERROR_START_FAILED.create();
         } else {
-            source.sendSuccess(Component.translatable ("commands.battle.success", faction1.getName(), faction2.getName(), blockPos), true);
+            source.sendSuccess(() -> Component.translatable ("commands.battle.success", faction1.getName(), faction2.getName(), blockPos), true);
         }
         return 1;
     }

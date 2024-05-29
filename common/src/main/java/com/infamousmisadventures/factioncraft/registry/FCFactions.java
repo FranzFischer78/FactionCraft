@@ -1,20 +1,17 @@
 package com.infamousmisadventures.factioncraft.registry;
 
 import com.infamousmisadventures.factioncraft.boost.Boost;
-import com.infamousmisadventures.factioncraft.capabilities.playerfactions.PlayerFaction;
-import com.infamousmisadventures.factioncraft.capabilities.playerfactions.PlayerFactions;
-import com.infamousmisadventures.factioncraft.capabilities.playerfactions.PlayerFactionsHelper;
 import com.infamousmisadventures.factioncraft.faction.Faction;
 import com.infamousmisadventures.factioncraft.faction.FactionBoostConfig;
 import com.infamousmisadventures.factioncraft.faction.FactionRaidConfig;
 import com.infamousmisadventures.factioncraft.faction.FactionType;
-import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityType;
 import com.infamousmisadventures.factioncraft.faction.relations.FactionRelations;
+import com.infamousmisadventures.factioncraft.level.saveddata.PlayerFaction;
+import com.infamousmisadventures.factioncraft.level.saveddata.PlayerFactions;
 import com.infamousmisadventures.factioncraft.util.GeneralUtils;
 import com.infamousmisadventures.factioncraft.util.data.MergeableCodecDataManager;
 import com.infamousmisadventures.factioncraft.util.data.ResourceSet;
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -28,7 +25,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.infamousmisadventures.factioncraft.FCConstants.LOGGER;
 import static com.infamousmisadventures.factioncraft.FCConstants.MOD_ID;
 import static com.infamousmisadventures.factioncraft.faction.relations.FactionRelation.ENEMY_THRESHOLD;
 import static com.infamousmisadventures.factioncraft.faction.relations.FactionRelation.NEUTRAL;
@@ -152,7 +148,7 @@ public class FCFactions {
     }
 
     public static Faction createPlayerFaction(Player player){
-        Faction faction = new Faction(new ResourceLocation(MOD_ID, "player/" + player.getName().getString().toLowerCase()), false, FactionType.PLAYER, new CompoundTag(), FactionRaidConfig.PLAYER, FactionBoostConfig.DEFAULT, FactionRelations.DEFAULT, Collections.emptyList(), modLoc("default"), new ArrayList<>(), ResourceSet.getEmpty(Registries.ENTITY_TYPE));
+        Faction faction = new Faction(new ResourceLocation(MOD_ID, "player/" + player.getName().getString().toLowerCase()), false, FactionType.PLAYER, new CompoundTag(), FactionRaidConfig.PLAYER, FactionBoostConfig.DEFAULT, FactionRelations.DEFAULT, Collections.emptyList(), modLoc("default"), new ArrayList<>(), ResourceSet.getEmpty(ENTITY_TYPE));
         for (Faction faction1 : getFactionData().values()) {
             if(!faction.getRelations().getEnemies().contains(getKey(faction))){
                 if(faction1.getFactionType().equals(FactionType.MONSTER)) {
@@ -169,7 +165,7 @@ public class FCFactions {
     }
 
     public static void reloadPlayerFactions() {
-        PlayerFactions playerFactions = PlayerFactionsHelper.getPlayerFactions();
+        PlayerFactions playerFactions = PlayerFactions.getOrCreate();
         playerFactions.getPlayerFactions().forEach((uuid, playerFaction) -> reloadPlayerFaction(playerFaction));
     }
 

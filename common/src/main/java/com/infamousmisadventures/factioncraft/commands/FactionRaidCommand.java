@@ -1,18 +1,17 @@
 package com.infamousmisadventures.factioncraft.commands;
 
+import com.infamousmisadventures.factioncraft.commands.arguments.FactionArgument;
+import com.infamousmisadventures.factioncraft.faction.Faction;
+import com.infamousmisadventures.factioncraft.level.saveddata.RaidManager;
+import com.infamousmisadventures.factioncraft.raid.Raid;
+import com.infamousmisadventures.factioncraft.raid.target.PlayerRaidTarget;
+import com.infamousmisadventures.factioncraft.raid.target.RaidTarget;
+import com.infamousmisadventures.factioncraft.raid.target.VillageRaidTarget;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-import com.infamousmisadventures.factioncraft.capabilities.raidmanager.RaidManager;
-import com.infamousmisadventures.factioncraft.capabilities.raidmanager.RaidManagerHelper;
-import com.infamousmisadventures.factioncraft.commands.arguments.FactionArgument;
-import com.infamousmisadventures.factioncraft.faction.Faction;
-import com.infamousmisadventures.factioncraft.raid.Raid;
-import com.infamousmisadventures.factioncraft.raid.target.PlayerRaidTarget;
-import com.infamousmisadventures.factioncraft.raid.target.RaidTarget;
-import com.infamousmisadventures.factioncraft.raid.target.VillageRaidTarget;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -140,14 +139,14 @@ public class FactionRaidCommand {
     }
 
     private static int glowRaiders(CommandSourceStack source, ServerLevel level, BlockPos blockPos) throws CommandSyntaxException {
-        RaidManager raidManagerCapability = RaidManagerHelper.getRaidManagerCapability(level);
+        RaidManager raidManagerCapability = RaidManager.getOrCreate(level);
         Raid raid = raidManagerCapability.getRaidAt(blockPos);
         if (raid == null) {
             throw ERROR_GLOW_FAILED.create();
         } else {
             Set<Mob> raidersInWave = raid.getRaidersInWave(raid.getGroupsSpawned());
             raidersInWave.forEach(FactionRaidCommand::factioncraft_glow);
-            source.sendSuccess(Component.translatable("commands.raid.glow.success", blockPos.toString(), raidersInWave.size()), true);
+            source.sendSuccess(() -> Component.translatable("commands.raid.glow.success", blockPos.toString(), raidersInWave.size()), true);
         }
         return 1;
     }
@@ -157,13 +156,13 @@ public class FactionRaidCommand {
     }
 
     private static int increaseRaidTargetStrength(CommandSourceStack source, int amount, ServerLevel level, BlockPos blockPos) throws CommandSyntaxException {
-        RaidManager raidManagerCapability = RaidManagerHelper.getRaidManagerCapability(level);
+        RaidManager raidManagerCapability = RaidManager.getOrCreate(level);
         Raid raid = raidManagerCapability.getRaidAt(blockPos);
         if (raid == null) {
             throw ERROR_INCREASE_FAILED.create();
         } else {
             raid.getRaidTarget().increaseTargetStrength(amount);
-            source.sendSuccess(Component.translatable("commands.raid.increase.success", blockPos.toString(), amount), true);
+            source.sendSuccess(() -> Component.translatable("commands.raid.increase.success", blockPos.toString(), amount), true);
         }
         return 1;
     }
@@ -196,36 +195,36 @@ public class FactionRaidCommand {
     }
 
     private static int createRaid(CommandSourceStack source, Faction faction, ServerLevel level, RaidTarget raidTarget, String targetArgument) throws CommandSyntaxException {
-        RaidManager raidManagerCapability = RaidManagerHelper.getRaidManagerCapability(level);
+        RaidManager raidManagerCapability = RaidManager.getOrCreate(level);
         Raid raid = raidManagerCapability.createRaid(faction, raidTarget);
         if (raid == null) {
             throw ERROR_START_FAILED.create();
         } else {
-            source.sendSuccess(Component.translatable("commands.raid.success", targetArgument), true);
+            source.sendSuccess(() -> Component.translatable("commands.raid.success", targetArgument), true);
         }
         return 1;
     }
 
     private static int endRaidWave(CommandSourceStack source, ServerLevel level, BlockPos blockPos) throws CommandSyntaxException {
-        RaidManager raidManagerCapability = RaidManagerHelper.getRaidManagerCapability(level);
+        RaidManager raidManagerCapability = RaidManager.getOrCreate(level);
         Raid raid = raidManagerCapability.getRaidAt(blockPos);
         if (raid == null) {
             throw ERROR_ENDWAVE_FAILED.create();
         } else {
             raid.endWave();
-            source.sendSuccess(Component.translatable("commands.raid.endwave.success", blockPos.toString()), true);
+            source.sendSuccess(() -> Component.translatable("commands.raid.endwave.success", blockPos.toString()), true);
         }
         return 1;
     }
 
     private static int endRaid(CommandSourceStack source, ServerLevel level, BlockPos blockPos) throws CommandSyntaxException {
-        RaidManager raidManagerCapability = RaidManagerHelper.getRaidManagerCapability(level);
+        RaidManager raidManagerCapability = RaidManager.getOrCreate(level);
         Raid raid = raidManagerCapability.getRaidAt(blockPos);
         if (raid == null) {
             throw ERROR_END_FAILED.create();
         } else {
             raid.stop();
-            source.sendSuccess(Component.translatable("commands.raid.end.success", blockPos.toString()), true);
+            source.sendSuccess(() -> Component.translatable("commands.raid.end.success", blockPos.toString()), true);
         }
         return 1;
     }
