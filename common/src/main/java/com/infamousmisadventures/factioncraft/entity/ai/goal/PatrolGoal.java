@@ -1,8 +1,8 @@
 package com.infamousmisadventures.factioncraft.entity.ai.goal;
 
 
-import com.infamousmisadventures.factioncraft.capabilities.patroller.Patroller;
-import com.infamousmisadventures.factioncraft.capabilities.patroller.PatrollerHelper;
+import com.infamousmisadventures.factioncraft.entity.data.MobPatrollerData;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IMobPatrollerDataHolder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Mob;
@@ -10,7 +10,6 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.util.LazyOptional;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -34,8 +33,8 @@ public class PatrolGoal<T extends Mob> extends Goal {
      * method as well.
      */
     public boolean canUse() {
-        boolean flag = this.mob.level.getGameTime() < this.cooldownUntil;
-        Patroller cap = PatrollerHelper.getPatrollerCapability(this.mob);
+        boolean flag = this.mob.level().getGameTime() < this.cooldownUntil;
+        MobPatrollerData cap = ((IMobPatrollerDataHolder) mob).getOrCreateMobPatrollerData();
         return cap.isPatrolling() && this.mob.getTarget() == null && !this.mob.isVehicle() && cap.hasPatrolTarget() && !flag;
     }
 
@@ -55,7 +54,7 @@ public class PatrolGoal<T extends Mob> extends Goal {
      * Keep ticking a continuous task that has already been started
      */
     public void tick() {
-        Patroller cap = PatrollerHelper.getPatrollerCapability(this.mob);
+        MobPatrollerData cap = ((IMobPatrollerDataHolder) mob).getOrCreateMobPatrollerData();
         boolean flag = cap.isPatrolLeader();
         PathNavigation pathnavigator = this.mob.getNavigation();
         if (pathnavigator.isDone()) {
@@ -68,14 +67,14 @@ public class PatrolGoal<T extends Mob> extends Goal {
                 Vec3 vector3d2 = vector3d1.subtract(vector3d);
                 vector3d = vector3d2.yRot(90.0F).scale(0.4D).add(vector3d);
                 Vec3 vector3d3 = vector3d.subtract(vector3d1).normalize().scale(10.0D).add(vector3d1);
-                BlockPos blockpos = new BlockPos(vector3d3);
-                blockpos = this.mob.level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, blockpos);
+                BlockPos blockpos = BlockPos.containing(vector3d3);
+                blockpos = this.mob.level().getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, blockpos);
                 if (!pathnavigator.moveTo(blockpos.getX(), blockpos.getY(), blockpos.getZ(), flag ? this.leaderSpeedModifier : this.speedModifier)) {
                     this.moveRandomly();
-                    this.cooldownUntil = this.mob.level.getGameTime() + 200L;
+                    this.cooldownUntil = this.mob.level().getGameTime() + 200L;
                 } else if (flag) {
                     for(Mob patrollerentity : list) {
-                        Patroller patrollerCap = ((IMobPatrollerDataHolder) patrollerentity).getOrCreateMobPatrollerData();
+                        MobPatrollerData patrollerCap = ((IMobPatrollerDataHolder) patrollerentity).getOrCreateMobPatrollerData();
                         patrollerCap.setPatrolTarget(blockpos);
                     }
                 }
@@ -85,8 +84,8 @@ public class PatrolGoal<T extends Mob> extends Goal {
     }
 
     private List<Mob> findPatrolCompanions() {
-        return this.mob.level.getEntitiesOfClass(Mob.class, this.mob.getBoundingBox().inflate(32.0D), (p_226543_1_) -> {
-            Patroller cap = ((IMobPatrollerDataHolder) p_226543_1_).getOrCreateMobPatrollerData();
+        return this.mob.level().getEntitiesOfClass(Mob.class, this.mob.getBoundingBox().inflate(32.0D), (p_226543_1_) -> {
+            MobPatrollerData cap = ((IMobPatrollerDataHolder) p_226543_1_).getOrCreateMobPatrollerData();
             if(cap == null) return false;
             return cap.canJoinPatrol(this.mob) && !p_226543_1_.is(this.mob);
         });
@@ -94,7 +93,7 @@ public class PatrolGoal<T extends Mob> extends Goal {
 
     private boolean moveRandomly() {
         RandomSource random = this.mob.getRandom();
-        BlockPos blockpos = this.mob.level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, this.mob.blockPosition().offset(-8 + random.nextInt(16), 0, -8 + random.nextInt(16)));
+        BlockPos blockpos = this.mob.level().getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, this.mob.blockPosition().offset(-8 + random.nextInt(16), 0, -8 + random.nextInt(16)));
         return this.mob.getNavigation().moveTo(blockpos.getX(), blockpos.getY(), blockpos.getZ(), this.speedModifier);
     }
 }

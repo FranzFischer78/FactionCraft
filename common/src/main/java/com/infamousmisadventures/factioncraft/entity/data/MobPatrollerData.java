@@ -11,6 +11,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
 
 import static com.infamousmisadventures.factioncraft.util.BrainHelper.hasBrain;
 
@@ -65,6 +66,11 @@ public class MobPatrollerData implements INBTSerializable<CompoundTag> {
         FactionEntityData thisCap = ((IFactionEntityDataHolder) this.entity).getOrCreateFactionEntityData();
         FactionEntityData otherCap = ((IFactionEntityDataHolder) mob).getOrCreateFactionEntityData();
         return thisCap.getFaction() != null && thisCap.getFaction().equals(otherCap.getFaction());
+    }
+
+    public float getPatrollerWalkSpeed(Mob mobEntity)
+    {
+        return isPatrolLeader() ? 0.595F : 0.7F;
     }
 
     public CompoundTag save(CompoundTag compoundNbt) {
@@ -126,5 +132,16 @@ public class MobPatrollerData implements INBTSerializable<CompoundTag> {
         this.patrolLeader = tag.getBoolean("PatrolLeader");
         this.patrolling = tag.getBoolean("Patrolling");
         updatePatrolGoals();
+    }
+
+    public void onEntityJoin(){
+        if (isPatrolling()) {
+            if (entity instanceof AbstractPiglin piglin) {
+                piglin.setImmuneToZombification(true);
+            }
+        }
+    }
+
+    public void onEntityDie(){
     }
 }

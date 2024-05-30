@@ -1,5 +1,6 @@
 package com.infamousmisadventures.factioncraft.boost;
 
+import com.infamousmisadventures.factioncraft.registry.FCBoostTypes;
 import com.infamousmisadventures.factioncraft.registry.FCBoosts;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -81,5 +82,10 @@ public class RoleBoost extends Boost {
     @Override
     public boolean canApply(LivingEntity livingEntity) {
         return livingEntity instanceof Mob;
+    }
+
+    @Override
+    public BoostType<? extends Boost> type() {
+        return FCBoostTypes.ROLE.get();
     }
 }

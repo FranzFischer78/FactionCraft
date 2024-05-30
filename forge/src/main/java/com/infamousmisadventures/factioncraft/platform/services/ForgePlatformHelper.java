@@ -1,7 +1,9 @@
 package com.infamousmisadventures.factioncraft.platform.services;
 
+import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLLoader;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class ForgePlatformHelper implements IPlatformHelper {
 
@@ -20,5 +22,9 @@ public class ForgePlatformHelper implements IPlatformHelper {
         return !FMLLoader.isProduction();
     }
 
+    @Override
+    public MinecraftServer getCurrentServer() {
+        return ServerLifecycleHooks.getCurrentServer();
+    }
 
 }

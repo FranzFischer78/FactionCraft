@@ -47,7 +47,7 @@ public class AppliedBoostsData implements INBTSerializable<CompoundTag> {
         this.setAppliedBoosts(appliedBoostsList.stream().map(inbt -> Boost.load((CompoundTag) inbt)).collect(Collectors.toList()));
     }
 
-    public void OnEntityJoin(LivingEntity entity) {
+    public void onEntityJoin(LivingEntity entity) {
         if(!entity.level().isClientSide() && entity instanceof Mob mob) {
             getAppliedBoosts().forEach(boost -> boost.applyAIChanges(mob));
         }

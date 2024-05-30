@@ -1,11 +1,11 @@
 package com.infamousmisadventures.factioncraft.faction;
 
 import com.infamousmisadventures.factioncraft.FactionCraft;
-import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntity;
-import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntityHelper;
 import com.infamousmisadventures.factioncraft.config.FactionCraftConfig;
 import com.infamousmisadventures.factioncraft.dominion.AreaDominion;
 import com.infamousmisadventures.factioncraft.dominion.AreaPos;
+import com.infamousmisadventures.factioncraft.entity.data.FactionEntityData;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IFactionEntityDataHolder;
 import com.infamousmisadventures.factioncraft.level.saveddata.Dominion;
 import com.infamousmisadventures.factioncraft.registry.FCFactions;
 import net.minecraft.core.BlockPos;
@@ -60,7 +60,7 @@ public class FactionSpawnEvents {
     public static void onEntityJoinLevelEvent(EntityJoinLevelEvent event) {
         if (event.getLevel().isClientSide() || event.loadedFromDisk() || !FactionCraftConfig.ENABLE_DOMINION.get()) return;
         if (event.getEntity() instanceof net.minecraft.world.entity.Mob mob) {
-            FactionEntity factionEntity = ((IFactionEntityDataHolder) mob).getOrCreateFactionEntityData();
+            FactionEntityData factionEntity = ((IFactionEntityDataHolder) mob).getOrCreateFactionEntityData();
             if (factionEntity.getFaction() == null || factionEntity.getFaction() == GAIA) {
                 Dominion dominion = Dominion.getOrCreate(event.getLevel());
                 AreaDominion areaDominion = dominion.getAreaDominion(event.getLevel(), new AreaPos(event.getEntity().blockPosition()));

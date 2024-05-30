@@ -2,6 +2,7 @@ package com.infamousmisadventures.factioncraft.faction;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -36,11 +37,11 @@ public class FactionRaidConfig {
     private final Component raidBarVictoryComponent;
     private final Component raidBarDefeatComponent;
     private final float mobsFraction;
-    private final Optional<SoundEvent> waveSoundEvent;
-    private final Optional<SoundEvent> victorySoundEvent;
-    private final Optional<SoundEvent> defeatSoundEvent;
+    private final Optional<Holder<SoundEvent>> waveSoundEvent;
+    private final Optional<Holder<SoundEvent>> victorySoundEvent;
+    private final Optional<Holder<SoundEvent>> defeatSoundEvent;
 
-    public FactionRaidConfig(boolean enabled, String name, String victoryAlt, String defeatAlt, float mobsFraction, Optional<SoundEvent> waveSoundEvent, Optional<SoundEvent> victorySoundEvent, Optional<SoundEvent> defeatSoundEvent) {
+    public FactionRaidConfig(boolean enabled, String name, String victoryAlt, String defeatAlt, float mobsFraction, Optional<Holder<SoundEvent>> waveSoundEvent, Optional<Holder<SoundEvent>> victorySoundEvent, Optional<Holder<SoundEvent>> defeatSoundEvent) {
         this.enabled = enabled;
         this.name = name;
         this.victoryAlt = victoryAlt;
@@ -88,15 +89,15 @@ public class FactionRaidConfig {
         return mobsFraction;
     }
 
-    public Optional<SoundEvent> getWaveSoundEvent() {
+    public Optional<Holder<SoundEvent>> getWaveSoundEvent() {
         return waveSoundEvent;
     }
 
-    public Optional<SoundEvent> getVictorySoundEvent() {
+    public Optional<Holder<SoundEvent>> getVictorySoundEvent() {
         return victorySoundEvent;
     }
 
-    public Optional<SoundEvent> getDefeatSoundEvent() {
+    public Optional<Holder<SoundEvent>> getDefeatSoundEvent() {
         return defeatSoundEvent;
     }
 }

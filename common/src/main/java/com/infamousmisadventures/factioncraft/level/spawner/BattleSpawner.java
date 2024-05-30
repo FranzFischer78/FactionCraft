@@ -1,20 +1,19 @@
 package com.infamousmisadventures.factioncraft.level.spawner;
 
-import com.infamousmisadventures.factioncraft.capabilities.raidmanager.RaidManager;
-import com.infamousmisadventures.factioncraft.capabilities.raidmanager.RaidManagerHelper;
 import com.infamousmisadventures.factioncraft.config.FactionCraftConfig;
 import com.infamousmisadventures.factioncraft.faction.Faction;
-import com.infamousmisadventures.factioncraft.registry.FCFactions;
+import com.infamousmisadventures.factioncraft.level.saveddata.RaidManager;
 import com.infamousmisadventures.factioncraft.raid.target.FactionBattleRaidTarget;
+import com.infamousmisadventures.factioncraft.registry.FCFactions;
 import com.infamousmisadventures.factioncraft.util.GeneralUtils;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.CustomSpawner;
+import net.minecraft.world.level.biome.Biome;
 
 import java.util.Arrays;
 import java.util.List;
@@ -86,11 +85,8 @@ public class BattleSpawner implements CustomSpawner {
          return 0;
       }else{
          Faction faction2 = GeneralUtils.getRandomItem(enemies, random);
-         RaidManager cap = RaidManagerHelper.getRaidManagerCapability(pLevel);
+         RaidManager cap = RaidManager.getOrCreate(pLevel);
          FactionBattleRaidTarget factionBattleRaidTarget = new FactionBattleRaidTarget(blockpos, faction1, faction2, pLevel);
-         if(cap == null){
-            return 0;
-         }
          cap.createRaid(Arrays.asList(faction1, faction2), factionBattleRaidTarget);
          return 1;
       }

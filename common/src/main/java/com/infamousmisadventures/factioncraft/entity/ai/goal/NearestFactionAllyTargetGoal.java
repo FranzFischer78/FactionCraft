@@ -1,12 +1,11 @@
 package com.infamousmisadventures.factioncraft.entity.ai.goal;
 
-import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntity;
-import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntityHelper;
+import com.infamousmisadventures.factioncraft.entity.data.FactionEntityData;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IFactionEntityDataHolder;
 import com.infamousmisadventures.factioncraft.faction.Faction;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.target.TargetGoal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
@@ -60,13 +59,13 @@ public class NearestFactionAllyTargetGoal<T extends LivingEntity> extends Target
    }
 
    public boolean canContinueToUse() {
-      FactionEntity factionEntityCapability = FactionEntityHelper.getFactionEntityCapability(this.mob);
+      FactionEntityData factionEntityCapability = ((IFactionEntityDataHolder) this.mob).getOrCreateFactionEntityData();
       LivingEntity livingentity = factionEntityCapability.getNearestDamagedFactionAlly();
       if (livingentity == null) {
          livingentity = this.targetMob;
       }
-      if(! (livingentity instanceof Mob Mob)) return false;
-      FactionEntity targetFactionEntityCapability = ((IFactionEntityDataHolder) mob).getOrCreateFactionEntityData();
+      if(! (livingentity instanceof Mob newTargetMob)) return false;
+      FactionEntityData targetFactionEntityCapability = ((IFactionEntityDataHolder) newTargetMob).getOrCreateFactionEntityData();
 
       if (livingentity == null) {
          return false;
@@ -107,18 +106,18 @@ public class NearestFactionAllyTargetGoal<T extends LivingEntity> extends Target
 
    protected void findTarget() {
       if (this.targetType != Player.class && this.targetType != ServerPlayer.class) {
-         this.target = this.mob.level.getNearestEntity(this.mob.level.getEntitiesOfClass(this.targetType, this.getTargetSearchArea(this.getFollowDistance()), (p_148152_) -> {
-            Faction faction = FactionEntityHelper.getFactionEntityCapability(this.mob).getFaction();
-            return faction != null && p_148152_ instanceof Mob && faction.equals(FactionEntityHelper.getFactionEntityCapability((Mob) p_148152_).getFaction());
+         this.target = this.mob.level().getNearestEntity(this.mob.level().getEntitiesOfClass(this.targetType, this.getTargetSearchArea(this.getFollowDistance()), (p_148152_) -> {
+            Faction faction = ((IFactionEntityDataHolder) this.mob).getOrCreateFactionEntityData().getFaction();
+            return faction != null && p_148152_ instanceof Mob && faction.equals(((IFactionEntityDataHolder) p_148152_).getOrCreateFactionEntityData().getFaction());
          }), this.targetConditions, this.mob, this.mob.getX(), this.mob.getEyeY(), this.mob.getZ());
       } else {
-         this.target = this.mob.level.getNearestPlayer(this.targetConditions, this.mob, this.mob.getX(), this.mob.getEyeY(), this.mob.getZ());
+         this.target = this.mob.level().getNearestPlayer(this.targetConditions, this.mob, this.mob.getX(), this.mob.getEyeY(), this.mob.getZ());
       }
 
    }
 
    public void stop() {
-      FactionEntity factionEntityCapability = FactionEntityHelper.getFactionEntityCapability(this.mob);
+      FactionEntityData factionEntityCapability = ((IFactionEntityDataHolder) this.mob).getOrCreateFactionEntityData();
       factionEntityCapability.setNearestDamagedFactionAlly(null);
       this.targetMob = null;
    }
@@ -127,7 +126,7 @@ public class NearestFactionAllyTargetGoal<T extends LivingEntity> extends Target
     * Execute a one shot task or start executing a continuous task
     */
    public void start() {
-      FactionEntity factionEntityCapability = FactionEntityHelper.getFactionEntityCapability(this.mob);
+      FactionEntityData factionEntityCapability = ((IFactionEntityDataHolder) this.mob).getOrCreateFactionEntityData();
       factionEntityCapability.setNearestDamagedFactionAlly(this.target);
       super.start();
    }

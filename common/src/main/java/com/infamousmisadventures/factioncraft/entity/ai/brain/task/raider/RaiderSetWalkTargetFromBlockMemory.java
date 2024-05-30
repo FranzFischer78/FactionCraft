@@ -1,8 +1,8 @@
 package com.infamousmisadventures.factioncraft.entity.ai.brain.task.raider;
 
 import com.google.common.collect.ImmutableMap;
-import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntity;
-import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntityHelper;
+import com.infamousmisadventures.factioncraft.entity.data.FactionEntityData;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IFactionEntityDataHolder;
 import com.infamousmisadventures.factioncraft.registry.FCMemoryModuleTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
@@ -42,7 +42,7 @@ public class RaiderSetWalkTargetFromBlockMemory<E extends LivingEntity> extends 
                   Vec3 vec3 = null;
                   int i = 0;
 
-                  for (int j = 1000; i < 1000 && (vec3 == null || this.tooFar(pathfinderMob, GlobalPos.of(pLevel.dimension(), new BlockPos(vec3)))); ++i) {
+                  for (int j = 1000; i < 1000 && (vec3 == null || this.tooFar(pathfinderMob, GlobalPos.of(pLevel.dimension(), BlockPos.containing(vec3)))); ++i) {
                      vec3 = DefaultRandomPos.getPosTowards(pathfinderMob, 15, 7, Vec3.atBottomCenterOf(destination.pos()), (double) ((float) Math.PI / 2F));
                   }
 
@@ -64,7 +64,7 @@ public class RaiderSetWalkTargetFromBlockMemory<E extends LivingEntity> extends 
    }
 
    private void isStuck(PathfinderMob pathfinderMob, long pTime) {
-      FactionEntity factionEntityCapability = FactionEntityHelper.getFactionEntityCapability(pathfinderMob);
+      FactionEntityData factionEntityCapability = ((IFactionEntityDataHolder) pathfinderMob).getOrCreateFactionEntityData();
       factionEntityCapability.setStuck(true);
       Brain<?> brain = pathfinderMob.getBrain();
       pathfinderMob.getBrain().setMemory(FCMemoryModuleTypes.IS_STUCK.get(), true);

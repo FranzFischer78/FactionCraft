@@ -10,10 +10,13 @@ import com.infamousmisadventures.factioncraft.registry.FCMemoryModuleTypes;
 import com.infamousmisadventures.factioncraft.util.INBTSerializable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.util.GoalUtils;
+import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
 import net.minecraft.world.entity.npc.AbstractVillager;
 
 import java.util.ArrayList;
@@ -150,6 +153,28 @@ public class MobRaiderData implements INBTSerializable<CompoundTag> {
                 }
             }
         }
+    }
 
+    public void onEntityJoin(){
+        if (hasActiveRaid()) {
+            if (entity instanceof AbstractPiglin piglin) {
+                piglin.setImmuneToZombification(true);
+            }
+        }
+    }
+
+    public void onEntityDie(DamageSource damageSource){
+        if(entity.level().isClientSide()) return;
+        if (hasActiveRaid()) {
+            Raid raid = getRaid();
+            raid.updateBossbar();
+            if (isWaveLeader()) {
+                raid.removeLeader(getWave());
+            }
+            if (damageSource.getEntity() != null && damageSource.getEntity().getType() == EntityType.PLAYER) {
+                raid.addHeroOfTheVillage(damageSource.getEntity());
+            }
+            raid.removeFromRaid(entity, getWave(), false);
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.infamousmisadventures.factioncraft.blockentity;
 
 import com.infamousmisadventures.factioncraft.config.FactionCraftConfig;
+import com.infamousmisadventures.factioncraft.level.saveddata.RaidManager;
 import com.infamousmisadventures.factioncraft.raid.Raid;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -69,7 +70,7 @@ public class ReconstructBlockEntity extends BlockEntity {
 
     private void loadRaid(ServerLevel level) {
         if(raid == null && raidId != 0) {
-            RaidManager raidManager = RaidManagerHelper.getRaidManagerCapability(level);
+            RaidManager raidManager = RaidManager.getOrCreate(level);
             this.raid = raidManager.getRaids().get(raidId);
         }
     }

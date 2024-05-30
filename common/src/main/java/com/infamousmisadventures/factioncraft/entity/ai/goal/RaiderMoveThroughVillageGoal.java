@@ -2,13 +2,13 @@ package com.infamousmisadventures.factioncraft.entity.ai.goal;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntity;
-import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntityHelper;
-import com.infamousmisadventures.factioncraft.capabilities.raider.Raider;
-import com.infamousmisadventures.factioncraft.capabilities.raider.RaiderHelper;
-import com.infamousmisadventures.factioncraft.capabilities.raidmanager.RaidManager;
 import com.infamousmisadventures.factioncraft.config.FactionCraftConfig;
+import com.infamousmisadventures.factioncraft.entity.data.FactionEntityData;
+import com.infamousmisadventures.factioncraft.entity.data.MobRaiderData;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IFactionEntityDataHolder;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IMobRaiderDataHolder;
 import com.infamousmisadventures.factioncraft.faction.Faction;
+import com.infamousmisadventures.factioncraft.level.saveddata.RaidManager;
 import com.infamousmisadventures.factioncraft.raid.Raid;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -34,15 +34,15 @@ public class RaiderMoveThroughVillageGoal extends Goal {
     private final List<BlockPos> visited = Lists.newArrayList();
     private final int distanceToPoi;
     private final BooleanSupplier canDealWithDoors;
-    private final Raider raiderCapability;
-    private final FactionEntity factionEntityCapability;
+    private final MobRaiderData raiderCapability;
+    private final FactionEntityData factionEntityCapability;
     private final int uncertaintyDistance;
     private Path path = null;
 
     public RaiderMoveThroughVillageGoal(Mob p_i50570_1_, double pSpeedModifier, int pDistanceToPoi, BooleanSupplier canDealWithDoors, int uncertaintyDistance) {
         this.mob = p_i50570_1_;
-        this.raiderCapability = RaiderHelper.getRaiderCapability(this.mob);
-        this.factionEntityCapability = FactionEntityHelper.getFactionEntityCapability(this.mob);
+        this.raiderCapability = ((IMobRaiderDataHolder) this.mob).getOrCreateMobRaiderData();
+        this.factionEntityCapability = ((IFactionEntityDataHolder) this.mob).getOrCreateFactionEntityData();
         this.uncertaintyDistance = uncertaintyDistance;
         this.speedModifier = pSpeedModifier;
         this.distanceToPoi = pDistanceToPoi;
@@ -64,7 +64,7 @@ public class RaiderMoveThroughVillageGoal extends Goal {
     }
 
     private boolean hasSuitablePoi() {
-        ServerLevel serverlevel = (ServerLevel) this.mob.level;
+        ServerLevel serverlevel = (ServerLevel) this.mob.level();
         BlockPos blockpos = this.mob.blockPosition();
         Optional<BlockPos> optional = serverlevel.getPoiManager().getRandom(poiType -> poiType.is(PoiTypes.HOME), this::hasNotVisited, PoiManager.Occupancy.ANY, blockpos, 48, this.mob.getRandom());
         if (optional.isEmpty()) {
@@ -125,7 +125,7 @@ public class RaiderMoveThroughVillageGoal extends Goal {
 
         if (path == null) {
             if(FactionCraftConfig.ENABLE_DIGGER_AI.get()) {
-                Faction faction = FactionEntityHelper.getFactionEntityCapability(this.mob).getFaction();
+                Faction faction = ((IFactionEntityDataHolder) this.mob).getOrCreateFactionEntityData().getFaction();
                 raiderCapability.getRaid().spawnDigger(faction, this.mob.blockPosition(), this.mob);
             }
             return;
@@ -159,11 +159,11 @@ public class RaiderMoveThroughVillageGoal extends Goal {
     }
 
     private void recruitNearby(Raid pRaid) {
-        FactionEntity sourceFactionEntityCapability = FactionEntityHelper.getFactionEntityCapability(this.mob);
+        FactionEntityData sourceFactionEntityCapability = ((IFactionEntityDataHolder) this.mob).getOrCreateFactionEntityData();
         if (pRaid.isActive()) {
             Set<Mob> set = Sets.newHashSet();
-            List<Mob> list = this.mob.level.getEntitiesOfClass(Mob.class, this.mob.getBoundingBox().inflate(16.0D), (p_220742_1_) -> {
-                FactionEntity targetFactionEntityCapability = FactionEntityHelper.getFactionEntityCapability(p_220742_1_);
+            List<Mob> list = this.mob.level().getEntitiesOfClass(Mob.class, this.mob.getBoundingBox().inflate(16.0D), (p_220742_1_) -> {
+                FactionEntityData targetFactionEntityCapability = ((IFactionEntityDataHolder) p_220742_1_).getOrCreateFactionEntityData();
                 return sourceFactionEntityCapability.getFaction().equals(targetFactionEntityCapability.getFaction()) && !raiderCapability.hasActiveRaid() && RaidManager.canJoinRaid(p_220742_1_, pRaid);
             });
             set.addAll(list);

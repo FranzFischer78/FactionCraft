@@ -61,7 +61,7 @@ public class GuardVillagerCompat {
 
     private static boolean isRaider(LivingEntity livingEntity) {
         if(livingEntity instanceof Mob mob) {
-            Raider raiderCapability = RaiderHelper.getRaiderCapability(mob);
+            Raider raiderCapability = ((IMobRaiderDataHolder) mob).getOrCreateMobRaiderData()
             return livingEntity.isAlive() && raiderCapability != null && raiderCapability.hasActiveRaid();
         }else{
             return false;

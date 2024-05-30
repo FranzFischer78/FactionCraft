@@ -1,14 +1,13 @@
 package com.infamousmisadventures.factioncraft.entity.ai.brain.task.villager;
 
 import com.google.common.collect.ImmutableMap;
-import com.infamousmisadventures.factioncraft.capabilities.raidmanager.RaidManager;
-import com.infamousmisadventures.factioncraft.capabilities.raidmanager.RaidManagerHelper;
-import com.infamousmisadventures.factioncraft.registry.FCActivities;
+import com.infamousmisadventures.factioncraft.level.saveddata.RaidManager;
 import com.infamousmisadventures.factioncraft.raid.Raid;
+import com.infamousmisadventures.factioncraft.registry.FCActivities;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.behavior.Behavior;
-import net.minecraft.server.level.ServerLevel;
 
 public class BeginVillagerRaidTask extends Behavior<LivingEntity> {
     public BeginVillagerRaidTask() {
@@ -22,7 +21,7 @@ public class BeginVillagerRaidTask extends Behavior<LivingEntity> {
 
     protected void start(ServerLevel level, LivingEntity entity, long gameTime) {
         Brain<?> brain = entity.getBrain();
-        RaidManager raidManagerCapability = RaidManagerHelper.getRaidManagerCapability(level);
+        RaidManager raidManagerCapability = RaidManager.getOrCreate(level);
         Raid raid = raidManagerCapability.getRaidAt(entity.blockPosition());
         if (raid != null) {
             if (raid.hasFirstWaveSpawned() && !raid.isBetweenWaves()) {

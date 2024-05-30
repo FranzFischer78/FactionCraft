@@ -1,10 +1,10 @@
 package com.infamousmisadventures.factioncraft.faction;
 
 import com.infamousmisadventures.factioncraft.boost.Boost;
-import com.infamousmisadventures.factioncraft.registry.FCBoosts;
-import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntity;
-import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntityHelper;
+import com.infamousmisadventures.factioncraft.entity.data.FactionEntityData;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IFactionEntityDataHolder;
 import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityType;
+import com.infamousmisadventures.factioncraft.registry.FCBoosts;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Mob;
@@ -53,10 +53,10 @@ public class FactionBoostHelper {
     private static int applyUniformType(int targetStrength, List<Mob> entities, ServerLevel level, Faction faction) {
         int appliedStrength = 0;
         RandomSource random = level.random;
-        Set<FactionEntityType> factionEntityTypes = entities.stream().map(mobEntity -> FactionEntityHelper.getFactionEntityCapability(mobEntity).getFactionEntityType()).collect(Collectors.toSet());
+        Set<FactionEntityType> factionEntityTypes = entities.stream().map(mobEntity -> ((IFactionEntityDataHolder) mobEntity).getOrCreateFactionEntityData().getFactionEntityType()).collect(Collectors.toSet());
         while(appliedStrength < targetStrength) {
             FactionEntityType randomFactionEntityType = getRandomItem(new ArrayList<>(factionEntityTypes), random);
-            List<Mob> entitiesWithType = entities.stream().filter(mobEntity -> randomFactionEntityType.equals(FactionEntityHelper.getFactionEntityCapability(mobEntity).getFactionEntityType())).collect(Collectors.toList());
+            List<Mob> entitiesWithType = entities.stream().filter(mobEntity -> randomFactionEntityType.equals(((IFactionEntityDataHolder) mobEntity).getOrCreateFactionEntityData().getFactionEntityType())).collect(Collectors.toList());
             if(appliedStrength+entitiesWithType.size() > targetStrength){
                 break;
             }
@@ -76,9 +76,9 @@ public class FactionBoostHelper {
     private static int applyRandom(int targetStrength, List<Mob> entities, ServerLevel level, Faction faction) {
         int appliedStrength = 0;
         RandomSource random = level.random;
-        while(appliedStrength < targetStrength) {
+        while(appliedStrength < targetStrength && !entities.isEmpty()) {
             Mob randomEntity = getRandomItem(entities, random);
-            FactionEntity cap = FactionEntityHelper.getFactionEntityCapability(randomEntity);
+            FactionEntityData cap = ((IFactionEntityDataHolder) randomEntity).getOrCreateFactionEntityData();
             FactionEntityType factionEntityType = cap.getFactionEntityType();
             Boost boost = FCBoosts.getRandomBoostForEntity(random, randomEntity, getWhitelistBoosts(faction, factionEntityType), getBlacklistBoosts(faction, factionEntityType), getRarityOverrides(faction, factionEntityType));
             if(boost == null){

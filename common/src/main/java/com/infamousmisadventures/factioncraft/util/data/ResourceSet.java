@@ -1,15 +1,15 @@
 package com.infamousmisadventures.factioncraft.util.data;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
+import com.infamousmisadventures.factioncraft.platform.Services;
 import com.infamousmisadventures.factioncraft.tags.TagHelper;
 import com.infamousmisadventures.factioncraft.util.RegistryHelper;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tags.TagKey;
-import net.minecraftforge.server.ServerLifecycleHooks;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +51,7 @@ public class ResourceSet<T> {
     }
 
     public boolean contains(T object) {
-        MinecraftServer currentServer = ServerLifecycleHooks.getCurrentServer();
+        MinecraftServer currentServer = Services.PLATFORM.getCurrentServer();
         if(currentServer == null) {
             return false;
         }
@@ -63,7 +63,7 @@ public class ResourceSet<T> {
     }
 
     private List<T> getObjects() {
-        MinecraftServer currentServer = ServerLifecycleHooks.getCurrentServer();
+        MinecraftServer currentServer = Services.PLATFORM.getCurrentServer();
         if (this.objects == null && currentServer != null) {
             this.objects = this.resourceLocations.stream()
                     .filter(resourceLocation -> !resourceLocation.tag())

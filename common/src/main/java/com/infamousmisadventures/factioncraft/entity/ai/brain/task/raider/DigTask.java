@@ -1,10 +1,10 @@
 package com.infamousmisadventures.factioncraft.entity.ai.brain.task.raider;
 
 import com.google.common.collect.ImmutableMap;
-import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntity;
-import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntityHelper;
-import com.infamousmisadventures.factioncraft.capabilities.raidmanager.RaidManager;
-import com.infamousmisadventures.factioncraft.capabilities.raidmanager.RaidManagerHelper;
+import com.infamousmisadventures.factioncraft.entity.data.FactionEntityData;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IFactionEntityDataHolder;
+import com.infamousmisadventures.factioncraft.level.saveddata.RaidManager;
+import com.infamousmisadventures.factioncraft.mixins.DiggerItemAccessor;
 import com.infamousmisadventures.factioncraft.raid.Raid;
 import com.infamousmisadventures.factioncraft.registry.FCMemoryModuleTypes;
 import net.minecraft.core.BlockPos;
@@ -19,12 +19,12 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.behavior.Behavior;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.MemoryStatus;
 import net.minecraft.world.entity.ai.memory.WalkTarget;
 import net.minecraft.world.entity.ai.util.DefaultRandomPos;
+import net.minecraft.world.item.DiggerItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.ClipContext;
@@ -34,26 +34,24 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.ToolAction;
-import net.minecraftforge.common.ToolActions;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 
 import static com.infamousmisadventures.factioncraft.block.ReconstructBlock.setReconstructBlock;
 import static com.infamousmisadventures.factioncraft.util.GeneralUtils.blockPosToVec3;
-import static net.minecraftforge.common.ForgeMod.REACH_DISTANCE;
 
 public class DigTask<E extends LivingEntity> extends Behavior<E> {
-
-    private static final Set<ToolAction> digActions = Set.of(ToolActions.SHOVEL_DIG, ToolActions.AXE_DIG, ToolActions.PICKAXE_DIG);
 
     private final boolean requiresTool;
     private final boolean requiresProperTool;
     private final List<BlockPos> targetBlocks = new ArrayList<>();
     private final EquipmentSlot hand;
-    private final FactionEntity factionEntityCapability;
+    private final FactionEntityData factionEntityCapability;
     private BlockState currentBlockState = null;
     private float breakDuration = 0;
     private int destroyProgressStart = 0;
@@ -61,7 +59,7 @@ public class DigTask<E extends LivingEntity> extends Behavior<E> {
 
     public DigTask(Mob entity, boolean requiresTool, boolean requiresProperTool, EquipmentSlot hand) {
         super(ImmutableMap.of(FCMemoryModuleTypes.RAID_WALK_TARGET.get(), MemoryStatus.VALUE_PRESENT, FCMemoryModuleTypes.IS_STUCK.get(), MemoryStatus.VALUE_PRESENT));
-        this.factionEntityCapability = FactionEntityHelper.getFactionEntityCapability(entity);
+        this.factionEntityCapability = ((IFactionEntityDataHolder) entity).getOrCreateFactionEntityData();
         this.requiresTool = requiresTool;
         this.requiresProperTool = requiresProperTool;
         this.hand = hand;
@@ -86,7 +84,7 @@ public class DigTask<E extends LivingEntity> extends Behavior<E> {
         return !this.targetBlocks.isEmpty() && this.hasRequiredMemories(entity);
     }
 
-    private boolean hasRequiredMemories(E pOwner) {
+    protected boolean hasRequiredMemories(E pOwner) {
         for(Map.Entry<MemoryModuleType<?>, MemoryStatus> entry : this.entryCondition.entrySet()) {
             MemoryModuleType<?> memorymoduletype = entry.getKey();
             MemoryStatus memorystatus = entry.getValue();
@@ -110,14 +108,15 @@ public class DigTask<E extends LivingEntity> extends Behavior<E> {
     }
 
     private float getReachDistance(E entity) {
-        AttributeInstance reachDistanceAttribute = entity.getAttribute(REACH_DISTANCE.get());
-        return reachDistanceAttribute != null ? (float) reachDistanceAttribute.getValue() : 4.5F;
+        /*AttributeInstance reachDistanceAttribute = entity.getAttribute(REACH_DISTANCE.get());
+        return reachDistanceAttribute != null ? (float) reachDistanceAttribute.getValue() : 4.5F;*/
+        return 4.5F;
     }
 
     private void initBlockBreak(E entity) {
-        this.currentBlockState = entity.level.getBlockState(this.targetBlocks.get(0));
-        this.breakDuration = breakProgress(entity.level, this.targetBlocks.get(0), entity);
-        entity.level.destroyBlockProgress(entity.getId(), targetBlocks.get(0), (int) this.breakDuration);
+        this.currentBlockState = entity.level().getBlockState(this.targetBlocks.get(0));
+        this.breakDuration = breakProgress(entity.level(), this.targetBlocks.get(0), entity);
+        entity.level().destroyBlockProgress(entity.getId(), targetBlocks.get(0), (int) this.breakDuration);
         this.destroyProgressStart = entity.tickCount;
     }
 
@@ -167,14 +166,14 @@ public class DigTask<E extends LivingEntity> extends Behavior<E> {
             entity.swing(InteractionHand.MAIN_HAND);
         }
         if (destroyTicks % 4 == 0) {
-            SoundType soundType = this.currentBlockState.getSoundType(entity.level, this.targetBlocks.get(0), entity);
-            entity.level.playSound(null, this.targetBlocks.get(0), soundType.getHitSound(), SoundSource.BLOCKS, (soundType.getVolume() + 1.0F) / 2.0F, soundType.getPitch() * 0.8F);
+            SoundType soundType = this.currentBlockState.getSoundType();
+            entity.level().playSound(null, this.targetBlocks.get(0), soundType.getHitSound(), SoundSource.BLOCKS, (soundType.getVolume() + 1.0F) / 2.0F, soundType.getPitch() * 0.8F);
         }
         float f1 = this.breakDuration * (float) (destroyTicks + 1);
         if (f1 >= 0.7F) {
-            RaidManager raidManager = RaidManagerHelper.getRaidManagerCapability(entity.level);
+            RaidManager raidManager = RaidManager.getOrCreate(pLevel);
             Raid raid = raidManager.getRaidAt(targetBlocks.get(0));
-            setReconstructBlock(entity.level, targetBlocks.get(0), entity.level.getBlockState(targetBlocks.get(0)), raid, entity);
+            setReconstructBlock(entity.level(), targetBlocks.get(0), pLevel.getBlockState(targetBlocks.get(0)), raid, entity);
             this.targetBlocks.remove(0);
             if (!this.targetBlocks.isEmpty()) {
                 initBlockBreak(entity);
@@ -195,7 +194,7 @@ public class DigTask<E extends LivingEntity> extends Behavior<E> {
         for (int i = 0; i < mobHeight; i++) {
             Vec3 vecFrom = entity.position().add(0, i+0.51D, 0);
             Vec3 vecTo = getVecTo(targetPos, vecFrom, i, entity);
-            BlockHitResult rayTraceResult = entity.level.clip(new ClipContext(vecFrom, vecTo, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, entity));
+            BlockHitResult rayTraceResult = entity.level().clip(new ClipContext(vecFrom, vecTo, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, entity));
             if (rayTraceResult.getType() == HitResult.Type.MISS)
                 continue;
             if (this.targetBlocks.contains(rayTraceResult.getBlockPos()))
@@ -206,9 +205,9 @@ public class DigTask<E extends LivingEntity> extends Behavior<E> {
             if (distance > reachDistance * reachDistance)
                 continue;
 
-            BlockState state = entity.level.getBlockState(rayTraceResult.getBlockPos());
+            BlockState state = entity.level().getBlockState(rayTraceResult.getBlockPos());
 
-            if (state.hasBlockEntity() || state.getDestroySpeed(entity.level, rayTraceResult.getBlockPos()) == -1)
+            if (state.hasBlockEntity() || state.getDestroySpeed(entity.level(), rayTraceResult.getBlockPos()) == -1)
                 continue;
 
             this.targetBlocks.add(rayTraceResult.getBlockPos());
@@ -247,11 +246,8 @@ public class DigTask<E extends LivingEntity> extends Behavior<E> {
     }
 
     private boolean canToolDig(E entity) {
-        for (ToolAction action : digActions) {
-            if (this.getTool(entity).canPerformAction(action))
-                return true;
-        }
-        return false;
+        ItemStack itemstack = getTool(entity);
+        return itemstack != ItemStack.EMPTY && itemstack.getItem() instanceof DiggerItem diggerItem && this.currentBlockState.is(((DiggerItemAccessor) diggerItem).getBlocks());
     }
 
     public float getDigSpeed(BlockState pState, @Nullable BlockPos pos, E entity) {
@@ -292,7 +288,7 @@ public class DigTask<E extends LivingEntity> extends Behavior<E> {
             f /= 5.0F;
         }
 
-        if (!entity.isOnGround()) {
+        if (!entity.onGround()) {
             f /= 5.0F;
         }
 

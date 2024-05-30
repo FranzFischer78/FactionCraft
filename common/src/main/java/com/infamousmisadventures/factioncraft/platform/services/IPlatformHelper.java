@@ -1,5 +1,7 @@
 package com.infamousmisadventures.factioncraft.platform.services;
 
+import net.minecraft.server.MinecraftServer;
+
 public interface IPlatformHelper {
 
     /**
@@ -32,4 +34,11 @@ public interface IPlatformHelper {
     default String getEnvironmentName() {
         return isDevelopmentEnvironment() ? "development" : "production";
     }
+
+    /**
+     * Gets the Minecraft server instance.
+     *
+     * @return The Minecraft server instance.
+     */
+    MinecraftServer getCurrentServer();
 }

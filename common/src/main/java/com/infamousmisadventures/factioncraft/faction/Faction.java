@@ -34,8 +34,8 @@ import static com.infamousmisadventures.factioncraft.util.ResourceLocationHelper
 import static net.minecraft.world.level.Level.OVERWORLD;
 
 public class Faction {
-    public static final Faction DEFAULT = new Faction(new ResourceLocation("faction/default"), false, FactionType.MONSTER, new CompoundTag(), FactionRaidConfig.DEFAULT, FactionBoostConfig.DEFAULT, FactionRelations.DEFAULT, Collections.emptyList(), modLoc("default"), List.of(OVERWORLD.location()), ResourceSet.getEmpty(Registries.ENTITY_TYPE));
-    public static final Faction GAIA = new Faction(new ResourceLocation("faction/gaia"), false, FactionType.GAIA, new CompoundTag(), FactionRaidConfig.DEFAULT, FactionBoostConfig.DEFAULT, FactionRelations.DEFAULT, Collections.emptyList(), modLoc("default"), List.of(OVERWORLD.location()), ResourceSet.getEmpty(Registries.ENTITY_TYPE));
+    public static final Faction DEFAULT = new Faction(new ResourceLocation("faction/default"), false, FactionType.MONSTER, new CompoundTag(), FactionRaidConfig.DEFAULT, FactionBoostConfig.DEFAULT, FactionRelations.DEFAULT, modLoc("default"), List.of(OVERWORLD.location()), ResourceSet.getEmpty(Registries.ENTITY_TYPE));
+    public static final Faction GAIA = new Faction(new ResourceLocation("faction/gaia"), false, FactionType.GAIA, new CompoundTag(), FactionRaidConfig.DEFAULT, FactionBoostConfig.DEFAULT, FactionRelations.DEFAULT, modLoc("default"), List.of(OVERWORLD.location()), ResourceSet.getEmpty(Registries.ENTITY_TYPE));
     public static final ResourceLocation VILLAGE_NAME = new ResourceLocation("faction/village");
 
     public static final Codec<Faction> CODEC = RecordCodecBuilder.create(builder ->
@@ -47,7 +47,6 @@ public class Faction {
                     FactionRaidConfig.CODEC.optionalFieldOf("raid_config", FactionRaidConfig.DEFAULT).forGetter(Faction::getRaidConfig),
                     FactionBoostConfig.CODEC.optionalFieldOf("boosts", FactionBoostConfig.DEFAULT).forGetter(Faction::getBoostConfig),
                     FactionRelations.CODEC_OLD.optionalFieldOf("relations", FactionRelations.DEFAULT).forGetter(Faction::getRelations),
-                    FactionEntityType.CODEC_OLD.listOf().optionalFieldOf("entities", new ArrayList<>()).forGetter(Faction::getEntityTypes),
                     ResourceLocation.CODEC.optionalFieldOf("activation_advancement", modLoc("activation_advancement")).forGetter(Faction::getActivationAdvancement),
                     ResourceLocation.CODEC.listOf().optionalFieldOf("home_dimensions", List.of(OVERWORLD.location())).forGetter(Faction::getHomeDimensions),
                     ResourceSet.getCodec(Registries.ENTITY_TYPE).optionalFieldOf("default_entities", ResourceSet.getEmpty(Registries.ENTITY_TYPE)).forGetter(data -> data.defaultEntities)
@@ -60,13 +59,13 @@ public class Faction {
     private final FactionRaidConfig raidConfig;
     private final FactionBoostConfig boostConfig;
     private final FactionRelations relations;
-    private List<FactionEntityType> entityTypes;
+    private List<FactionEntityType> entityTypes = new ArrayList<>();
     private final ResourceLocation activationAdvancement;
     private final List<ResourceLocation> homeDimensions;
     private final ResourceSet<EntityType<?>> defaultEntities;
     private final DominionSpawner dominionSpawner = new DominionSpawner(this);
 
-    public Faction(ResourceLocation name, boolean replace, FactionType factionType, CompoundTag banner, FactionRaidConfig raidConfig, FactionBoostConfig boostConfig, FactionRelations relations, List<FactionEntityType> entityTypes, ResourceLocation activationAdvancement, List<ResourceLocation> homeDimensions, ResourceSet<EntityType<?>> defaultEntities) {
+    public Faction(ResourceLocation name, boolean replace, FactionType factionType, CompoundTag banner, FactionRaidConfig raidConfig, FactionBoostConfig boostConfig, FactionRelations relations, ResourceLocation activationAdvancement, List<ResourceLocation> homeDimensions, ResourceSet<EntityType<?>> defaultEntities) {
         this.name = name;
         this.replace = replace;
         this.factionType = factionType;
@@ -74,7 +73,6 @@ public class Faction {
         this.raidConfig = raidConfig;
         this.boostConfig = boostConfig;
         this.relations = relations;
-        this.entityTypes = entityTypes;
         this.activationAdvancement = activationAdvancement;
         this.homeDimensions = homeDimensions;
         this.defaultEntities = defaultEntities;

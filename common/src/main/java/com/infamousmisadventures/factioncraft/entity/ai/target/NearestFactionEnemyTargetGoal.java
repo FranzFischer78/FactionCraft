@@ -1,17 +1,15 @@
 package com.infamousmisadventures.factioncraft.entity.ai.target;
 
-import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntityHelper;
-import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntity;
-import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+import com.infamousmisadventures.factioncraft.entity.data.FactionEntityData;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IFactionEntityDataHolder;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.target.TargetGoal;
+import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.phys.AABB;
 
 import javax.annotation.Nullable;
 import java.util.EnumSet;
-
-import net.minecraft.world.entity.ai.goal.Goal.Flag;
 
 public class NearestFactionEnemyTargetGoal extends TargetGoal {
    protected final int randomInterval;
@@ -44,14 +42,14 @@ public class NearestFactionEnemyTargetGoal extends TargetGoal {
    }
 
    protected void findTarget() {
-      this.target = this.mob.level.getNearestEntity(Mob.class, this.targetConditions, this.mob, this.mob.getX(), this.mob.getEyeY(), this.mob.getZ(), this.getTargetSearchArea(this.getFollowDistance()));
+      this.target = this.mob.level().getNearestEntity(Mob.class, this.targetConditions, this.mob, this.mob.getX(), this.mob.getEyeY(), this.mob.getZ(), this.getTargetSearchArea(this.getFollowDistance()));
    }
 
    private boolean hasEnemyFaction(LivingEntity livingEntity) {
       if(livingEntity instanceof Mob){
          Mob targetMob = (Mob) livingEntity;
-         FactionEntity targetCap = FactionEntityHelper.getFactionEntityCapability(targetMob);
-         FactionEntity sourceCap = FactionEntityHelper.getFactionEntityCapability(this.mob);
+         FactionEntityData targetCap = ((IFactionEntityDataHolder) targetMob).getOrCreateFactionEntityData();
+         FactionEntityData sourceCap = ((IFactionEntityDataHolder) this.mob).getOrCreateFactionEntityData();
          if(sourceCap == null || targetCap == null){
             return false;
          }

@@ -1,20 +1,20 @@
 package com.infamousmisadventures.factioncraft.entity.ai.goal;
 
 import com.google.common.collect.Sets;
-import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntity;
-import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntityHelper;
-import com.infamousmisadventures.factioncraft.capabilities.raider.Raider;
-import com.infamousmisadventures.factioncraft.capabilities.raider.RaiderHelper;
-import com.infamousmisadventures.factioncraft.capabilities.raidmanager.RaidManager;
 import com.infamousmisadventures.factioncraft.config.FactionCraftConfig;
+import com.infamousmisadventures.factioncraft.entity.data.FactionEntityData;
+import com.infamousmisadventures.factioncraft.entity.data.MobRaiderData;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IFactionEntityDataHolder;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IMobRaiderDataHolder;
 import com.infamousmisadventures.factioncraft.faction.Faction;
+import com.infamousmisadventures.factioncraft.level.saveddata.RaidManager;
 import com.infamousmisadventures.factioncraft.raid.Raid;
-import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.ai.util.DefaultRandomPos;
-import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.ai.util.DefaultRandomPos;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -22,15 +22,15 @@ import java.util.Set;
 
 public class MoveTowardsRaidGoal<T extends Mob> extends Goal {
     private final T mob;
-    private final Raider raiderCapability;
-    private final FactionEntity factionEntityCapability;
+    private final MobRaiderData raiderCapability;
+    private final FactionEntityData factionEntityData;
     private int lastStuckCheck = 0;
     private Vec3 lastStuckCheckPos;
 
     public MoveTowardsRaidGoal(T p_i50323_1_) {
         this.mob = p_i50323_1_;
-        this.raiderCapability = RaiderHelper.getRaiderCapability(this.mob);
-        this.factionEntityCapability = FactionEntityHelper.getFactionEntityCapability(this.mob);
+        this.raiderCapability = ((IMobRaiderDataHolder) this.mob).getOrCreateMobRaiderData();
+        this.factionEntityData = ((IFactionEntityDataHolder) this.mob).getOrCreateFactionEntityData();
         this.lastStuckCheck = mob.tickCount;
         this.lastStuckCheckPos = mob.position();
         this.setFlags(EnumSet.of(Flag.MOVE));
@@ -45,21 +45,21 @@ public class MoveTowardsRaidGoal<T extends Mob> extends Goal {
                 && this.mob.getTarget() == null
                 && !this.mob.isVehicle() && raiderCapability.hasActiveRaid()
                 && !raiderCapability.getRaid().isOver()
-                && !((ServerLevel)this.mob.level).isVillage(this.mob.blockPosition());
+                && !((ServerLevel)this.mob.level()).isVillage(this.mob.blockPosition());
     }
 
     /**
      * Returns whether an in-progress EntityAIBase should continue executing
      */
     public boolean canContinueToUse() {
-        return raiderCapability != null && raiderCapability.hasActiveRaid() && this.mob.getTarget() == null && !raiderCapability.getRaid().isOver() && this.mob.level instanceof ServerLevel && !((ServerLevel)this.mob.level).isVillage(this.mob.blockPosition());
+        return raiderCapability != null && raiderCapability.hasActiveRaid() && this.mob.getTarget() == null && !raiderCapability.getRaid().isOver() && this.mob.level() instanceof ServerLevel && !((ServerLevel)this.mob.level()).isVillage(this.mob.blockPosition());
     }
 
     @Override
     public void start() {
         if (raiderCapability.hasActiveRaid()) {
             Raid raid = raiderCapability.getRaid();
-            factionEntityCapability.setTargetPosition(raid.getCenter());
+            factionEntityData.setTargetPosition(raid.getCenter());
         }
         super.start();
     }
@@ -70,14 +70,14 @@ public class MoveTowardsRaidGoal<T extends Mob> extends Goal {
     public void tick() {
         if (raiderCapability.hasActiveRaid()) {
             Raid raid = raiderCapability.getRaid();
-            factionEntityCapability.setTargetPosition(raid.getCenter());
+            factionEntityData.setTargetPosition(raid.getCenter());
 
             if(FactionCraftConfig.ENABLE_DIGGER_AI.get() && doStuckCheck()) {
-                Faction faction = FactionEntityHelper.getFactionEntityCapability(this.mob).getFaction();
+                Faction faction = factionEntityData.getFaction();
                 raiderCapability.getRaid().spawnDigger(faction, mob.blockPosition(), this.mob);
-                factionEntityCapability.setStuck(true);
+                factionEntityData.setStuck(true);
             }else{
-                factionEntityCapability.setStuck(false);
+                factionEntityData.setStuck(false);
             }
 
             if (this.mob.tickCount % 20 == 0) {
@@ -107,12 +107,11 @@ public class MoveTowardsRaidGoal<T extends Mob> extends Goal {
     }
 
     private void recruitNearby(Raid pRaid) {
-        FactionEntity sourceFactionEntityCapability = FactionEntityHelper.getFactionEntityCapability(this.mob);
-        if (pRaid.isActive()) {
+        if (pRaid.isActive() && this.mob.level() instanceof ServerLevel serverLevel){
             Set<Mob> set = Sets.newHashSet();
-            List<Mob> list = this.mob.level.getEntitiesOfClass(Mob.class, this.mob.getBoundingBox().inflate(16.0D), (p_220742_1_) -> {
-                FactionEntity targetFactionEntityCapability = FactionEntityHelper.getFactionEntityCapability(p_220742_1_);
-                return sourceFactionEntityCapability.getFaction().equals(targetFactionEntityCapability.getFaction()) && !raiderCapability.hasActiveRaid() && RaidManager.canJoinRaid(p_220742_1_, pRaid);
+            List<Mob> list = this.mob.level().getEntitiesOfClass(Mob.class, this.mob.getBoundingBox().inflate(16.0D), (p_220742_1_) -> {
+                FactionEntityData targetFactionEntityCapability = ((IFactionEntityDataHolder) p_220742_1_).getOrCreateFactionEntityData();
+                return factionEntityData.getFaction().equals(targetFactionEntityCapability.getFaction()) && !raiderCapability.hasActiveRaid() && RaidManager.canJoinRaid(p_220742_1_, pRaid);
             });
             set.addAll(list);
 

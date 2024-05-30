@@ -24,13 +24,13 @@ public class DominionSpawner {
 
     public List<MobSpawnSettings.SpawnerData>  GetSpawnerData(LevelAccessor level, BlockPos spawnBlockPos, int dominionAmount){
         Holder<Biome> biome = level.getBiome(spawnBlockPos);
-        SpawnerKey spawnerKey = new SpawnerKey(level, spawnBlockPos, biome.get(), dominionAmount);
+        SpawnerKey spawnerKey = new SpawnerKey(level, spawnBlockPos, biome.value(), dominionAmount);
         return getFactionEntityTypes(spawnerKey).stream().map(FactionEntityType::toSpawnerData).toList();
     }
 
     public List<FactionEntityType> GetSpawnableFactionEntityTypes(LevelAccessor level, BlockPos spawnBlockPos, int dominionAmount){
         Holder<Biome> biome = level.getBiome(spawnBlockPos);
-        SpawnerKey spawnerKey = new SpawnerKey(level, spawnBlockPos, biome.get(), dominionAmount);
+        SpawnerKey spawnerKey = new SpawnerKey(level, spawnBlockPos, biome.value(), dominionAmount);
         return getFactionEntityTypes(spawnerKey);
     }
 

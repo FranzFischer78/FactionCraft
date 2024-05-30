@@ -1,6 +1,7 @@
 package com.infamousmisadventures.factioncraft.block;
 
 import com.infamousmisadventures.factioncraft.blockentity.ReconstructBlockEntity;
+import com.infamousmisadventures.factioncraft.raid.Raid;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.LivingEntity;

@@ -1,12 +1,12 @@
 package com.infamousmisadventures.factioncraft.level.spawner;
 
-import com.infamousmisadventures.factioncraft.capabilities.patroller.Patroller;
-import com.infamousmisadventures.factioncraft.capabilities.patroller.PatrollerHelper;
 import com.infamousmisadventures.factioncraft.config.FactionCraftConfig;
+import com.infamousmisadventures.factioncraft.entity.data.MobPatrollerData;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IMobPatrollerDataHolder;
 import com.infamousmisadventures.factioncraft.faction.EntityWeightMapProperties;
 import com.infamousmisadventures.factioncraft.faction.Faction;
-import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityType;
 import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityRank;
+import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityType;
 import com.infamousmisadventures.factioncraft.registry.FCFactions;
 import com.infamousmisadventures.factioncraft.util.GeneralUtils;
 import net.minecraft.core.BlockPos;
@@ -28,8 +28,6 @@ import net.minecraft.world.level.levelgen.Heightmap;
 
 import java.util.List;
 import java.util.Map;
-
-import static net.minecraftforge.registries.ForgeRegistries.ENTITY_TYPES;
 
 public class PatrolSpawner implements CustomSpawner {
    private int nextTick;
@@ -111,7 +109,7 @@ public class PatrolSpawner implements CustomSpawner {
    private static boolean spawnPatrolMember(ServerLevel pLevel, BlockPos pPos, RandomSource pRandom, boolean pLeader, Faction faction) {
       BlockState blockstate = pLevel.getBlockState(pPos);
       Holder<Biome> biome = pLevel.getBiome(pPos);
-      EntityWeightMapProperties entityWeightMapProperties = new EntityWeightMapProperties().setBlockPos(pPos).setBiome(biome.get()).setWave(2);
+      EntityWeightMapProperties entityWeightMapProperties = new EntityWeightMapProperties().setBlockPos(pPos).setBiome(biome.value()).setWave(2);
       if(pLeader) {
          entityWeightMapProperties.setAllowedRanks(List.of(FactionEntityRank.CAPTAIN));
       } else {
@@ -130,7 +128,7 @@ public class PatrolSpawner implements CustomSpawner {
       } else {
          Mob entity = (Mob) factionEntityType.createEntity(pLevel, faction, pPos, pLeader, pLeader? FactionEntityRank.CAPTAIN : FactionEntityRank.SOLDIER, MobSpawnType.PATROL);
          if (entity != null) {
-            Patroller patrollerCap = PatrollerHelper.getPatrollerCapability(entity);
+            MobPatrollerData patrollerCap = ((IMobPatrollerDataHolder) entity).getOrCreateMobPatrollerData();
             if (pLeader) {
                patrollerCap.setPatrolLeader(true);
                patrollerCap.findPatrolTarget();

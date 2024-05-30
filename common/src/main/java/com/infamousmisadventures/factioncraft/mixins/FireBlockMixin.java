@@ -1,7 +1,6 @@
 package com.infamousmisadventures.factioncraft.mixins;
 
-import com.infamousmisadventures.factioncraft.capabilities.raidmanager.RaidManager;
-import com.infamousmisadventures.factioncraft.capabilities.raidmanager.RaidManagerHelper;
+import com.infamousmisadventures.factioncraft.level.saveddata.RaidManager;
 import com.infamousmisadventures.factioncraft.raid.Raid;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -29,7 +28,7 @@ public class FireBlockMixin {
     @Inject(method = "Lnet/minecraft/world/level/block/FireBlock;tick(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/util/RandomSource;)V",
             at = @At("HEAD"))
     public void factioncraft_tick(BlockState j2, ServerLevel serverLevel, BlockPos blockPos, RandomSource l1, CallbackInfo ci){
-        RaidManager raidManagerCapability = RaidManagerHelper.getRaidManagerCapability(serverLevel);
+        RaidManager raidManagerCapability = RaidManager.getOrCreate(serverLevel);
         raid = raidManagerCapability.getRaidAt(blockPos);
     }
 

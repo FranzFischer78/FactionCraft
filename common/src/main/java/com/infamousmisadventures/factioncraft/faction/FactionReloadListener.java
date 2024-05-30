@@ -1,11 +1,9 @@
 package com.infamousmisadventures.factioncraft.faction;
 
 import com.infamousmisadventures.factioncraft.FactionCraft;
-import com.infamousmisadventures.factioncraft.capabilities.playerfactions.PlayerFactions;
-import com.infamousmisadventures.factioncraft.capabilities.playerfactions.PlayerFactionsHelper;
-import com.infamousmisadventures.factioncraft.capabilities.savedfactiondata.SavedFactionData;
-import com.infamousmisadventures.factioncraft.capabilities.savedfactiondata.SavedFactionDataHelper;
 import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityType;
+import com.infamousmisadventures.factioncraft.level.saveddata.FactionRelationsData;
+import com.infamousmisadventures.factioncraft.platform.Services;
 import com.infamousmisadventures.factioncraft.registry.FCFactionEntityTypes;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -14,7 +12,6 @@ import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.server.ServerLifecycleHooks;
 
 import java.util.Map;
 
@@ -46,9 +43,9 @@ public class FactionReloadListener implements ResourceManagerReloadListener {
     }
 
     private void updateActualRelationships(Faction faction) {
-        MinecraftServer currentServer = ServerLifecycleHooks.getCurrentServer();
+        MinecraftServer currentServer = Services.PLATFORM.getCurrentServer();
         if(currentServer == null) return;
-        SavedFactionData savedFactionData = SavedFactionDataHelper.getCapability(currentServer.overworld());
+        FactionRelationsData savedFactionData = FactionRelationsData.getOrCreate(currentServer.overworld());
         faction.getRelations().initiateActualRelations(savedFactionData.getOriginalRelations(faction));
     }
 

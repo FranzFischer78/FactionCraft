@@ -120,13 +120,13 @@ public class ThrowPotionGoal extends Goal {
         double d1 = pTarget.getEyeY() - (double) 1.1F - this.mob.getY();
         double d2 = pTarget.getZ() + vec3.z - this.mob.getZ();
         double d3 = Math.sqrt(d0 * d0 + d2 * d2);
-        ThrownPotion thrownpotion = new ThrownPotion(this.mob.level, this.mob);
+        ThrownPotion thrownpotion = new ThrownPotion(this.mob.level(), this.mob);
         thrownpotion.setItem(PotionUtils.setPotion(new ItemStack(Items.SPLASH_POTION), potion));
         thrownpotion.setXRot(thrownpotion.getXRot() - -20.0F);
         thrownpotion.shoot(d0, d1 + d3 * 0.2D, d2, 0.75F, 8.0F);
         if (!this.mob.isSilent()) {
-            this.mob.level.playSound((Player) null, this.mob.getX(), this.mob.getY(), this.mob.getZ(), SoundEvents.WITCH_THROW, this.mob.getSoundSource(), 1.0F, 0.8F + this.mob.getRandom().nextFloat() * 0.4F);
+            this.mob.level().playSound((Player) null, this.mob.getX(), this.mob.getY(), this.mob.getZ(), SoundEvents.WITCH_THROW, this.mob.getSoundSource(), 1.0F, 0.8F + this.mob.getRandom().nextFloat() * 0.4F);
         }
-        this.mob.level.addFreshEntity(thrownpotion);
+        this.mob.level().addFreshEntity(thrownpotion);
     }
 }

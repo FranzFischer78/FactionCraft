@@ -2,3 +2,5 @@ accessWidener v2 named
 accessible method net/minecraft/world/entity/ai/sensing/SensorType <init> (Ljava/util/function/Supplier;)V
 accessible method net/minecraft/world/entity/schedule/Activity <init> (Ljava/lang/String;)V
 accessible class net/minecraft/server/level/ServerLevel$EntityCallbacks
+accessible field net/minecraft/world/entity/ai/goal/target/TargetGoal unseenTicks I
+accessible class net/minecraft/world/level/block/entity/BlockEntityType$BlockEntitySupplier

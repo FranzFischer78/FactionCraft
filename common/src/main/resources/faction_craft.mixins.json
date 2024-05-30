@@ -6,9 +6,14 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "BrainAccessor",
+    "CommandsMixin",
+    "DiggerItemAccessor",
+    "ExplosionMixin",
+    "LivingEntityAccessor",
     "MobAccessor",
     "MobMixin",
-    "ServerLevelMixin"
+    "ServerLevelAccessor",
+    "ServerLevelEntityCallbacksMixin"
   ],
   "client": [
   ],

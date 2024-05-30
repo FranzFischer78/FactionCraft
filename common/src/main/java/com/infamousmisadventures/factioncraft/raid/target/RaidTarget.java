@@ -6,7 +6,6 @@ import com.infamousmisadventures.factioncraft.raid.Raid;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.common.IExtensibleEnum;
 
 public interface RaidTarget {
 
@@ -32,7 +31,7 @@ public interface RaidTarget {
 
     float getSpawnDistance();
 
-    enum Type implements IExtensibleEnum {
+    enum Type {
         VILLAGE("village"),
         PLAYER("player"),
         BATTLE("battle");

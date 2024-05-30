@@ -4,6 +4,7 @@ import com.infamousmisadventures.factioncraft.entity.data.MobPatrollerData;
 import com.infamousmisadventures.factioncraft.entity.data.holder.IMobPatrollerDataHolder;
 import com.infamousmisadventures.factioncraft.entity.data.holder.IMobRaiderDataHolder;
 import com.infamousmisadventures.factioncraft.entity.data.MobRaiderData;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -49,6 +50,11 @@ public abstract class MobMixin extends LivingEntity implements IMobRaiderDataHol
     @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
     public void readAdditionalSaveData(CompoundTag nbt, CallbackInfo ci) {
         getOrCreateMobRaiderData().deserializeNBT(nbt.getCompound("MobRaiderData"));
+    }
+
+    @ModifyReturnValue(method = "Lnet/minecraft/world/entity/Mob;requiresCustomPersistence()Z", at = @At("RETURN"))
+    public boolean requiresCustomPersistence(boolean returnValue) {
+        return returnValue || getOrCreateMobRaiderData().hasActiveRaid() || getOrCreateMobPatrollerData().isPatrolling();
     }
 
     @Inject(method = "tick", at = @At("HEAD"))

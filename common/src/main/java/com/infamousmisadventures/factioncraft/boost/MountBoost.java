@@ -71,8 +71,6 @@ public class MountBoost extends Boost {
                 Vec3 pos = livingEntity.position();
                 mount.setPos(pos.x, pos.y, pos.z);
                 if (mount instanceof Mob mobMount) {
-                    if (net.minecraftforge.common.ForgeHooks.canEntitySpawn(mobMount, level, mount.blockPosition().getX(), mount.blockPosition().getY(), mount.blockPosition().getZ(), null, MobSpawnType.EVENT) == -1)
-                        return 0;
                     mobMount.finalizeSpawn(level, level.getCurrentDifficultyAt(mount.blockPosition()), MobSpawnType.EVENT, null, null);
                 }
                 super.apply(livingEntity);

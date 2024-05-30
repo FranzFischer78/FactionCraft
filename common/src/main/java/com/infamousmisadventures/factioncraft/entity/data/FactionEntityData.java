@@ -2,6 +2,7 @@ package com.infamousmisadventures.factioncraft.entity.data;
 
 
 import com.infamousmisadventures.factioncraft.config.FactionCraftConfig;
+import com.infamousmisadventures.factioncraft.dominion.AreaDominion;
 import com.infamousmisadventures.factioncraft.dominion.AreaPos;
 import com.infamousmisadventures.factioncraft.faction.Faction;
 import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityRank;
@@ -13,8 +14,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.ChunkPos;
 
+import java.util.List;
 import java.util.Objects;
 
 
@@ -156,6 +160,24 @@ public class FactionEntityData implements INBTSerializable<CompoundTag> {
                 return (float) (FactionCraftConfig.AVERAGE_DOMINION_DAY_GRADE_4.get() / 10f);
             default:
                 return (float) (FactionCraftConfig.AVERAGE_DOMINION_DAY_GRADE_5.get() / 10f);
+        }
+    }
+
+    public void onEntityJoin() {
+        if (entity.level() instanceof ServerLevel serverLevel){
+            if (FactionCraftConfig.ENABLE_DEFAULT_FACTION.get()) {
+                if (getFaction() == null || getFaction() == Faction.GAIA) {
+                    AreaDominion areaDominion = Dominion.getOrCreate(serverLevel).getAreaDominion(serverLevel, new AreaPos(entity.blockPosition()));
+                    List<Faction> factions = FCFactions.getFactionData().values().stream()
+                            .filter(faction -> faction.getDefaultEntities().contains(entity.getType()))
+                            .filter(faction -> !FactionCraftConfig.ENABLE_DOMINION.get() || areaDominion.getFactionDominion(faction) > FactionCraftConfig.DOMINION_DEFAULT_ENTITY_TRESHOLD.get())
+                            .toList();
+                    if (!factions.isEmpty()) {
+                        RandomSource randomSource = RandomSource.create(new ChunkPos(entity.blockPosition()).toLong());
+                        setFaction(factions.get(randomSource.nextInt(factions.size())));
+                    }
+                }
+            }
         }
     }
 

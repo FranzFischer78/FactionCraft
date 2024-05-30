@@ -1,7 +1,7 @@
 package com.infamousmisadventures.factioncraft.entity.ai.brain.task.raider;
 
 import com.google.common.collect.ImmutableMap;
-import com.infamousmisadventures.factioncraft.capabilities.raider.RaiderHelper;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IMobRaiderDataHolder;
 import com.infamousmisadventures.factioncraft.raid.Raid;
 import com.infamousmisadventures.factioncraft.registry.FCMemoryModuleTypes;
 import net.minecraft.core.BlockPos;
@@ -38,15 +38,15 @@ public class AcquireVillageRaidTarget<E extends LivingEntity> extends Behavior<E
         return builder.build();
     }
 
-    protected boolean checkExtraStartConditions(ServerLevel pLevel, PathfinderMob pEntity) {
-        return RaiderHelper.getRaiderCapability(pEntity).getRaid() != null;
+    protected boolean checkExtraStartConditions(ServerLevel pLevel, PathfinderMob mob) {
+        return ((IMobRaiderDataHolder) mob).getOrCreateMobRaiderData().getRaid() != null;
     }
 
 
     @Override
     protected void start(ServerLevel pLevel, E pEntity, long pGameTime) {
         if (pEntity instanceof Mob mob) {
-            Raid raid = RaiderHelper.getRaiderCapability(mob).getRaid();
+            Raid raid = ((IMobRaiderDataHolder) mob).getOrCreateMobRaiderData().getRaid();
             if (raid != null && pLevel.isVillage(pEntity.blockPosition())) {
                 Optional<GlobalPos> memoryToAcquireOptional = pEntity.getBrain().getMemory(FCMemoryModuleTypes.RAID_WALK_TARGET.get());
                 if(memoryToAcquireOptional.isPresent() && closeEnough(pLevel, pEntity, memoryToAcquireOptional.get())) {

@@ -2,7 +2,6 @@ package com.infamousmisadventures.factioncraft.boost.ai;
 
 import com.infamousmisadventures.factioncraft.boost.Boost;
 import com.infamousmisadventures.factioncraft.boost.BoostType;
-import com.infamousmisadventures.factioncraft.entity.ai.goal.GoalHelper;
 import com.infamousmisadventures.factioncraft.mixins.MobAccessor;
 import com.infamousmisadventures.factioncraft.registry.FCBoostTypes;
 import com.mojang.serialization.Codec;
@@ -77,7 +76,7 @@ public class MeleeAttackBoost extends Boost {
     @Override
     public void applyAIChanges(Mob mobEntity) {
         if(mobEntity instanceof PathfinderMob pathfinder) {
-            List<Goal> meleeGoals = GoalHelper.getAvailableGoals(pathfinder).stream().map(WrappedGoal::getGoal).filter(goal -> goal instanceof MeleeAttackGoal).collect(Collectors.toList());
+            List<Goal> meleeGoals = ((MobAccessor) mobEntity).getGoalSelector().getAvailableGoals().stream().map(WrappedGoal::getGoal).filter(goal -> goal instanceof MeleeAttackGoal).collect(Collectors.toList());
             if(meleeGoals.isEmpty()) {
                 MeleeAttackGoal meleeGoal = new MeleeAttackGoal(pathfinder, 1.2D, false);
                 ((MobAccessor) mobEntity).getGoalSelector().addGoal(3, meleeGoal);

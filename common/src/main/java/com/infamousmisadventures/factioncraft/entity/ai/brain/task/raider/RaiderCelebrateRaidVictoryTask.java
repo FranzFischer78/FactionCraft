@@ -2,8 +2,7 @@ package com.infamousmisadventures.factioncraft.entity.ai.brain.task.raider;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.infamousmisadventures.factioncraft.capabilities.raidmanager.RaidManager;
-import com.infamousmisadventures.factioncraft.capabilities.raidmanager.RaidManagerHelper;
+import com.infamousmisadventures.factioncraft.level.saveddata.RaidManager;
 import com.infamousmisadventures.factioncraft.raid.Raid;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
@@ -33,7 +32,7 @@ public class RaiderCelebrateRaidVictoryTask extends Behavior<Villager> {
 
    protected boolean checkExtraStartConditions(ServerLevel pLevel, Villager pOwner) {
       BlockPos blockpos = pOwner.blockPosition();
-      RaidManager raidManagerCapability = RaidManagerHelper.getRaidManagerCapability(pLevel);
+      RaidManager raidManagerCapability = RaidManager.getOrCreate(pLevel);
       this.currentRaid = raidManagerCapability.getRaidAt(blockpos);
       return this.currentRaid != null && this.currentRaid.isVictory() && MoveToSkySeeingSpot.hasNoBlocksAbove(pLevel, pOwner, blockpos);
    }
@@ -57,8 +56,8 @@ public class RaiderCelebrateRaidVictoryTask extends Behavior<Villager> {
          DyeColor dyecolor = Util.getRandom(DyeColor.values(), random);
          int i = random.nextInt(3);
          ItemStack itemstack = this.getFirework(dyecolor, i);
-         FireworkRocketEntity fireworkrocketentity = new FireworkRocketEntity(pOwner.level, pOwner, pOwner.getX(), pOwner.getEyeY(), pOwner.getZ(), itemstack);
-         pOwner.level.addFreshEntity(fireworkrocketentity);
+         FireworkRocketEntity fireworkrocketentity = new FireworkRocketEntity(pOwner.level(), pOwner, pOwner.getX(), pOwner.getEyeY(), pOwner.getZ(), itemstack);
+         pOwner.level().addFreshEntity(fireworkrocketentity);
       }
 
    }

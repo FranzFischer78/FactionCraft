@@ -1,21 +1,19 @@
 package com.infamousmisadventures.factioncraft.entity;
 
 import com.google.common.collect.ImmutableList;
-import com.infamousmisadventures.factioncraft.entity.data.MobPatrollerData;
-import com.infamousmisadventures.factioncraft.entity.data.holder.IMobPatrollerDataHolder;
-import com.infamousmisadventures.factioncraft.mixins.MobAccessor;
-import com.mojang.datafixers.util.Pair;
-import com.infamousmisadventures.factioncraft.capabilities.patroller.Patroller;
-import com.infamousmisadventures.factioncraft.capabilities.patroller.PatrollerHelper;
-import com.infamousmisadventures.factioncraft.capabilities.raider.RaiderHelper;
-import com.infamousmisadventures.factioncraft.registry.FCActivities;
 import com.infamousmisadventures.factioncraft.entity.ai.brain.task.raider.*;
 import com.infamousmisadventures.factioncraft.entity.ai.brain.task.villager.*;
 import com.infamousmisadventures.factioncraft.entity.ai.target.FactionAllyHurtTargetGoal;
 import com.infamousmisadventures.factioncraft.entity.ai.target.NearestFactionEnemyTargetGoal;
+import com.infamousmisadventures.factioncraft.entity.data.MobPatrollerData;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IMobPatrollerDataHolder;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IMobRaiderDataHolder;
+import com.infamousmisadventures.factioncraft.mixins.MobAccessor;
+import com.infamousmisadventures.factioncraft.registry.FCActivities;
 import com.infamousmisadventures.factioncraft.registry.FCMemoryModuleTypes;
 import com.infamousmisadventures.factioncraft.registry.FCSensorTypes;
 import com.infamousmisadventures.factioncraft.util.BrainHelper;
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -84,8 +82,8 @@ public class EntityAIEvents {
         Behavior<? super E> attackTask = BrainHelper.getAttackTask(brain);
         brain.addActivityWithConditions(FCActivities.FACTION_RAIDER_PREP.get(), getRaiderPackage(1.1F, attackTask), Set.of(Pair.of(FCMemoryModuleTypes.RAID.get(), MemoryStatus.VALUE_PRESENT)));
         brain.addActivityWithConditions(FCActivities.FACTION_RAIDER_VILLAGE.get(), getVillageRaiderPackage(0.8F, attackTask), Set.of(Pair.of(FCMemoryModuleTypes.RAIDED_VILLAGE_POI.get(), MemoryStatus.VALUE_PRESENT)));
-        brain.addActivityWithConditions(FCActivities.FACTION_PATROL.get(), getPatrollerPackage(PatrollerHelper.getPatrollerWalkSpeed(mob), attackTask), Set.of(Pair.of(FCMemoryModuleTypes.PATROLLER.get(), MemoryStatus.VALUE_PRESENT)));
-        RaiderHelper.getRaiderCapability(mob).updateRaidAI();
+        brain.addActivityWithConditions(FCActivities.FACTION_PATROL.get(), getPatrollerPackage(((IMobPatrollerDataHolder) mob).getOrCreateMobPatrollerData().getPatrollerWalkSpeed(mob), attackTask), Set.of(Pair.of(FCMemoryModuleTypes.PATROLLER.get(), MemoryStatus.VALUE_PRESENT)));
+        ((IMobRaiderDataHolder) mob).getOrCreateMobRaiderData().updateRaidAI();
     }
 
     public static void addVillagerTasks(Villager villagerEntity) {
@@ -101,7 +99,7 @@ public class EntityAIEvents {
     }
 
     private static ImmutableList<Pair<Integer, ? extends Behavior<? super Villager>>> getRaidPackage(VillagerProfession pProfession, float p_220640_1_) {
-        return ImmutableList.of(Pair.of(0, new RunOne<>(ImmutableList.of(Pair.of(new GoOutsideAfterRaidTask(p_220640_1_), 5), Pair.of(new FindWalkTargetAfterRaidVictoryTask(p_220640_1_ * 1.1F), 2)))), Pair.of(0, new CelebrateRaidVictoryTask(600, 600)), Pair.of(2, new FindHidingPlaceDuringRaidTask(24, p_220640_1_ * 1.4F)), getMinimalLookBehavior(), Pair.of(99, new ForgetRaidTask()));
+        return ImmutableList.of(Pair.of(0, new RunOne<>(ImmutableList.of(Pair.of(MoveToSkySeeingSpot.create(p_220640_1_), 5), Pair.of(VillageBoundRandomStroll.create(p_220640_1_ * 1.1F, 2, 2), 2)))), Pair.of(0, new CelebrateRaidVictoryTask(600, 600)), Pair.of(2, LocateHidingPlace.create(24, p_220640_1_ * 1.4F, 1)), getMinimalLookBehavior(), Pair.of(99, new ForgetRaidTask()));
     }
 
     private static  <E extends LivingEntity>  ImmutableList<Pair<Integer, ? extends Behavior<? super E>>> getRaiderPackage(float speedModifier, Behavior<? super E> attackTask) {

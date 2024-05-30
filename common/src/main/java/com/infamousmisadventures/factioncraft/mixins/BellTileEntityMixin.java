@@ -1,7 +1,7 @@
 package com.infamousmisadventures.factioncraft.mixins;
 
-import com.infamousmisadventures.factioncraft.capabilities.raider.Raider;
-import com.infamousmisadventures.factioncraft.capabilities.raider.RaiderHelper;
+import com.infamousmisadventures.factioncraft.entity.data.MobRaiderData;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IMobRaiderDataHolder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -41,7 +41,7 @@ public abstract class BellTileEntityMixin extends BlockEntity {
     private static void factioncraft_areRaidersNearby(BlockPos blockPos, List<LivingEntity> nearbyEntities, CallbackInfoReturnable<Boolean> cir) {
         for(LivingEntity livingentity : nearbyEntities) {
             if(livingentity instanceof Mob mob) {
-                Raider raiderCapability = RaiderHelper.getRaiderCapability(mob);
+                MobRaiderData raiderCapability = ((IMobRaiderDataHolder) mob).getOrCreateMobRaiderData();
                 if (livingentity.isAlive() && blockPos.closerToCenterThan(livingentity.position(), 64.0D) && raiderCapability != null && raiderCapability.hasActiveRaid()) {
                     cir.setReturnValue(true);
                     break;
@@ -64,7 +64,7 @@ public abstract class BellTileEntityMixin extends BlockEntity {
             cancellable = true)
     private static void factioncraft_isRaiderWithinRange(BlockPos blockPos, LivingEntity livingEntity, CallbackInfoReturnable<Boolean> cir) {
         if(livingEntity instanceof Mob mob) {
-            Raider raiderCapability = RaiderHelper.getRaiderCapability(mob);
+            MobRaiderData raiderCapability = ((IMobRaiderDataHolder) mob).getOrCreateMobRaiderData();
             cir.setReturnValue(livingEntity.isAlive()&& blockPos.closerToCenterThan(livingEntity.position(), 88.0D) && raiderCapability != null && raiderCapability.hasActiveRaid());
         }
     }

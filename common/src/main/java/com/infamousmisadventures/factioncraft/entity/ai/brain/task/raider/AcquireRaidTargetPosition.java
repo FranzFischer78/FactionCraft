@@ -1,7 +1,7 @@
 package com.infamousmisadventures.factioncraft.entity.ai.brain.task.raider;
 
 import com.google.common.collect.ImmutableMap;
-import com.infamousmisadventures.factioncraft.capabilities.raider.RaiderHelper;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IMobRaiderDataHolder;
 import com.infamousmisadventures.factioncraft.raid.Raid;
 import com.infamousmisadventures.factioncraft.registry.FCMemoryModuleTypes;
 import net.minecraft.core.GlobalPos;
@@ -28,14 +28,14 @@ public class AcquireRaidTargetPosition<E extends LivingEntity> extends Behavior<
    }
 
    protected boolean checkExtraStartConditions(ServerLevel pLevel, PathfinderMob pEntity) {
-      return RaiderHelper.getRaiderCapability(pEntity).getRaid() != null;
+      return ((IMobRaiderDataHolder) pEntity).getOrCreateMobRaiderData().getRaid() != null;
    }
 
 
    @Override
    protected void start(ServerLevel pLevel, E pEntity, long pGameTime) {
       if (pEntity instanceof Mob mob) {
-         Raid raid = RaiderHelper.getRaiderCapability(mob).getRaid();
+         Raid raid = ((IMobRaiderDataHolder) mob).getOrCreateMobRaiderData().getRaid();
          if (raid != null) {
             pEntity.getBrain().setMemory(FCMemoryModuleTypes.RAID_WALK_TARGET.get(), GlobalPos.of(pLevel.dimension(), raid.getRaidTarget().getTargetBlockPos()));
          }

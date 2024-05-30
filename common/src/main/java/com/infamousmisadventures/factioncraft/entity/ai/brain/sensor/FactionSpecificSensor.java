@@ -1,8 +1,8 @@
 package com.infamousmisadventures.factioncraft.entity.ai.brain.sensor;
 
 import com.google.common.collect.ImmutableSet;
-import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntity;
-import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntityHelper;
+import com.infamousmisadventures.factioncraft.entity.data.FactionEntityData;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IFactionEntityDataHolder;
 import com.infamousmisadventures.factioncraft.faction.Faction;
 import com.infamousmisadventures.factioncraft.registry.FCMemoryModuleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -12,13 +12,6 @@ import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.NearestVisibleLivingEntities;
 import net.minecraft.world.entity.ai.sensing.Sensor;
-import net.minecraft.world.entity.boss.wither.WitherBoss;
-import net.minecraft.world.entity.monster.WitherSkeleton;
-import net.minecraft.world.entity.monster.hoglin.Hoglin;
-import net.minecraft.world.entity.monster.piglin.Piglin;
-import net.minecraft.world.entity.monster.piglin.PiglinAi;
-import net.minecraft.world.entity.monster.piglin.PiglinBrute;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.Optional;
 import java.util.Set;
@@ -40,10 +33,10 @@ public class FactionSpecificSensor extends Sensor<LivingEntity> {
          return p_186157_ instanceof Mob;
       })) {
          if(pEntity instanceof Mob mob) {
-            FactionEntity thisFactionEntityCapability = ((IFactionEntityDataHolder) mob).getOrCreateFactionEntityData();
+            FactionEntityData thisFactionEntityCapability = ((IFactionEntityDataHolder) mob).getOrCreateFactionEntityData();
             Faction thisEntityFaction = thisFactionEntityCapability.getFaction();
             if(thisEntityFaction != null) {
-               FactionEntity factionEntityCapability = FactionEntityHelper.getFactionEntityCapability((Mob) livingentity);
+               FactionEntityData factionEntityCapability = ((IFactionEntityDataHolder) livingentity).getOrCreateFactionEntityData();
                Faction entityFaction = factionEntityCapability.getFaction();
                if (thisEntityFaction.isEnemyOf(entityFaction)) {
                   optional2 = Optional.of(livingentity);

@@ -1,7 +1,7 @@
 package com.infamousmisadventures.factioncraft.entity.ai.target;
 
-import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntity;
-import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntityHelper;
+import com.infamousmisadventures.factioncraft.entity.data.FactionEntityData;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IFactionEntityDataHolder;
 import com.infamousmisadventures.factioncraft.faction.Faction;
 import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.world.entity.LivingEntity;
@@ -31,7 +31,7 @@ public class FactionAllyHurtTargetGoal extends TargetGoal {
         if (this.mob.getRandom().nextInt(this.randomInterval) != 0) {
             return false;
         } else {
-            FactionEntity sourceCap = FactionEntityHelper.getFactionEntityCapability(this.mob);
+            FactionEntityData sourceCap = ((IFactionEntityDataHolder) this.mob).getOrCreateFactionEntityData();
             if (sourceCap.getFaction() == null || sourceCap.getFaction().equals(Faction.GAIA)) {
                 return false;
             }
@@ -47,7 +47,7 @@ public class FactionAllyHurtTargetGoal extends TargetGoal {
     }
 
     protected List<Mob> findHurtAllies() {
-        return this.mob.level.getEntitiesOfClass(Mob.class, new AABB(this.mob.blockPosition()).inflate(30),
+        return this.mob.level().getEntitiesOfClass(Mob.class, new AABB(this.mob.blockPosition()).inflate(30),
                 this::isPotentialHurtAlly);
     }
 
@@ -66,8 +66,8 @@ public class FactionAllyHurtTargetGoal extends TargetGoal {
 
     private boolean hasSameFaction(LivingEntity livingEntity) {
         if(livingEntity instanceof Mob targetMob){
-            FactionEntity targetCap = FactionEntityHelper.getFactionEntityCapability(targetMob);
-            FactionEntity sourceCap = FactionEntityHelper.getFactionEntityCapability(this.mob);
+            FactionEntityData targetCap = ((IFactionEntityDataHolder) targetMob).getOrCreateFactionEntityData();
+            FactionEntityData sourceCap = ((IFactionEntityDataHolder) this.mob).getOrCreateFactionEntityData();
             return sourceCap.getFaction() != null && targetCap.getFaction() != null && sourceCap.getFaction().equals(targetCap.getFaction());
         }
         return false;

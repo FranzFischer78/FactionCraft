@@ -1,6 +1,5 @@
 package com.infamousmisadventures.factioncraft.boost;
 
-import com.infamousmisadventures.factioncraft.entity.ai.goal.GoalHelper;
 import com.infamousmisadventures.factioncraft.mixins.MobAccessor;
 import com.infamousmisadventures.factioncraft.registry.FCBoostTypes;
 import com.mojang.serialization.Codec;
@@ -77,7 +76,7 @@ public class DaylightProtectionBoost extends Boost {
 
     @Override
     public void applyAIChanges(Mob mobEntity) {
-        List<Goal> toRemove = GoalHelper.getAvailableGoals(mobEntity).stream()
+        List<Goal> toRemove = ((MobAccessor) mobEntity).getGoalSelector().getAvailableGoals().stream()
                 .filter(prioritizedGoal -> prioritizedGoal.getGoal() instanceof FleeSunGoal || prioritizedGoal.getGoal() instanceof RestrictSunGoal)
                 .map(WrappedGoal::getGoal)
                 .toList();

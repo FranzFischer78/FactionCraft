@@ -1,8 +1,8 @@
 package com.infamousmisadventures.factioncraft.entity.ai.goal;
 
 
-import com.infamousmisadventures.factioncraft.capabilities.raider.Raider;
-import com.infamousmisadventures.factioncraft.capabilities.raider.RaiderHelper;
+import com.infamousmisadventures.factioncraft.entity.data.MobRaiderData;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IMobRaiderDataHolder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.OpenDoorGoal;
@@ -11,7 +11,6 @@ import net.minecraft.world.entity.ai.util.GoalUtils;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.pathfinder.Node;
 import net.minecraft.world.level.pathfinder.Path;
-import net.minecraftforge.common.util.LazyOptional;
 
 public class RaidOpenDoorGoal extends OpenDoorGoal {
     public RaidOpenDoorGoal(Mob p_i51284_2_) {
@@ -23,7 +22,7 @@ public class RaidOpenDoorGoal extends OpenDoorGoal {
      * method as well.
      */
     public boolean canUse() {
-        Raider raiderCapability = RaiderHelper.getRaiderCapability(this.mob);
+        MobRaiderData raiderCapability = ((IMobRaiderDataHolder) this.mob).getOrCreateMobRaiderData();
         return raiderCapability.hasActiveRaid() && (super.canUse() || this.canUseSameSpot());
     }
 
@@ -38,7 +37,7 @@ public class RaidOpenDoorGoal extends OpenDoorGoal {
                     Node node = path.getNode(i);
                     this.doorPos = new BlockPos(node.x, node.y + 1, node.z);
                     if (!(this.mob.distanceToSqr((double)this.doorPos.getX(), this.mob.getY(), (double)this.doorPos.getZ()) > 2.25D)) {
-                        this.hasDoor = DoorBlock.isWoodenDoor(this.mob.level, this.doorPos);
+                        this.hasDoor = DoorBlock.isWoodenDoor(this.mob.level(), this.doorPos);
                         if (this.hasDoor) {
                             return true;
                         }
@@ -47,7 +46,7 @@ public class RaidOpenDoorGoal extends OpenDoorGoal {
             }
 
             this.doorPos = this.mob.blockPosition().above();
-            this.hasDoor = DoorBlock.isWoodenDoor(this.mob.level, this.doorPos);
+            this.hasDoor = DoorBlock.isWoodenDoor(this.mob.level(), this.doorPos);
             return this.hasDoor;
         }
     }

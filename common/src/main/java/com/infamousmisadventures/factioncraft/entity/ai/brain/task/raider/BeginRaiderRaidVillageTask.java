@@ -1,10 +1,10 @@
 package com.infamousmisadventures.factioncraft.entity.ai.brain.task.raider;
 
 import com.google.common.collect.ImmutableMap;
-import com.infamousmisadventures.factioncraft.capabilities.raider.RaiderHelper;
-import com.infamousmisadventures.factioncraft.registry.FCActivities;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IMobRaiderDataHolder;
 import com.infamousmisadventures.factioncraft.raid.Raid;
 import com.infamousmisadventures.factioncraft.raid.target.RaidTarget;
+import com.infamousmisadventures.factioncraft.registry.FCActivities;
 import com.infamousmisadventures.factioncraft.registry.FCMemoryModuleTypes;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.server.level.ServerLevel;
@@ -23,9 +23,9 @@ public class BeginRaiderRaidVillageTask extends Behavior<LivingEntity> {
 
     protected boolean checkExtraStartConditions(ServerLevel pLevel, LivingEntity entity) {
         if (pLevel.random.nextInt(20) == 0 && entity instanceof Mob mob) {
-            Raid raid = RaiderHelper.getRaiderCapability(mob).getRaid();
+            Raid raid = ((IMobRaiderDataHolder) mob).getOrCreateMobRaiderData().getRaid();
             if (raid != null) {
-                return raid.getRaidTarget().getRaidType() == RaidTarget.Type.VILLAGE && ((ServerLevel)entity.level).isVillage(entity.blockPosition());
+                return raid.getRaidTarget().getRaidType() == RaidTarget.Type.VILLAGE && pLevel.isVillage(entity.blockPosition());
             }
         }
         return false;
@@ -34,7 +34,7 @@ public class BeginRaiderRaidVillageTask extends Behavior<LivingEntity> {
     protected void start(ServerLevel level, LivingEntity entity, long gameTime) {
         if (entity instanceof Mob mob) {
             Brain<?> brain = entity.getBrain();
-            Raid raid = RaiderHelper.getRaiderCapability(mob).getRaid();
+            Raid raid = ((IMobRaiderDataHolder) mob).getOrCreateMobRaiderData().getRaid();
             if (raid != null) {
                 if(raid.getRaidTarget().getRaidType() == RaidTarget.Type.VILLAGE) {
                     brain.eraseMemory(FCMemoryModuleTypes.RAID_WALK_TARGET.get());

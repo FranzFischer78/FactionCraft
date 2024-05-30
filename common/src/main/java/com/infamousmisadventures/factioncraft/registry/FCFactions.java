@@ -8,6 +8,7 @@ import com.infamousmisadventures.factioncraft.faction.FactionType;
 import com.infamousmisadventures.factioncraft.faction.relations.FactionRelations;
 import com.infamousmisadventures.factioncraft.level.saveddata.PlayerFaction;
 import com.infamousmisadventures.factioncraft.level.saveddata.PlayerFactions;
+import com.infamousmisadventures.factioncraft.platform.Services;
 import com.infamousmisadventures.factioncraft.util.GeneralUtils;
 import com.infamousmisadventures.factioncraft.util.data.MergeableCodecDataManager;
 import com.infamousmisadventures.factioncraft.util.data.ResourceSet;
@@ -92,7 +93,7 @@ public class FCFactions {
             homeDimensions.addAll(raw.getHomeDimensions());
             defaultEntities = defaultEntities.merge(raw.getDefaultEntities());
         }
-        return new Faction(name,false, factionType, banner, factionRaidConfig, boostConfig, factionRelations, new ArrayList<>(), activationAdvancement, homeDimensions, defaultEntities);
+        return new Faction(name,false, factionType, banner, factionRaidConfig, boostConfig, factionRelations, activationAdvancement, homeDimensions, defaultEntities);
     }
 
 
@@ -148,7 +149,7 @@ public class FCFactions {
     }
 
     public static Faction createPlayerFaction(Player player){
-        Faction faction = new Faction(new ResourceLocation(MOD_ID, "player/" + player.getName().getString().toLowerCase()), false, FactionType.PLAYER, new CompoundTag(), FactionRaidConfig.PLAYER, FactionBoostConfig.DEFAULT, FactionRelations.DEFAULT, Collections.emptyList(), modLoc("default"), new ArrayList<>(), ResourceSet.getEmpty(ENTITY_TYPE));
+        Faction faction = new Faction(new ResourceLocation(MOD_ID, "player/" + player.getName().getString().toLowerCase()), false, FactionType.PLAYER, new CompoundTag(), FactionRaidConfig.PLAYER, FactionBoostConfig.DEFAULT, FactionRelations.DEFAULT, modLoc("default"), new ArrayList<>(), ResourceSet.getEmpty(ENTITY_TYPE));
         for (Faction faction1 : getFactionData().values()) {
             if(!faction.getRelations().getEnemies().contains(getKey(faction))){
                 if(faction1.getFactionType().equals(FactionType.MONSTER)) {
@@ -165,7 +166,7 @@ public class FCFactions {
     }
 
     public static void reloadPlayerFactions() {
-        PlayerFactions playerFactions = PlayerFactions.getOrCreate();
+        PlayerFactions playerFactions = PlayerFactions.getOrCreate(Services.PLATFORM.getCurrentServer().getLevel(ServerLevel.OVERWORLD));
         playerFactions.getPlayerFactions().forEach((uuid, playerFaction) -> reloadPlayerFaction(playerFaction));
     }
 

@@ -1,8 +1,7 @@
 package com.infamousmisadventures.factioncraft.raid.target;
 
 import com.infamousmisadventures.factioncraft.FCConstants;
-import com.infamousmisadventures.factioncraft.FactionCraft;
-import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntityHelper;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IFactionEntityDataHolder;
 import com.infamousmisadventures.factioncraft.event.CalculateStrengthEvent;
 import com.infamousmisadventures.factioncraft.faction.Faction;
 import com.infamousmisadventures.factioncraft.platform.Services;
@@ -93,7 +92,7 @@ public class FactionBattleRaidTarget implements RaidTarget {
         }
         Set<Mob> raidersInWave = raid.getRaidersInWave(raid.getGroupsSpawned());
         if(raidersInWave == null) return true;
-        return raidersInWave.stream().map(mobEntity -> FactionEntityHelper.getFactionEntityCapability(mobEntity).getFaction()).collect(Collectors.toSet()).size()<=1;
+        return raidersInWave.stream().map(mobEntity -> ((IFactionEntityDataHolder) mobEntity).getOrCreateFactionEntityData().getFaction()).collect(Collectors.toSet()).size()<=1;
     }
 
     @Override

@@ -1,11 +1,12 @@
 package com.infamousmisadventures.factioncraft.entity.ai.goal;
 
-import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntity;
-import com.infamousmisadventures.factioncraft.capabilities.factionentity.FactionEntityHelper;
-import com.infamousmisadventures.factioncraft.capabilities.raidmanager.RaidManager;
-import com.infamousmisadventures.factioncraft.capabilities.raidmanager.RaidManagerHelper;
+import com.infamousmisadventures.factioncraft.entity.data.FactionEntityData;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IFactionEntityDataHolder;
+import com.infamousmisadventures.factioncraft.level.saveddata.RaidManager;
+import com.infamousmisadventures.factioncraft.mixins.DiggerItemAccessor;
 import com.infamousmisadventures.factioncraft.raid.Raid;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
@@ -15,9 +16,9 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.util.DefaultRandomPos;
+import net.minecraft.world.item.DiggerItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.ClipContext;
@@ -27,27 +28,24 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.ToolAction;
-import net.minecraftforge.common.ToolActions;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 import static com.infamousmisadventures.factioncraft.block.ReconstructBlock.setReconstructBlock;
 import static com.infamousmisadventures.factioncraft.util.GeneralUtils.blockPosToVec3;
-import static net.minecraftforge.common.ForgeMod.REACH_DISTANCE;
 
 public class FactionDigGoal extends Goal {
-
-    private static final Set<ToolAction> digActions = Set.of(ToolActions.SHOVEL_DIG, ToolActions.AXE_DIG, ToolActions.PICKAXE_DIG);
 
     private final Mob mob;
     private final boolean requiresTool;
     private final boolean requiresProperTool;
     private final List<BlockPos> targetBlocks = new ArrayList<>();
     private final EquipmentSlot hand;
-    private final FactionEntity factionEntityCapability;
+    private final FactionEntityData factionEntityCapability;
     private BlockState currentBlockState = null;
     private float breakDuration = 0;
     private int destroyProgressStart = 0;
@@ -86,8 +84,9 @@ public class FactionDigGoal extends Goal {
     }
 
     private float getReachDistance() {
-        AttributeInstance reachDistanceAttribute = this.mob.getAttribute(REACH_DISTANCE.get());
-        return reachDistanceAttribute != null ? (float) reachDistanceAttribute.getValue() : 4.5F;
+        /*AttributeInstance reachDistanceAttribute = this.mob.getAttribute(REACH_DISTANCE.get());
+        return reachDistanceAttribute != null ? (float) reachDistanceAttribute.getValue() : 4.5F;*/
+        return 4.5F;
     }
 
     @Override
@@ -103,9 +102,9 @@ public class FactionDigGoal extends Goal {
     }
 
     private void initBlockBreak() {
-        this.currentBlockState = this.mob.level.getBlockState(this.targetBlocks.get(0));
-        this.breakDuration = breakProgress(mob.level, this.targetBlocks.get(0));
-        this.mob.level.destroyBlockProgress(this.mob.getId(), targetBlocks.get(0), (int) this.breakDuration);
+        this.currentBlockState = this.mob.level().getBlockState(this.targetBlocks.get(0));
+        this.breakDuration = breakProgress(mob.level(), this.targetBlocks.get(0));
+        this.mob.level().destroyBlockProgress(this.mob.getId(), targetBlocks.get(0), (int) this.breakDuration);
         this.destroyProgressStart = this.mob.tickCount;
     }
 
@@ -152,14 +151,14 @@ public class FactionDigGoal extends Goal {
             this.mob.swing(InteractionHand.MAIN_HAND);
         }
         if (destroyTicks % 4 == 0) {
-            SoundType soundType = this.currentBlockState.getSoundType(this.mob.level, this.targetBlocks.get(0), this.mob);
-            this.mob.level.playSound(null, this.targetBlocks.get(0), soundType.getHitSound(), SoundSource.BLOCKS, (soundType.getVolume() + 1.0F) / 2.0F, soundType.getPitch() * 0.8F);
+            SoundType soundType = this.currentBlockState.getSoundType();
+            this.mob.level().playSound(null, this.targetBlocks.get(0), soundType.getHitSound(), SoundSource.BLOCKS, (soundType.getVolume() + 1.0F) / 2.0F, soundType.getPitch() * 0.8F);
         }
         float f1 = this.breakDuration * (float) (destroyTicks + 1);
-        if (f1 >= 0.7F) {
-            RaidManager raidManager = RaidManagerHelper.getRaidManagerCapability(this.mob.level);
+        if (f1 >= 0.7F && this.mob.level() instanceof ServerLevel serverLevel) {
+            RaidManager raidManager = RaidManager.getOrCreate(serverLevel);
             Raid raid = raidManager.getRaidAt(targetBlocks.get(0));
-            setReconstructBlock(this.mob.level, targetBlocks.get(0), this.mob.level.getBlockState(targetBlocks.get(0)), raid, this.mob);
+            setReconstructBlock(this.mob.level(), targetBlocks.get(0), this.mob.level().getBlockState(targetBlocks.get(0)), raid, this.mob);
             this.targetBlocks.remove(0);
             if (!this.targetBlocks.isEmpty()) {
                 initBlockBreak();
@@ -185,7 +184,7 @@ public class FactionDigGoal extends Goal {
         for (int i = 0; i < mobHeight; i++) {
             Vec3 vecFrom = this.mob.position().add(0, i+0.51D, 0);
             Vec3 vecTo = getVecTo(targetPos, vecFrom, i);
-            BlockHitResult rayTraceResult = this.mob.level.clip(new ClipContext(vecFrom, vecTo, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this.mob));
+            BlockHitResult rayTraceResult = this.mob.level().clip(new ClipContext(vecFrom, vecTo, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this.mob));
             if (rayTraceResult.getType() == HitResult.Type.MISS)
                 continue;
             if (this.targetBlocks.contains(rayTraceResult.getBlockPos()))
@@ -196,9 +195,9 @@ public class FactionDigGoal extends Goal {
             if (distance > reachDistance * reachDistance)
                 continue;
 
-            BlockState state = this.mob.level.getBlockState(rayTraceResult.getBlockPos());
+            BlockState state = this.mob.level().getBlockState(rayTraceResult.getBlockPos());
 
-            if (state.hasBlockEntity() || state.getDestroySpeed(this.mob.level, rayTraceResult.getBlockPos()) == -1)
+            if (state.hasBlockEntity() || state.getDestroySpeed(this.mob.level(), rayTraceResult.getBlockPos()) == -1)
                 continue;
 
             this.targetBlocks.add(rayTraceResult.getBlockPos());
@@ -237,11 +236,8 @@ public class FactionDigGoal extends Goal {
     }
 
     private boolean canToolDig() {
-        for (ToolAction action : digActions) {
-            if (this.getTool().canPerformAction(action))
-                return true;
-        }
-        return false;
+        ItemStack itemstack = getTool();
+        return itemstack != ItemStack.EMPTY && itemstack.getItem() instanceof DiggerItem diggerItem && this.currentBlockState.is(((DiggerItemAccessor) diggerItem).getBlocks());
     }
 
     public float getDigSpeed(BlockState pState, @Nullable BlockPos pos) {
@@ -282,7 +278,7 @@ public class FactionDigGoal extends Goal {
             f /= 5.0F;
         }
 
-        if (!this.mob.isOnGround()) {
+        if (!this.mob.onGround()) {
             f /= 5.0F;
         }
 

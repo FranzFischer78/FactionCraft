@@ -3,7 +3,7 @@ package com.infamousmisadventures.factioncraft.registry;
 import com.infamousmisadventures.factioncraft.blockentity.ReconstructBlockEntity;
 import com.infamousmisadventures.factioncraft.platform.Services;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
 import java.util.function.Supplier;
@@ -19,7 +19,7 @@ public class FCBlockEntityTypes {
     public static void register() {
     }
 
-    private static Supplier<BlockEntityType<?>> registerBlockEntity(String id, Supplier<BlockEntityType<?>> attribSup) {
+    private static <U extends BlockEntity> Supplier<BlockEntityType<U>> registerBlockEntity(String id, Supplier<BlockEntityType<U>> attribSup) {
         return Services.REGISTRAR.registerObject(modLoc(id), attribSup, BuiltInRegistries.BLOCK_ENTITY_TYPE);
     }
 }

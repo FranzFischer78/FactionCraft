@@ -2,18 +2,24 @@ package com.infamousmisadventures.factioncraft.raid;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.infamousmisadventures.factioncraft.entity.data.FactionEntityData;
+import com.infamousmisadventures.factioncraft.entity.data.MobRaiderData;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IFactionEntityDataHolder;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IMobRaiderDataHolder;
 import com.infamousmisadventures.factioncraft.event.FactionRaidEvent;
 import com.infamousmisadventures.factioncraft.faction.EntityWeightMapProperties;
 import com.infamousmisadventures.factioncraft.faction.Faction;
 import com.infamousmisadventures.factioncraft.faction.FactionGroupSpawner;
 import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityRank;
 import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityType;
+import com.infamousmisadventures.factioncraft.level.saveddata.RaidManager;
 import com.infamousmisadventures.factioncraft.platform.Services;
 import com.infamousmisadventures.factioncraft.raid.target.RaidTarget;
 import com.infamousmisadventures.factioncraft.raid.target.RaidTargetHelper;
 import com.infamousmisadventures.factioncraft.registry.FCFactions;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
@@ -282,7 +288,7 @@ public class Raid {
         }
     }
 
-    private void playSound(BlockPos p_221293_1_, Optional<SoundEvent> soundEvent) {
+    private void playSound(BlockPos p_221293_1_, Optional<Holder<SoundEvent>> soundEvent) {
         if(soundEvent.isEmpty()) return;
         float f = 13.0F;
         int i = 64;
@@ -372,7 +378,7 @@ public class Raid {
         FactionGroupSpawner factionGroupSpawner = new FactionGroupSpawner(level, spawnBlockPos, waveNumber, targetStrength, faction.getRaidConfig().getMobsFraction(), faction);
         factionGroupSpawner.spawnGroup();
         factionGroupSpawner.getEntities().forEach(mobEntity -> {
-            FactionEntity factionEntityCapability = FactionEntityHelper.getFactionEntityCapability(mobEntity);
+            FactionEntityData factionEntityCapability = ((IFactionEntityDataHolder) mobEntity).getOrCreateFactionEntityData();
             if (factionEntityCapability.getFaction() != null && factionEntityCapability.getFactionEntityType() != null) {
                 this.joinRaid(waveNumber, mobEntity);
             }
@@ -403,7 +409,7 @@ public class Raid {
 
     public void joinRaid(int pWave, Mob mobEntity) {
         this.addWaveMob(pWave, mobEntity, true);
-        RaiderHelper.getRaiderCapability(mobEntity).addToRaid(pWave, this);
+        ((IMobRaiderDataHolder) mobEntity).getOrCreateMobRaiderData().addToRaid(pWave, this);
     }
 
     public void addWaveMob(int wave, Mob mobEntity, boolean fresh) {
@@ -439,7 +445,7 @@ public class Raid {
                     this.totalHealth -= mobEntity.getHealth();
                 }
 
-                RaiderHelper.getRaiderCapability(mobEntity).setRaid(null);
+               ((IMobRaiderDataHolder) mobEntity).getOrCreateMobRaiderData().setRaid(null);
                 this.updateBossbar();
             }
         }
@@ -454,9 +460,9 @@ public class Raid {
 
             for (Mob mobEntity : waveEntry.getValue()) {
                 BlockPos blockpos = mobEntity.blockPosition();
-                if (mobEntity.isAlive() && mobEntity.level.dimension() == this.level.dimension() && !(this.getCenter().distSqr(blockpos) >= 12544.0D)) {
+                if (mobEntity.isAlive() && mobEntity.level().dimension() == this.level.dimension() && !(this.getCenter().distSqr(blockpos) >= 12544.0D)) {
                     if (mobEntity.tickCount > 600) {
-                        Raider raiderCapability = RaiderHelper.getRaiderCapability(mobEntity);
+                        MobRaiderData raiderCapability = ((IMobRaiderDataHolder) mobEntity).getOrCreateMobRaiderData();
                         if (this.level.getEntity(mobEntity.getUUID()) == null) {
                             set.add(mobEntity);
                         }
@@ -563,7 +569,7 @@ public class Raid {
     private Predicate<ServerPlayer> validPlayer() {
         return (serverPlayerEntity) -> {
             BlockPos blockpos = serverPlayerEntity.blockPosition();
-            RaidManager cap = getRaidManagerCapability(this.level);
+            RaidManager cap = RaidManager.getOrCreate(this.level);
             return serverPlayerEntity.isAlive() && cap.getRaidAt(blockpos) == this;
         };
     }
@@ -679,7 +685,7 @@ public class Raid {
 
     private long getDiggersInWave() {
         return this.getRaidersInWave(this.getGroupsSpawned()).stream()
-                .filter(entity -> FactionEntityHelper.getFactionEntityCapability(entity).hasRank(FactionEntityRank.DIGGER)).count();
+                .filter(entity -> ((IFactionEntityDataHolder) entity).getOrCreateFactionEntityData().hasRank(FactionEntityRank.DIGGER)).count();
     }
 
     public CompoundTag save(CompoundTag pNbt) {
