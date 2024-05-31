@@ -15,7 +15,7 @@ import java.util.List;
 public class ReloadableServerResourcesMixin {
 
     @Inject(method= "listeners()Ljava/util/List;", at = @At("RETURN"), cancellable = true)
-    private void elementary$listeners(CallbackInfoReturnable<List<PreparableReloadListener>> cir){
+    private void factionCraft$listeners(CallbackInfoReturnable<List<PreparableReloadListener>> cir){
         List<PreparableReloadListener> listeners = new ArrayList<>();
         listeners.addAll(cir.getReturnValue());
         listeners.addAll(DatapackReloadListener.reloadListeners());

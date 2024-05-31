@@ -12,7 +12,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.scores.Team;
 
-import javax.annotation.Nullable;
 import java.util.EnumSet;
 import java.util.function.Predicate;
 
@@ -20,7 +19,6 @@ public class NearestFactionAllyTargetGoal<T extends LivingEntity> extends Target
    private static final int DEFAULT_RANDOM_INTERVAL = 10;
    protected final Class<T> targetType;
    protected final int randomInterval;
-   @Nullable
    protected LivingEntity target;
    /** This filter is applied to the Entity search. Only matching entities will be targeted. */
    protected TargetingConditions targetConditions;
@@ -37,7 +35,7 @@ public class NearestFactionAllyTargetGoal<T extends LivingEntity> extends Target
       this(pMob, pTargetType, DEFAULT_RANDOM_INTERVAL, pMustSee, pMustReach, (Predicate<LivingEntity>)null);
    }
 
-   public NearestFactionAllyTargetGoal(Mob pMob, Class<T> pTargetType, int pRandomInterval, boolean pMustSee, boolean pMustReach, @Nullable Predicate<LivingEntity> pTargetPredicate) {
+   public NearestFactionAllyTargetGoal(Mob pMob, Class<T> pTargetType, int pRandomInterval, boolean pMustSee, boolean pMustReach, Predicate<LivingEntity> pTargetPredicate) {
       super(pMob, pMustSee, pMustReach);
       this.targetType = pTargetType;
       this.randomInterval = reducedTickDelay(pRandomInterval);
@@ -131,7 +129,7 @@ public class NearestFactionAllyTargetGoal<T extends LivingEntity> extends Target
       super.start();
    }
 
-   public void setTarget(@Nullable LivingEntity pTarget) {
+   public void setTarget(LivingEntity pTarget) {
       this.target = pTarget;
    }
 }

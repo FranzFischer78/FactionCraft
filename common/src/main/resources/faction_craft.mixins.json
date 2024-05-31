@@ -5,15 +5,25 @@
   "refmap": "${mod_id}.refmap.json",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "BellTileEntityMixin",
     "BrainAccessor",
+    "BrainMixin",
     "CommandsMixin",
     "DiggerItemAccessor",
+    "EntityAccessor",
     "ExplosionMixin",
+    "FireBlockMixin",
+    "GoalSelectorAccessor",
     "LivingEntityAccessor",
+    "LivingEntityMixin",
     "MobAccessor",
     "MobMixin",
+    "NaturalSpawnerMixin",
+    "PlayerListMixin",
     "ServerLevelAccessor",
-    "ServerLevelEntityCallbacksMixin"
+    "ServerLevelEntityCallbacksMixin",
+    "ServerLevelMixin",
+    "StartAttackingMixin"
   ],
   "client": [
   ],

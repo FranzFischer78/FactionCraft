@@ -19,11 +19,9 @@ import net.minecraft.world.item.FireworkRocketItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 public class CelebrateRaidVictoryTask extends Behavior<Villager> {
-   @Nullable
    private Raid currentRaid;
 
    public CelebrateRaidVictoryTask(int p_i50370_1_, int p_i50370_2_) {

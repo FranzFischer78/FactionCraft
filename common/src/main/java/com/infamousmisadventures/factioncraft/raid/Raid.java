@@ -44,7 +44,6 @@ import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
 
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -512,7 +511,6 @@ public class Raid {
         return Optional.empty();
     }
 
-    @Nullable
     private BlockPos findRandomSpawnPos(int outerAttempt, int maxInnerAttempts) {
         int i = 2 - outerAttempt;
         BlockPos.MutableBlockPos blockpos$mutable = new BlockPos.MutableBlockPos();

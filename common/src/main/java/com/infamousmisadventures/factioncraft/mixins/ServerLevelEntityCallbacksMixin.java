@@ -1,8 +1,10 @@
 package com.infamousmisadventures.factioncraft.mixins;
 
+import com.infamousmisadventures.factioncraft.entity.ai.EntityAIHandler;
 import com.infamousmisadventures.factioncraft.entity.data.holder.IAppliedBoostsDataHolder;
 import com.infamousmisadventures.factioncraft.entity.data.holder.IFactionEntityDataHolder;
 import com.infamousmisadventures.factioncraft.entity.data.holder.IMobRaiderDataHolder;
+import com.infamousmisadventures.factioncraft.faction.FactionSpawnHandler;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -19,11 +21,14 @@ public class ServerLevelEntityCallbacksMixin {
     @Inject(method = "Lnet/minecraft/server/level/ServerLevel$EntityCallbacks;onTrackingStart(Lnet/minecraft/world/entity/Entity;)V", at = @At("HEAD"))
     private void onTrackingStart(Entity entity, CallbackInfo ci) {
         if (entity instanceof LivingEntity livingEntity) {
+            EntityAIHandler.onEntityJoin(livingEntity);
             ((IFactionEntityDataHolder) livingEntity).getOrCreateFactionEntityData().onEntityJoin();
             ((IAppliedBoostsDataHolder) livingEntity).getOrCreateAppliedBoostsData().onEntityJoin(livingEntity);
         }
         if (entity instanceof Mob mob){
             ((IMobRaiderDataHolder) mob).getOrCreateMobRaiderData().onEntityJoin();
         }
+        if(entity.level() instanceof ServerLevel serverLevel)
+            FactionSpawnHandler.onEntityJoin(serverLevel, entity);
     }
 }

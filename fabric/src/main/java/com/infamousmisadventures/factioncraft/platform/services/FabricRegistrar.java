@@ -1,5 +1,6 @@
 package com.infamousmisadventures.factioncraft.platform.services;
 
+import com.infamousmisadventures.factioncraft.registry.*;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 
@@ -9,6 +10,15 @@ public class FabricRegistrar implements IRegistrar {
 
     @Override
     public void setupRegistrar() {
+        FCRegistries.register();
+        FCActivities.register();
+        FCArgumentTypes.register();
+        FCBlockEntityTypes.register();
+        FCBlocks.register();
+        FCMemoryModuleTypes.register();
+        FCMobEffects.register();
+        FCSensorTypes.register();
+
     }
 
     @Override

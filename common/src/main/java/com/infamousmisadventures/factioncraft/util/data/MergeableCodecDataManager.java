@@ -105,7 +105,7 @@ public class MergeableCodecDataManager<RAW, FINE> extends SimplePreparableReload
         }
 
         LOGGER.info("Data loader for {} loaded {} finalized objects", this.folderName, this.data.size());
-        return ImmutableMap.copyOf(map);
+        return map;
     }
 
     /**

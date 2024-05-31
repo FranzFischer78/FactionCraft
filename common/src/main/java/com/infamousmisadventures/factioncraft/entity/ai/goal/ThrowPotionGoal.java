@@ -13,7 +13,6 @@ import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.phys.Vec3;
 
-import javax.annotation.Nullable;
 import java.util.EnumSet;
 import java.util.function.Supplier;
 
@@ -25,7 +24,6 @@ public class ThrowPotionGoal extends Goal {
     private final float attackRadius;
     private final float attackRadiusSqr;
     private final Potion potion;
-    @Nullable
     private LivingEntity target;
     private int attackTime = -1;
     private int seeTime;

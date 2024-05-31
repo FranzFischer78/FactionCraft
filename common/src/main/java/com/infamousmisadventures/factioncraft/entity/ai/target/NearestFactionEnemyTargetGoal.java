@@ -8,7 +8,6 @@ import net.minecraft.world.entity.ai.goal.target.TargetGoal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.phys.AABB;
 
-import javax.annotation.Nullable;
 import java.util.EnumSet;
 
 public class NearestFactionEnemyTargetGoal extends TargetGoal {
@@ -66,7 +65,7 @@ public class NearestFactionEnemyTargetGoal extends TargetGoal {
       super.start();
    }
 
-   public void setTarget(@Nullable LivingEntity pTarget) {
+   public void setTarget(LivingEntity pTarget) {
       this.target = pTarget;
    }
 }

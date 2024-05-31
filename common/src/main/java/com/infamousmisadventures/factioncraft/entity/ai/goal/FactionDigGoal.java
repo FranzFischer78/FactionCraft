@@ -30,7 +30,6 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -240,7 +239,7 @@ public class FactionDigGoal extends Goal {
         return itemstack != ItemStack.EMPTY && itemstack.getItem() instanceof DiggerItem diggerItem && this.currentBlockState.is(((DiggerItemAccessor) diggerItem).getBlocks());
     }
 
-    public float getDigSpeed(BlockState pState, @Nullable BlockPos pos) {
+    public float getDigSpeed(BlockState pState, BlockPos pos) {
         float f = this.getTool().getDestroySpeed(pState);
         if (f > 1.0F) {
             int i = EnchantmentHelper.getBlockEfficiency(this.mob);

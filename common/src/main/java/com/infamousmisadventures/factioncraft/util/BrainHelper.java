@@ -3,23 +3,27 @@ package com.infamousmisadventures.factioncraft.util;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.mojang.datafixers.util.Pair;
-import com.infamousmisadventures.factioncraft.entity.ai.brain.sensor.FactionSpecificSensor;
 import com.infamousmisadventures.factioncraft.mixins.BrainAccessor;
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.Brain;
-import net.minecraft.world.entity.ai.behavior.StartAttacking;
+import net.minecraft.world.entity.ai.behavior.Behavior;
+import net.minecraft.world.entity.ai.behavior.BehaviorControl;
 import net.minecraft.world.entity.ai.memory.ExpirableValue;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
+import net.minecraft.world.entity.ai.sensing.Sensor;
 import net.minecraft.world.entity.ai.sensing.SensorType;
 import net.minecraft.world.entity.schedule.Activity;
-import net.minecraft.world.entity.ai.behavior.Behavior;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 public class BrainHelper {
+
+    public static List<BehaviorControl<? extends Mob>> startAttackingCache = new ArrayList<>();
 
     /*
     public static <E extends LivingEntity> void addActivityAndRemoveMemoryWhenStopped(Brain<E> brain, Activity activity, int priorityStart, ImmutableList<? extends Task<? super E>> tasks, MemoryModuleType<?> memoryToRemove) {
@@ -79,7 +83,7 @@ public class BrainHelper {
         brain.getMemories().put(memoryModuleType, Optional.empty().map(ExpirableValue::of));
     }
 
-    public static void addSensor(Brain<?> brain, SensorType<?> sensorType) {
+    public static void addSensor(Brain<?> brain, SensorType<? extends Sensor<LivingEntity>> sensorType) {
         BrainAccessor<?> brainAccessor = castToAccessor(brain);
         brainAccessor.getSensors().put(sensorType, sensorType.create());
     }
@@ -89,12 +93,12 @@ public class BrainHelper {
         return (BrainAccessor<E>)brain;
     }
 
-    public static <E extends LivingEntity> Behavior<? super E> getAttackTask(Brain<E> brain) {
+    public static <E extends LivingEntity> BehaviorControl<? super E> getAttackTask(Brain<E> brain) {
         BrainAccessor<E> brainAccessor = castToAccessor(brain);
-        Optional<Behavior<? super E>> first = brainAccessor.getAvailableBehaviorsByPriority().values().stream()
+        Optional<BehaviorControl<? super E>> first = brainAccessor.getAvailableBehaviorsByPriority().values().stream()
                 .flatMap(activitySetMap -> activitySetMap.values().stream())
                 .flatMap(Collection::stream)
-                .filter(behavior -> behavior instanceof StartAttacking)
+                .filter(behavior -> startAttackingCache.contains(behavior))
                 .findFirst();
         return first.orElse(null);
     }

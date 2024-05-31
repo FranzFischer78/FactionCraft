@@ -1,9 +1,7 @@
 package com.infamousmisadventures.factioncraft.registry;
 
-import com.infamousmisadventures.factioncraft.entity.ai.brain.sensor.FactionSpecificSensor;
 import com.infamousmisadventures.factioncraft.platform.Services;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.entity.ai.sensing.SensorType;
 import net.minecraft.world.entity.schedule.Activity;
 
 import java.util.function.Supplier;

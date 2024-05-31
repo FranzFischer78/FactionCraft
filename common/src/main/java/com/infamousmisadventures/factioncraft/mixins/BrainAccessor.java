@@ -3,6 +3,7 @@ package com.infamousmisadventures.factioncraft.mixins;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.behavior.Behavior;
+import net.minecraft.world.entity.ai.behavior.BehaviorControl;
 import net.minecraft.world.entity.ai.memory.ExpirableValue;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.sensing.Sensor;
@@ -19,7 +20,7 @@ import java.util.Set;
 public interface BrainAccessor<E extends LivingEntity> {
 
     @Accessor
-    Map<Integer, Map<Activity, Set<Behavior<? super E>>>> getAvailableBehaviorsByPriority();
+    Map<Integer, Map<Activity, Set<BehaviorControl<? super E>>>> getAvailableBehaviorsByPriority();
 
     @Accessor
     Map<SensorType<? extends Sensor<? super E>>, Sensor<? super E>> getSensors();

@@ -10,6 +10,8 @@ import static com.infamousmisadventures.factioncraft.util.ResourceLocationHelper
 public class FCRegistries {
     public static Registry<BoostType> BOOST_TYPE = createRegistry(BoostType.class, modLoc("boost_type"));
 
+    public static void register() {
+    }
 
     private static <P> Registry<P> createRegistry(Class<P> classType, ResourceLocation registryLocation) {
         return Services.REGISTRY_CREATOR.createRegistry(classType, registryLocation);

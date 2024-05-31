@@ -4,3 +4,4 @@ accessible method net/minecraft/world/entity/schedule/Activity <init> (Ljava/lan
 accessible class net/minecraft/server/level/ServerLevel$EntityCallbacks
 accessible field net/minecraft/world/entity/ai/goal/target/TargetGoal unseenTicks I
 accessible class net/minecraft/world/level/block/entity/BlockEntityType$BlockEntitySupplier
+accessible field net/minecraft/commands/synchronization/ArgumentTypeInfos BY_CLASS Ljava/util/Map;

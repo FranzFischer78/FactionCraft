@@ -32,6 +32,7 @@ dependencies {
     modImplementation(include("io.github.fabricators_of_create.Porting-Lib:networking:${porting_lib_version}"))
     modLocalRuntime "fuzs.forgeconfigscreens:forgeconfigscreens-fabric:${forge_config_api_version}"
     modApi "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${forge_config_api_version}"
+    include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:0.3.6")))
 
     // Dependencies (Optional)
     modCompileOnlyApi("mezz.jei:jei-${minecraft_version}-common-api:${fabric_jei_version}")

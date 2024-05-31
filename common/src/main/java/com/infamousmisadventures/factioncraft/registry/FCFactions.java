@@ -15,6 +15,7 @@ import com.infamousmisadventures.factioncraft.util.data.ResourceSet;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
@@ -166,7 +167,9 @@ public class FCFactions {
     }
 
     public static void reloadPlayerFactions() {
-        PlayerFactions playerFactions = PlayerFactions.getOrCreate(Services.PLATFORM.getCurrentServer().getLevel(ServerLevel.OVERWORLD));
+        MinecraftServer currentServer = Services.PLATFORM.getCurrentServer();
+        if(currentServer == null) return;
+        PlayerFactions playerFactions = PlayerFactions.getOrCreate(currentServer.getLevel(ServerLevel.OVERWORLD));
         playerFactions.getPlayerFactions().forEach((uuid, playerFaction) -> reloadPlayerFaction(playerFaction));
     }
 

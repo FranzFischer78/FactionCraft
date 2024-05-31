@@ -5,7 +5,6 @@ import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.JsonKeySortOrderCallback;
 import net.minecraft.core.RegistrySetBuilder;
-import org.jetbrains.annotations.Nullable;
 
 public class FactionCraftDataGenFabric implements DataGeneratorEntrypoint {
 
@@ -14,7 +13,6 @@ public class FactionCraftDataGenFabric implements DataGeneratorEntrypoint {
 
     }
 
-    @Nullable
     @Override
     public String getEffectiveModId() {
         return FCConstants.MOD_ID;

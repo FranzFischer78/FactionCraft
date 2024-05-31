@@ -1,6 +1,8 @@
 package com.infamousmisadventures.factioncraft.mixins;
 
+import com.infamousmisadventures.factioncraft.entity.data.FactionEntityData;
 import com.infamousmisadventures.factioncraft.entity.data.MobPatrollerData;
+import com.infamousmisadventures.factioncraft.entity.data.holder.IFactionEntityDataHolder;
 import com.infamousmisadventures.factioncraft.entity.data.holder.IMobPatrollerDataHolder;
 import com.infamousmisadventures.factioncraft.entity.data.holder.IMobRaiderDataHolder;
 import com.infamousmisadventures.factioncraft.entity.data.MobRaiderData;
@@ -12,13 +14,19 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import static com.infamousmisadventures.factioncraft.faction.Faction.GAIA;
+
 @Mixin(value = Mob.class)
 public abstract class MobMixin extends LivingEntity implements IMobRaiderDataHolder, IMobPatrollerDataHolder {
+
+    @Shadow
+    private LivingEntity target;
 
     protected MobMixin(EntityType<? extends LivingEntity> $$0, Level $$1) {
         super($$0, $$1);
@@ -35,6 +43,7 @@ public abstract class MobMixin extends LivingEntity implements IMobRaiderDataHol
         }
         return factionCraft$mobRaiderData;
     }
+
     public MobPatrollerData getOrCreateMobPatrollerData() {
         if (factionCraft$mobPatrollerData == null) {
             factionCraft$mobPatrollerData = new MobPatrollerData((Mob) (Entity) this);
@@ -59,5 +68,20 @@ public abstract class MobMixin extends LivingEntity implements IMobRaiderDataHol
 
     @Inject(method = "tick", at = @At("HEAD"))
     public void tick(CallbackInfo callbackInfo) {
+    }
+
+    @Inject(method = "Lnet/minecraft/world/entity/Mob;setTarget(Lnet/minecraft/world/entity/LivingEntity;)V", at = @At("HEAD"), cancellable = true)
+    public void factionCraft$setTarget(LivingEntity livingEntity, CallbackInfo callbackInfo) {
+        if (!this.level().isClientSide() && livingEntity != null) {
+            FactionEntityData sourceCap = ((IFactionEntityDataHolder) this).getOrCreateFactionEntityData();
+            FactionEntityData targetCap = ((IFactionEntityDataHolder) livingEntity).getOrCreateFactionEntityData();
+            if (sameFaction(targetCap, sourceCap) || sourceCap.getFaction().isAllyOf(targetCap.getFaction())) {
+                callbackInfo.cancel();
+            }
+        }
+    }
+
+    private static boolean sameFaction(FactionEntityData targetCap, FactionEntityData sourceCap) {
+        return !GAIA.equals(targetCap.getFaction()) && targetCap.getFaction() == sourceCap.getFaction();
     }
 }

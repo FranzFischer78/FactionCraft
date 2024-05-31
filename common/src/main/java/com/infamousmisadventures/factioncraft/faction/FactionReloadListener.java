@@ -1,6 +1,5 @@
 package com.infamousmisadventures.factioncraft.faction;
 
-import com.infamousmisadventures.factioncraft.FactionCraft;
 import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityType;
 import com.infamousmisadventures.factioncraft.level.saveddata.FactionRelationsData;
 import com.infamousmisadventures.factioncraft.platform.Services;
@@ -9,28 +8,16 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
-import net.minecraftforge.event.AddReloadListenerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 
 import java.util.Map;
 
 import static com.infamousmisadventures.factioncraft.faction.relations.FactionRelation.ALLY_MAX;
 import static com.infamousmisadventures.factioncraft.faction.relations.FactionRelation.ENEMY_MAX;
-import static com.infamousmisadventures.factioncraft.registry.FCFactionEntityTypes.FACTION_ENTITY_TYPE_DATA;
 import static com.infamousmisadventures.factioncraft.registry.FCFactions.FACTION_DATA;
 import static com.infamousmisadventures.factioncraft.registry.FCFactions.reloadPlayerFactions;
 
-@Mod.EventBusSubscriber(modid = FactionCraft.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class FactionReloadListener implements ResourceManagerReloadListener {
 
-    @SubscribeEvent
-    public static void onAddReloadListeners(AddReloadListenerEvent event)
-    {
-        event.addListener(FACTION_DATA);
-        event.addListener(FACTION_ENTITY_TYPE_DATA);
-        event.addListener(new FactionReloadListener());
-    }
 
     @Override
     public void onResourceManagerReload(ResourceManager resourceManager) {
