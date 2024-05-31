@@ -18,6 +18,7 @@ public class FabricRegistrar implements IRegistrar {
         FCMemoryModuleTypes.register();
         FCMobEffects.register();
         FCSensorTypes.register();
+        FCBoostTypes.register();
 
     }
 
