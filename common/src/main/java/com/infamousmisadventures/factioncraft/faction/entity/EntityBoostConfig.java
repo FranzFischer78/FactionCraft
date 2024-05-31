@@ -10,6 +10,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -88,7 +89,9 @@ public class EntityBoostConfig {
     }
 
     public Map<Boost, Boost.Rarity> getRarityOverrides() {
-        return rarityOverridesLocations.stream().collect(Collectors.toMap(pair -> FCBoosts.getBoost(pair.getFirst()), Pair::getSecond));
+        Map<Boost, Boost.Rarity> overrideMap = new HashMap<>();
+        rarityOverridesLocations.forEach(pair -> overrideMap.put(FCBoosts.getBoost(pair.getFirst()), pair.getSecond()));
+        return overrideMap;
     }
 
     public CompoundTag save(CompoundTag compoundNbt){

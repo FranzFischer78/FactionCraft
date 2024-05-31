@@ -110,7 +110,7 @@ public abstract class LivingEntityMixin extends Entity implements IFactionEntity
         if (!this.level().isClientSide() && target != null) {
             FactionEntityData sourceCap = ((IFactionEntityDataHolder) target).getOrCreateFactionEntityData();
             FactionEntityData targetCap = this.getOrCreateFactionEntityData();
-            return sameFaction(targetCap, sourceCap) || sourceCap.getFaction().isAllyOf(targetCap.getFaction());
+            return !sameFaction(targetCap, sourceCap) && !sourceCap.getFaction().isAllyOf(targetCap.getFaction());
         }
         return true;
     }
