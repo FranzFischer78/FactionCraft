@@ -8,6 +8,7 @@ import com.infamousmisadventures.factioncraft.faction.Faction;
 import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityRank;
 import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityType;
 import com.infamousmisadventures.factioncraft.level.saveddata.Dominion;
+import com.infamousmisadventures.factioncraft.registry.FCFactionEntityTypes;
 import com.infamousmisadventures.factioncraft.registry.FCFactions;
 import com.infamousmisadventures.factioncraft.util.INBTSerializable;
 import net.minecraft.core.BlockPos;
@@ -95,9 +96,7 @@ public class FactionEntityData implements INBTSerializable<CompoundTag> {
             tag.putString("Faction", faction.getName().toString());
         }
         if (factionEntityType != null) {
-            CompoundTag compoundNBT = new CompoundTag();
-            compoundNBT = factionEntityType.save(compoundNBT);
-            tag.put("FactionEntityType", compoundNBT);
+            tag.putString("FactionEntityType", factionEntityType.getEntityTypeName().toString());
         }
         if (targetPosition != null) {
             tag.putLong("TargetPosition", targetPosition.asLong());
@@ -115,6 +114,10 @@ public class FactionEntityData implements INBTSerializable<CompoundTag> {
         }
         if (tag.contains("TargetPosition")) {
             targetPosition = BlockPos.of(tag.getLong("TargetPosition"));
+        }
+        if (tag.contains("FactionEntityType")) {
+            ResourceLocation entityTypeName = new ResourceLocation(tag.getString("FactionEntityType"));
+            factionEntityType = FCFactionEntityTypes.getFactionEntityType(entityTypeName);
         }
     }
 

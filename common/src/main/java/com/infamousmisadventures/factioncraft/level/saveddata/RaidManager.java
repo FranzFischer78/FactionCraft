@@ -65,6 +65,7 @@ public class RaidManager extends SavedData {
             } else {
                 raid.tick();
             }
+            this.setDirty();
         }
     }
 

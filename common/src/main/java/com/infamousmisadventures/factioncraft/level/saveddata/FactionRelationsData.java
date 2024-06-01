@@ -1,17 +1,16 @@
 package com.infamousmisadventures.factioncraft.level.saveddata;
 
 import com.infamousmisadventures.factioncraft.FCConstants;
+import com.infamousmisadventures.factioncraft.faction.Faction;
+import com.infamousmisadventures.factioncraft.faction.relations.FactionRelation;
 import com.infamousmisadventures.factioncraft.registry.FCFactions;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.infamousmisadventures.factioncraft.faction.Faction;
-import com.infamousmisadventures.factioncraft.faction.relations.FactionRelation;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceLocation;
-import com.infamousmisadventures.factioncraft.util.INBTSerializable;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
 
@@ -32,7 +31,7 @@ public class FactionRelationsData extends SavedData {
 
     public static FactionRelationsData getOrCreate(ServerLevel level)
     {
-        return level.getServer().overworld().getDataStorage().computeIfAbsent((tag) -> load(tag, level), () -> create(level), MOD_ID + "-raid_manager");
+        return level.getServer().overworld().getDataStorage().computeIfAbsent((tag) -> load(tag, level), () -> create(level), MOD_ID + "-faction_relations");
     }
 
     public static FactionRelationsData load(CompoundTag tag, ServerLevel level)

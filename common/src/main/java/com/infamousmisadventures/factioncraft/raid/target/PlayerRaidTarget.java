@@ -20,7 +20,7 @@ import static com.infamousmisadventures.factioncraft.raid.target.RaidTarget.Type
 
 public class PlayerRaidTarget implements RaidTarget {
 
-    private final Type raidType = VILLAGE;
+    private final Type raidType = PLAYER;
     private final ServerPlayer player;
     private int targetStrength;
 
