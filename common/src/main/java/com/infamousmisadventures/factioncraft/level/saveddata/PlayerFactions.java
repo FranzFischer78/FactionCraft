@@ -55,16 +55,19 @@ public class PlayerFactions extends SavedData {
 
     public PlayerFactions setPlayerFactions(Map<UUID, PlayerFaction> playerFactions) {
         this.playerFactions = playerFactions;
+        this.setDirty();
         return this;
     }
 
     public PlayerFactions setPlayerFactions(List<PlayerFaction> playerFactions) {
         playerFactions.forEach(playerFaction -> this.playerFactions.put(playerFaction.getPlayer(), playerFaction));
+        this.setDirty();
         return this;
     }
 
     public void addPlayerFaction(Player player, Faction faction) {
         this.playerFactions.put(player.getUUID(), new PlayerFaction(player.getUUID(), faction));
+        this.setDirty();
     }
 
 

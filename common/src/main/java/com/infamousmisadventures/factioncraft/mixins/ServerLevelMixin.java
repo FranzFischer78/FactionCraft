@@ -1,6 +1,8 @@
 package com.infamousmisadventures.factioncraft.mixins;
 
 import com.infamousmisadventures.factioncraft.config.FactionCraftConfig;
+import com.infamousmisadventures.factioncraft.level.saveddata.Dominion;
+import com.infamousmisadventures.factioncraft.level.saveddata.FactionRelationsData;
 import com.infamousmisadventures.factioncraft.level.saveddata.RaidManager;
 import com.infamousmisadventures.factioncraft.level.spawner.BattleSpawner;
 import net.minecraft.server.level.ServerLevel;
@@ -15,6 +17,8 @@ import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
 
+import static net.minecraft.world.level.Level.OVERWORLD;
+
 @Mixin(ServerLevel.class)
 public class ServerLevelMixin {
 
@@ -28,6 +32,10 @@ public class ServerLevelMixin {
     private void factioncraft$tick(BooleanSupplier $$0, CallbackInfo ci) {
         ServerLevel level = (ServerLevel) (Object) this;
         RaidManager.getOrCreate(level).tick();
+        Dominion.getOrCreate(level).tick();
+        if(level.equals(level.getServer().getLevel(OVERWORLD))) {
+            FactionRelationsData.getOrCreate(level).tick();
+        }
     }
 
     private void customSpawners(ServerLevelAccessor serverLevel) {

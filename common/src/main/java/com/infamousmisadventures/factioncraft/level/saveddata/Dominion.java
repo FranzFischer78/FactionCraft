@@ -121,4 +121,8 @@ public class Dominion extends SavedData {
         }
         return areaDominions.get(areaPos);
     }
+
+    public void tick() {
+        this.setDirty();
+    }
 }

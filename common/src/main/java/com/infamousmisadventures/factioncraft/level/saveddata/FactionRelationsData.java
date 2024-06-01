@@ -91,4 +91,8 @@ public class FactionRelationsData extends SavedData {
         }
         return new HashMap<>();
     }
+
+    public void tick() {
+        this.setDirty();
+    }
 }
