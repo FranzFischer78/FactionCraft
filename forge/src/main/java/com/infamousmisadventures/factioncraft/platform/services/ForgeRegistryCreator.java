@@ -22,6 +22,7 @@ public class ForgeRegistryCreator implements IRegistryCreator {
     public <P> Registry<P> createRegistry(Class<P> type, ResourceLocation registryName) {
         ResourceKey<Registry<P>> registryKey = ResourceKey.createRegistryKey(registryName);
         DeferredRegister<P> deferredRegister = DeferredRegister.create(registryKey, MOD_ID);
+        ForgeRegistrar.AddDeferredRegister(registryKey, deferredRegister);
         Supplier<IForgeRegistry<P>> iForgeRegistrySupplier = deferredRegister.makeRegistry(RegistryBuilder::new);
         return new MappedRegistry<>(registryKey, Lifecycle.stable());
     }

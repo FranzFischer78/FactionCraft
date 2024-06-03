@@ -24,9 +24,9 @@ public class FCArgumentTypes {
     public static void register() {
     }
 
-    private static <U extends ArgumentTypeInfo<?, ?>> Supplier<U> registerArgumentType(String id, Supplier<U> attribSup, Class<? extends ArgumentType> clazz) {
-        Supplier<U> uSupplier = Services.REGISTRAR.registerObject(modLoc(id), attribSup, BuiltInRegistries.COMMAND_ARGUMENT_TYPE);
-        ArgumentTypeInfos.BY_CLASS.put(clazz, uSupplier.get());
+    private static <U extends ArgumentTypeInfo<?, ?>> Supplier<U> registerArgumentType(String id, Supplier<U> supplier, Class<? extends ArgumentType> clazz) {
+        Supplier<U> uSupplier = Services.REGISTRAR.registerObject(modLoc(id), supplier, BuiltInRegistries.COMMAND_ARGUMENT_TYPE);
+        ArgumentTypeInfos.BY_CLASS.put(clazz, supplier.get());
         return uSupplier;
     }
 }

@@ -1,6 +1,7 @@
 package com.infamousmisadventures.factioncraft.platform.services;
 
 import com.google.common.collect.ImmutableMap;
+import com.infamousmisadventures.factioncraft.registry.*;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -19,20 +20,33 @@ public class ForgeRegistrar implements IRegistrar {
 
     @Override
     public void setupRegistrar() {
+        FCRegistries.register();
+        FCActivities.register();
+        FCArgumentTypes.register();
+        FCBlockEntityTypes.register();
+        FCBlocks.register();
+        FCMemoryModuleTypes.register();
+        FCMobEffects.register();
+        FCSensorTypes.register();
+        FCBoostTypes.register();
     }
 
     @Override
     public <V, T extends V> RegistryObject<T> registerObject(ResourceLocation objId, Supplier<T> objSup, Registry<V> targetRegistry) {
-        IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus(); // Should not be null at the time this method is called
+        //IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus(); // Should not be null at the time this method is called
 
         ResourceKey<? extends Registry<V>> targetRegistryKey = targetRegistry.key();
 
         DeferredRegister<V> existingDefReg = (DeferredRegister<V>) CACHED_REGISTRIES.computeIfAbsent(targetRegistryKey, defReg -> {
             DeferredRegister<V> cachedDefReg = DeferredRegister.create(targetRegistryKey, MOD_ID);
-            cachedDefReg.register(modBus);
+            //cachedDefReg.register(modBus);
             return cachedDefReg;
         });
         return existingDefReg.register(objId.getPath(), objSup);
+    }
+
+    public static void AddDeferredRegister(ResourceKey key, DeferredRegister register) {
+        CACHED_REGISTRIES.put(key, register);
     }
 
     public static ImmutableMap<ResourceKey, DeferredRegister> getCachedRegistries() {
