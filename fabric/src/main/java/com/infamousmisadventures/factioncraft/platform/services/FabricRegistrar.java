@@ -10,16 +10,6 @@ public class FabricRegistrar implements IRegistrar {
 
     @Override
     public void setupRegistrar() {
-        FCRegistries.register();
-        FCActivities.register();
-        FCArgumentTypes.register();
-        FCBlockEntityTypes.register();
-        FCBlocks.register();
-        FCMemoryModuleTypes.register();
-        FCMobEffects.register();
-        FCSensorTypes.register();
-        FCBoostTypes.register();
-
     }
 
     @Override

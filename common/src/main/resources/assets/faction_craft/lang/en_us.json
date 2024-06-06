@@ -29,6 +29,7 @@
   "block.faction_raid.undead_banner": "Rotten Banner",
   "block.faction_raid.end_banner": "Void Banner",
   "block.faction_raid.piglin_banner": "Snout Banner",
-  "block.faction_raid.wither_banner": "Wither Banner"
+  "block.faction_raid.wither_banner": "Wither Banner",
 
+  "item.faction_craft.ominous_bottle": "Ominous Bottle"
 }

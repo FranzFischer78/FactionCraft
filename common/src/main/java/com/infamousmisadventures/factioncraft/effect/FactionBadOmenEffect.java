@@ -32,7 +32,7 @@ public class FactionBadOmenEffect extends MobEffect {
 
             if (serverlevel.isVillage(pLivingEntity.blockPosition())) {
                 RaidManager raidManagerCapability = RaidManager.getOrCreate(serverlevel);
-                raidManagerCapability.createBadOmenRaid(new VillageRaidTarget(player.blockPosition(), serverlevel), player);
+                raidManagerCapability.createBadOmenRaid(new VillageRaidTarget(player.blockPosition(), serverlevel), player, pAmplifier);
             }
         }
     }

@@ -123,14 +123,13 @@ public class RaidManager extends SavedData {
         }
     }
 
-    public Raid createBadOmenRaid(RaidTarget raidTarget, ServerPlayer player) {
+    public Raid createBadOmenRaid(RaidTarget raidTarget, ServerPlayer player, int amplifier) {
         if (FactionCraftConfig.DISABLE_FACTION_RAIDS.get()) {
             return null;
         } else {
             Raid raid = this.getRaidAt(raidTarget.getTargetBlockPos());
-            List<Faction> badOmenFactions = new ArrayList<>();
             if (raid == null) {
-                raid = createRaid(new ArrayList<>(badOmenFactions), raidTarget);
+                raid = createRaid(getBadOmenFactions(player, amplifier), raidTarget);
                 clearBadOmen(player, raid, true);
             } else if (raid.getFactions().size() <= RAID_MAX_FACTIONS.get()) {
                 if (raid.getFactions().size() + badOmenFactions.size() <= RAID_MAX_FACTIONS.get()) {
@@ -148,6 +147,10 @@ public class RaidManager extends SavedData {
             }
             return raid;
         }
+    }
+
+    private List<Faction> getBadOmenFactions(ServerPlayer player, int amplifier) {
+        return null;
     }
 
     private void clearBadOmen(ServerPlayer player, Raid raid, boolean contributed) {

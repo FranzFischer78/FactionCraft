@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "faction_craft:item/ominous_bottle"
+  }
+}

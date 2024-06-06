@@ -6,8 +6,6 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 
@@ -20,15 +18,6 @@ public class ForgeRegistrar implements IRegistrar {
 
     @Override
     public void setupRegistrar() {
-        FCRegistries.register();
-        FCActivities.register();
-        FCArgumentTypes.register();
-        FCBlockEntityTypes.register();
-        FCBlocks.register();
-        FCMemoryModuleTypes.register();
-        FCMobEffects.register();
-        FCSensorTypes.register();
-        FCBoostTypes.register();
     }
 
     @Override
@@ -45,7 +34,7 @@ public class ForgeRegistrar implements IRegistrar {
         return existingDefReg.register(objId.getPath(), objSup);
     }
 
-    public static void AddDeferredRegister(ResourceKey key, DeferredRegister register) {
+    public static void addDeferredRegister(ResourceKey key, DeferredRegister register) {
         CACHED_REGISTRIES.put(key, register);
     }
 
