@@ -14,9 +14,8 @@ import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityRank;
 import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityType;
 import com.infamousmisadventures.factioncraft.level.saveddata.RaidManager;
 import com.infamousmisadventures.factioncraft.platform.Services;
-import com.infamousmisadventures.factioncraft.raid.target.RaidTarget;
-import com.infamousmisadventures.factioncraft.raid.target.RaidTargetHelper;
-import com.infamousmisadventures.factioncraft.registry.FCFactions;
+import com.infamousmisadventures.factioncraft.raid.target.NewRaidTargetHelper;
+import com.infamousmisadventures.factioncraft.raid.target.RaidConfig;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -25,7 +24,6 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -46,8 +44,6 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.infamousmisadventures.factioncraft.config.FactionCraftConfig.*;
 import static com.infamousmisadventures.factioncraft.util.GeneralUtils.getRandomEntry;
@@ -55,14 +51,13 @@ import static com.infamousmisadventures.factioncraft.util.GeneralUtils.getRandom
 public class Raid {
     private final int id;
     private final ServerLevel level;
-    private final RaidTarget raidTarget;
+    private final RaidConfig raidConfig;
     private final ServerBossEvent raidEvent = new ServerBossEvent(Component.literal(""), BossEvent.BossBarColor.RED, BossEvent.BossBarOverlay.NOTCHED_10);
     private final int numGroups;
     private final Queue<BlockPos> waveSpawnPos = new LinkedList<>();
     private final Map<Integer, Mob> groupToLeaderMap = Maps.newHashMap();
     private final Map<Integer, Set<Mob>> groupRaiderMap = Maps.newHashMap();
     private final Set<UUID> heroesOfTheVillage = Sets.newHashSet();
-    private List<Faction> factions;
     private int badOmenLevel;
     private float totalHealth;
     private int groupsSpawned = 0;
@@ -74,15 +69,14 @@ public class Raid {
     private int postRaidTicks;
     private int celebrationTicks;
 
-    public Raid(int uniqueId, List<Faction> factions, ServerLevel level, RaidTarget raidTarget) {
+    public Raid(int uniqueId, ServerLevel level, RaidConfig raidConfig) {
         this.id = uniqueId;
-        this.factions = factions;
         this.level = level;
-        this.raidTarget = raidTarget;
-        this.numGroups = this.getNumGroups(level.getDifficulty(), raidTarget);
-        this.groupsSpawned = raidTarget.getStartingWave();
+        this.raidConfig = raidConfig;
+        this.numGroups = this.getNumGroups(level.getDifficulty(), raidConfig);
+        this.groupsSpawned = raidConfig.getStartingWave();
         this.active = true;
-        this.raidEvent.setName(getRaidEventName(raidTarget));
+        this.raidEvent.setName(getRaidEventName(raidConfig));
         this.raidEvent.setProgress(0.0F);
         this.status = Status.ONGOING;
     }
@@ -90,18 +84,8 @@ public class Raid {
 
     public Raid(ServerLevel level, CompoundTag compoundNBT) {
         this.level = level;
-        ListTag factionListnbt = compoundNBT.getList("Factions", 10);
-        factions = new ArrayList<>();
-        for (int i = 0; i < factionListnbt.size(); ++i) {
-            CompoundTag compoundnbt = factionListnbt.getCompound(i);
-            ResourceLocation factionName = new ResourceLocation(compoundnbt.getString("Faction"));
-            if (FCFactions.factionExists(factionName)) {
-                Faction faction = FCFactions.getFaction(factionName);
-                this.factions.add(faction);
-            }
-        }
-        this.raidTarget = RaidTargetHelper.load(level, compoundNBT.getCompound("RaidTarget"));
-        this.raidEvent.setName(getRaidEventName(this.raidTarget));
+        this.raidConfig = NewRaidTargetHelper.load(level, compoundNBT.getCompound("RaidTarget"));
+        this.raidEvent.setName(getRaidEventName(this.raidConfig));
         this.id = compoundNBT.getInt("Id");
         this.started = compoundNBT.getBoolean("Started");
         this.active = compoundNBT.getBoolean("Active");
@@ -126,8 +110,8 @@ public class Raid {
         return level;
     }
 
-    public RaidTarget getRaidTarget() {
-        return raidTarget;
+    public RaidConfig getRaidConfig() {
+        return raidConfig;
     }
 
     public int getId() {
@@ -135,31 +119,14 @@ public class Raid {
     }
 
     public BlockPos getCenter() {
-        return this.raidTarget.getTargetBlockPos();
-    }
-
-    public Collection<Faction> getFactions() {
-        return factions;
-    }
-
-    public void addFactions(Collection<Faction> factions) {
-        this.factions = Stream.of(this.factions, factions)
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());
-    }
-
-    public void addFaction(Faction faction) {
-        this.factions.add(faction);
+        return this.raidConfig.getTargetBlockPos();
     }
 
     public void tick() {
         if (!this.isStopped()) {
-            if(this.factions.isEmpty()){
-                this.stop();
-            }
             if (this.status == Status.ONGOING) {
                 boolean flag = this.active;
-                this.active = this.level.hasChunkAt(this.raidTarget.getTargetBlockPos());
+                this.active = this.level.hasChunkAt(this.raidConfig.getTargetBlockPos());
                 if (this.level.getDifficulty() == Difficulty.PEACEFUL) {
                     this.stop();
                     return;
@@ -171,15 +138,15 @@ public class Raid {
                     return;
                 }
 
-                raidTarget.updateTargetBlockPos(level);
+                raidConfig.updateTargetBlockPos(level);
 
-                if (raidTarget.isDefeat(this, level)) {
+                if (raidConfig.isDefeat(this, level)) {
                     if (this.groupsSpawned > 0) {
                         FactionRaidEvent.Defeat event = new FactionRaidEvent.Defeat(this);
                         Services.EVENT_BUS.post(event);
                         this.status = Status.LOSS;
-                        this.playSound(raidTarget.getTargetBlockPos(), factions.get(0).getRaidConfig().getDefeatSoundEvent());
-                        this.raidEvent.setName(getRaidEventNameDefeat(raidTarget));
+                        this.playSound(raidConfig.getTargetBlockPos(), raidConfig.getDefeatSoundEvent());
+                        this.raidEvent.setName(getRaidEventNameDefeat(raidConfig));
                     } else {
                         this.stop();
                     }
@@ -204,27 +171,26 @@ public class Raid {
                     this.updateRaiders();
                     if (i > 0) {
                         if (i <= 2) {
-                            this.raidEvent.setName(getRaidEventName(raidTarget).copy().append(" - ").append(Component.translatable("event.minecraft.raid.raiders_remaining", i)));
+                            this.raidEvent.setName(getRaidEventName(raidConfig).copy().append(" - ").append(Component.translatable("event.minecraft.raid.raiders_remaining", i)));
                         } else {
-                            this.raidEvent.setName(getRaidEventName(raidTarget));
+                            this.raidEvent.setName(getRaidEventName(raidConfig));
                         }
                     } else {
-                        this.raidEvent.setName(getRaidEventName(raidTarget));
+                        this.raidEvent.setName(getRaidEventName(raidConfig));
                     }
                 }
 
                 boolean flag3 = false;
                 int k = 0;
 
-                //Something with waveSpawnPos
                 while (this.shouldSpawnGroup()) {
-                    for (int j = this.waveSpawnPos.size(); j < factions.size(); j++) {
+                    for (int j = this.waveSpawnPos.size(); j < getSpawnPosAmount(); j++) {
                         BlockPos randomSpawnPos = this.findRandomSpawnPos(k, 20);
                         if (randomSpawnPos != null) {
                             this.waveSpawnPos.add(randomSpawnPos);
                         }
                     }
-                    if (this.waveSpawnPos.size() >= factions.size()) {
+                    if (this.waveSpawnPos.size() >= getSpawnPosAmount()) {
                         this.started = true;
                         this.spawnGroup();
                         if (!flag3) {
@@ -249,8 +215,8 @@ public class Raid {
                         this.status = Status.VICTORY;
                         FactionRaidEvent.Victory event = new FactionRaidEvent.Victory(this);
                         Services.EVENT_BUS.post(event);
-                        this.playSound(raidTarget.getTargetBlockPos(), factions.get(0).getRaidConfig().getVictorySoundEvent());
-                        this.raidEvent.setName(getRaidEventNameVictory(raidTarget));
+                        this.playSound(raidConfig.getTargetBlockPos(), raidConfig.getVictorySoundEvent());
+                        this.raidEvent.setName(getRaidEventNameVictory(raidConfig));
 
                         for (UUID uuid : this.heroesOfTheVillage) {
                             Entity entity = this.level.getEntity(uuid);
@@ -278,13 +244,17 @@ public class Raid {
                     this.raidEvent.setVisible(true);
                     if (this.isVictory()) {
                         this.raidEvent.setProgress(0.0F);
-                        this.raidEvent.setName(getRaidEventNameVictory(raidTarget));
+                        this.raidEvent.setName(getRaidEventNameVictory(raidConfig));
                     } else {
-                        this.raidEvent.setName(getRaidEventNameDefeat(raidTarget));
+                        this.raidEvent.setName(getRaidEventNameDefeat(raidConfig));
                     }
                 }
             }
         }
+    }
+
+    private int getSpawnPosAmount() {
+        return 1;
     }
 
     private void playSound(BlockPos p_221293_1_, Optional<Holder<SoundEvent>> soundEvent) {
@@ -309,11 +279,11 @@ public class Raid {
         if (this.raidCooldownTicks <= 0) {
             if (this.raidCooldownTicks == 0 && this.groupsSpawned > 0) {
                 this.raidCooldownTicks = 300;
-                this.raidEvent.setName(getRaidEventName(raidTarget));
+                this.raidEvent.setName(getRaidEventName(raidConfig));
                 return true;
             }
         } else {
-            boolean flag1 = this.waveSpawnPos.size() >= factions.size();
+            boolean flag1 = this.waveSpawnPos.size() >= getSpawnPosAmount();
             boolean flag2 = !flag1 && this.raidCooldownTicks % 5 == 0;
             if (flag1 && !this.level.isPositionEntityTicking(this.waveSpawnPos.peek())) {
                 this.waveSpawnPos.poll();
@@ -355,10 +325,10 @@ public class Raid {
         double waveMultiplier = BASE_WAVE_MULTIPLIER.get() + (this.groupsSpawned * MULTIPLIER_INCREASE_PER_WAVE.get());
         double spreadMultiplier = ((level.random.nextFloat() * 2) - 1) * WAVE_TARGET_STRENGTH_SPREAD.get();
         double difficultyMultiplier = getDifficultyMultiplier(level.getDifficulty());
-        double badOmenMultiplier = MULTIPLIER_INCREASE_PER_BAD_OMEN.get() * (factions.size() - 1);
+        double badOmenMultiplier = MULTIPLIER_INCREASE_PER_BAD_OMEN.get();
         double totalMultiplier = waveMultiplier + spreadMultiplier + difficultyMultiplier + badOmenMultiplier;
-        int targetStrength = (int) Math.floor(raidTarget.getTargetStrength() * totalMultiplier);
-        Map<Faction, Integer> factionFractions = determineFactionFractions(targetStrength);
+        int targetStrength = (int) Math.floor(raidConfig.getTargetStrength() * totalMultiplier);
+        Map<Faction, Integer> factionFractions = raidConfig.determineFactionFractions(targetStrength);
         factionFractions.entrySet().forEach(entry -> spawnGroupForFaction(this.waveSpawnPos.poll(), waveNumber, entry.getValue(), entry.getKey()));
 
         this.waveSpawnPos.clear();
@@ -366,15 +336,8 @@ public class Raid {
         this.updateBossbar();
     }
 
-    private Map<Faction, Integer> determineFactionFractions(int targetStrength) {
-        Map<Faction, Integer> factionFractions = new HashMap<>();
-        int perFactionStrength = (int) Math.floor(targetStrength / factions.size());
-        factions.forEach(faction -> factionFractions.merge(faction, perFactionStrength, Integer::sum));
-        return factionFractions;
-    }
-
     private void spawnGroupForFaction(BlockPos spawnBlockPos, int waveNumber, int targetStrength, Faction faction) {
-        FactionGroupSpawner factionGroupSpawner = new FactionGroupSpawner(level, spawnBlockPos, waveNumber, targetStrength, faction.getRaidConfig().getMobsFraction(), faction);
+        FactionGroupSpawner factionGroupSpawner = new FactionGroupSpawner(level, spawnBlockPos, waveNumber, targetStrength, raidConfig.getMobsFraction(), faction);
         factionGroupSpawner.spawnGroup();
         factionGroupSpawner.getEntities().forEach(mobEntity -> {
             FactionEntityData factionEntityCapability = ((IFactionEntityDataHolder) mobEntity).getOrCreateFactionEntityData();
@@ -382,7 +345,7 @@ public class Raid {
                 this.joinRaid(waveNumber, mobEntity);
             }
         });
-        this.playSound(spawnBlockPos, factions.get(0).getRaidConfig().getWaveSoundEvent());
+        this.playSound(spawnBlockPos, raidConfig.getWaveSoundEvent());
     }
 
     public double getDifficultyMultiplier(Difficulty difficulty) {
@@ -517,11 +480,11 @@ public class Raid {
 
         for (int i1 = 0; i1 < maxInnerAttempts; ++i1) {
             float f = this.level.random.nextFloat() * ((float) Math.PI * 2F);
-            int j = this.raidTarget.getTargetBlockPos().getX() + Mth.floor(Mth.cos(f) * raidTarget.getSpawnDistance() * (float) i) + this.level.random.nextInt(5);
-            int l = this.raidTarget.getTargetBlockPos().getZ() + Mth.floor(Mth.sin(f) * raidTarget.getSpawnDistance() * (float) i) + this.level.random.nextInt(5);
+            int j = this.raidConfig.getTargetBlockPos().getX() + Mth.floor(Mth.cos(f) * raidConfig.getSpawnDistance() * (float) i) + this.level.random.nextInt(5);
+            int l = this.raidConfig.getTargetBlockPos().getZ() + Mth.floor(Mth.sin(f) * raidConfig.getSpawnDistance() * (float) i) + this.level.random.nextInt(5);
             int k = this.level.getHeight(Heightmap.Types.WORLD_SURFACE, j, l);
             blockpos$mutable.set(j, k, l);
-            if (isValidSpawnPos(blockpos$mutable) && raidTarget.isValidSpawnPos(outerAttempt, blockpos$mutable, this.level)) {
+            if (isValidSpawnPos(blockpos$mutable) && raidConfig.isValidSpawnPos(outerAttempt, blockpos$mutable, this.level)) {
                 return blockpos$mutable;
             }
         }
@@ -533,7 +496,7 @@ public class Raid {
         return this.waveSpawnPos.stream().map(existingWaveSpawnPos -> blockpos$mutable.distSqr(existingWaveSpawnPos) > 40).reduce((aBoolean, aBoolean2) -> aBoolean && aBoolean2).orElse(true);
     }
 
-    public int getNumGroups(Difficulty difficulty, RaidTarget raidTarget) {
+    public int getNumGroups(Difficulty difficulty, RaidConfig raidConfig) {
         int numberOfWaves = 0;
         switch (difficulty) {
             case EASY:
@@ -548,7 +511,7 @@ public class Raid {
             default:
                 numberOfWaves = 0;
         }
-        numberOfWaves = numberOfWaves + raidTarget.getAdditionalWaves();
+        numberOfWaves = numberOfWaves + raidConfig.getAdditionalWaves();
         return Math.min(numberOfWaves, MAX_NUMBER_WAVES.get());
     }
 
@@ -567,8 +530,8 @@ public class Raid {
     private Predicate<ServerPlayer> validPlayer() {
         return (serverPlayerEntity) -> {
             BlockPos blockpos = serverPlayerEntity.blockPosition();
-            RaidManager cap = RaidManager.getOrCreate(this.level);
-            return serverPlayerEntity.isAlive() && cap.getRaidAt(blockpos) == this;
+            RaidManager raidManager = RaidManager.getOrCreate(this.level);
+            return serverPlayerEntity.isAlive() && raidManager.getRaidAt(blockpos) == this;
         };
     }
 
@@ -644,16 +607,16 @@ public class Raid {
         return this.isVictory() || this.isLoss();
     }
 
-    private Component getRaidEventName(RaidTarget raidTarget) {
-        return raidTarget.getRaidType() == RaidTarget.Type.BATTLE ? Component.translatable("event.faction_craft.battle") : this.factions.get(0).getRaidConfig().getRaidBarNameComponent();
+    private Component getRaidEventName(RaidConfig raidConfig) {
+        return this.raidConfig.getRaidBarNameComponent();
     }
 
-    private Component getRaidEventNameDefeat(RaidTarget raidTarget) {
-        return raidTarget.getRaidType() == RaidTarget.Type.BATTLE ? Component.translatable("event.faction_craft.battle.over") : this.factions.get(0).getRaidConfig().getRaidBarDefeatComponent();
+    private Component getRaidEventNameDefeat(RaidConfig raidConfig) {
+        return this.raidConfig.getRaidBarDefeatComponent();
     }
 
-    private Component getRaidEventNameVictory(RaidTarget raidTarget) {
-        return raidTarget.getRaidType() == RaidTarget.Type.BATTLE ? Component.translatable("event.faction_craft.battle.over") : this.factions.get(0).getRaidConfig().getRaidBarVictoryComponent();
+    private Component getRaidEventNameVictory(RaidConfig raidConfig) {
+        return this.raidConfig.getRaidBarVictoryComponent();
     }
 
     public void endWave() {
@@ -699,17 +662,9 @@ public class Raid {
         pNbt.putInt("NumGroups", this.numGroups);
         pNbt.putString("Status", this.status.getName());
 
-        ListTag factionListnbt = new ListTag();
-        for (Faction faction : this.factions) {
-            CompoundTag compoundnbt = new CompoundTag();
-            compoundnbt.putString("Faction", faction.getName().toString());
-            factionListnbt.add(compoundnbt);
-        }
-        pNbt.put("Factions", factionListnbt);
-
-        CompoundTag raidTargetNbt = new CompoundTag();
-        raidTarget.save(raidTargetNbt);
-        pNbt.put("RaidTarget", raidTargetNbt);
+        CompoundTag NewRaidTargetNbt = new CompoundTag();
+        raidConfig.saveAdditionalData(NewRaidTargetNbt);
+        pNbt.put("NewRaidTarget", NewRaidTargetNbt);
 
         ListTag listnbt = new ListTag();
 

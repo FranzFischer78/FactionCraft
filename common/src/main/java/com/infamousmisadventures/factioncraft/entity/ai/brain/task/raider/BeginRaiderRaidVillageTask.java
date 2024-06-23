@@ -6,6 +6,7 @@ import com.infamousmisadventures.factioncraft.raid.Raid;
 import com.infamousmisadventures.factioncraft.raid.target.RaidTarget;
 import com.infamousmisadventures.factioncraft.registry.FCActivities;
 import com.infamousmisadventures.factioncraft.registry.FCMemoryModuleTypes;
+import com.infamousmisadventures.factioncraft.registry.FCRaidConfigBaseTypes;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
@@ -25,7 +26,7 @@ public class BeginRaiderRaidVillageTask extends Behavior<LivingEntity> {
         if (pLevel.random.nextInt(20) == 0 && entity instanceof Mob mob) {
             Raid raid = ((IMobRaiderDataHolder) mob).getOrCreateMobRaiderData().getRaid();
             if (raid != null) {
-                return raid.getRaidTarget().getRaidType() == RaidTarget.Type.VILLAGE && pLevel.isVillage(entity.blockPosition());
+                return raid.getRaidConfig().type().baseType().equals(FCRaidConfigBaseTypes.VILLAGE) && pLevel.isVillage(entity.blockPosition());
             }
         }
         return false;
@@ -36,9 +37,9 @@ public class BeginRaiderRaidVillageTask extends Behavior<LivingEntity> {
             Brain<?> brain = entity.getBrain();
             Raid raid = ((IMobRaiderDataHolder) mob).getOrCreateMobRaiderData().getRaid();
             if (raid != null) {
-                if(raid.getRaidTarget().getRaidType() == RaidTarget.Type.VILLAGE) {
+                if(raid.getRaidConfig().type().baseType().equals(FCRaidConfigBaseTypes.VILLAGE)) {
                     brain.eraseMemory(FCMemoryModuleTypes.RAID_WALK_TARGET.get());
-                    brain.setMemory(FCMemoryModuleTypes.RAIDED_VILLAGE_POI.get(), new ArrayList<>(List.of(GlobalPos.of(level.dimension(), raid.getRaidTarget().getTargetBlockPos()))));
+                    brain.setMemory(FCMemoryModuleTypes.RAIDED_VILLAGE_POI.get(), new ArrayList<>(List.of(GlobalPos.of(level.dimension(), raid.getRaidConfig().getTargetBlockPos()))));
                     brain.setDefaultActivity(FCActivities.FACTION_RAIDER_VILLAGE.get());
                     brain.setActiveActivityIfPossible(FCActivities.FACTION_RAIDER_VILLAGE.get());
                 }

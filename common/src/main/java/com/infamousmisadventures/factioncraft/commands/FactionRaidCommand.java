@@ -4,9 +4,8 @@ import com.infamousmisadventures.factioncraft.commands.arguments.FactionArgument
 import com.infamousmisadventures.factioncraft.faction.Faction;
 import com.infamousmisadventures.factioncraft.level.saveddata.RaidManager;
 import com.infamousmisadventures.factioncraft.raid.Raid;
-import com.infamousmisadventures.factioncraft.raid.target.PlayerRaidTarget;
-import com.infamousmisadventures.factioncraft.raid.target.RaidTarget;
-import com.infamousmisadventures.factioncraft.raid.target.VillageRaidTarget;
+import com.infamousmisadventures.factioncraft.raid.target.*;
+import com.infamousmisadventures.factioncraft.registry.FCRaidConfigTypes;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -38,17 +37,19 @@ public class FactionRaidCommand {
         LiteralArgumentBuilder<CommandSourceStack> factionRaidCommand
                 = Commands.literal("factionraid")
                 .requires(commandSource -> commandSource.hasPermission(2))
-                .then(Commands.literal("start").then(Commands.argument("faction", FactionArgument.factions()).then(Commands.literal("village").executes(sourceCommandContext ->
+                .then(Commands.literal("start").then(Commands.argument("faction", FactionArgument.factions())
+                        .then(Commands.literal("village").executes(sourceCommandContext ->
                         startVillageRaid(sourceCommandContext.getSource(), FactionArgument.getFaction(sourceCommandContext, "faction"))
-                ).then(Commands.argument("location", BlockPosArgument.blockPos()).executes(sourceCommandContext ->
-                        startVillageRaid(sourceCommandContext.getSource(), FactionArgument.getFaction(sourceCommandContext, "faction"), BlockPosArgument.getLoadedBlockPos(sourceCommandContext, "location"))
-                )).then(Commands.argument("player", EntityArgument.player()).executes(sourceCommandContext ->
-                        startVillageRaid(sourceCommandContext.getSource(), FactionArgument.getFaction(sourceCommandContext, "faction"), EntityArgument.getPlayer(sourceCommandContext, "player"))
-                ))).then(Commands.literal("player").executes(sourceCommandContext ->
+                        ).then(Commands.argument("location", BlockPosArgument.blockPos()).executes(sourceCommandContext ->
+                                startVillageRaid(sourceCommandContext.getSource(), FactionArgument.getFaction(sourceCommandContext, "faction"), BlockPosArgument.getLoadedBlockPos(sourceCommandContext, "location"))
+                        )).then(Commands.argument("player", EntityArgument.player()).executes(sourceCommandContext ->
+                                startVillageRaid(sourceCommandContext.getSource(), FactionArgument.getFaction(sourceCommandContext, "faction"), EntityArgument.getPlayer(sourceCommandContext, "player"))
+                        )))
+                        .then(Commands.literal("player").executes(sourceCommandContext ->
                         startPlayerRaid(sourceCommandContext.getSource(), FactionArgument.getFaction(sourceCommandContext, "faction"))
-                ).then(Commands.argument("player", EntityArgument.player()).executes(sourceCommandContext ->
-                        startPlayerRaid(sourceCommandContext.getSource(), FactionArgument.getFaction(sourceCommandContext, "faction"), EntityArgument.getPlayer(sourceCommandContext, "player"))
-                )))))
+                        ).then(Commands.argument("player", EntityArgument.player()).executes(sourceCommandContext ->
+                                startPlayerRaid(sourceCommandContext.getSource(), FactionArgument.getFaction(sourceCommandContext, "faction"), EntityArgument.getPlayer(sourceCommandContext, "player"))
+                        )))))
                 .then(Commands.literal("endwave").executes(sourceCommandContext ->
                         endRaidWave(sourceCommandContext.getSource())
                 ).then(Commands.argument("location", BlockPosArgument.blockPos()).executes(sourceCommandContext ->
@@ -161,7 +162,7 @@ public class FactionRaidCommand {
         if (raid == null) {
             throw ERROR_INCREASE_FAILED.create();
         } else {
-            raid.getRaidTarget().increaseTargetStrength(amount);
+            raid.getRaidConfig().increaseTargetStrength(amount);
             source.sendSuccess(() -> Component.translatable("commands.raid.increase.success", blockPos.toString(), amount), true);
         }
         return 1;
@@ -179,8 +180,13 @@ public class FactionRaidCommand {
 
     private static int startVillageRaid(CommandSourceStack source, Faction faction, BlockPos blockPos) throws CommandSyntaxException {
         ServerLevel level = source.getLevel();
-        RaidTarget raidTarget = new VillageRaidTarget(blockPos, level);
-        return createRaid(source, faction, level, raidTarget, blockPos.toString());
+        RaidConfigType type = FCRaidConfigTypes.getRaidConfig(FCRaidConfigTypes.VILLAGE_RAID_CONFIG);
+        if (type instanceof VillageRaidConfigType configType) {
+            VillageRaidConfig raidConfig = (VillageRaidConfig) configType.create();
+            raidConfig.init(faction, blockPos, level);
+            return createRaid(source, level, raidConfig, blockPos.toString());
+        }
+        throw ERROR_START_FAILED.create();
     }
 
     private static int startPlayerRaid(CommandSourceStack source, Faction faction) throws CommandSyntaxException {
@@ -190,13 +196,18 @@ public class FactionRaidCommand {
 
     private static int startPlayerRaid(CommandSourceStack source, Faction faction, ServerPlayer playerEntity) throws CommandSyntaxException {
         ServerLevel level = source.getLevel();
-        RaidTarget raidTarget = new PlayerRaidTarget(playerEntity, level);
-        return createRaid(source, faction, level, raidTarget, playerEntity.getDisplayName().getString());
+        RaidConfigType type = FCRaidConfigTypes.getRaidConfig(FCRaidConfigTypes.PLAYER_AMBUSH_CONFIG);
+        if (type instanceof PlayerRaidConfigType configType) {
+            PlayerRaidConfig raidConfig = (PlayerRaidConfig) configType.create();
+            raidConfig.init(faction, playerEntity, level);
+            return createRaid(source, level, raidConfig, playerEntity.getDisplayName().getString());
+        }
+        throw ERROR_START_FAILED.create();
     }
 
-    private static int createRaid(CommandSourceStack source, Faction faction, ServerLevel level, RaidTarget raidTarget, String targetArgument) throws CommandSyntaxException {
+    private static int createRaid(CommandSourceStack source, ServerLevel level, RaidConfig raidTarget, String targetArgument) throws CommandSyntaxException {
         RaidManager raidManagerCapability = RaidManager.getOrCreate(level);
-        Raid raid = raidManagerCapability.createRaid(faction, raidTarget);
+        Raid raid = raidManagerCapability.createRaid(raidTarget);
         if (raid == null) {
             throw ERROR_START_FAILED.create();
         } else {

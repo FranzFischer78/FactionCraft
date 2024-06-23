@@ -37,7 +37,7 @@ public class AcquireRaidTargetPosition<E extends LivingEntity> extends Behavior<
       if (pEntity instanceof Mob mob) {
          Raid raid = ((IMobRaiderDataHolder) mob).getOrCreateMobRaiderData().getRaid();
          if (raid != null) {
-            pEntity.getBrain().setMemory(FCMemoryModuleTypes.RAID_WALK_TARGET.get(), GlobalPos.of(pLevel.dimension(), raid.getRaidTarget().getTargetBlockPos()));
+            pEntity.getBrain().setMemory(FCMemoryModuleTypes.RAID_WALK_TARGET.get(), GlobalPos.of(pLevel.dimension(), raid.getRaidConfig().getTargetBlockPos()));
          }
       }
       super.start(pLevel, pEntity, pGameTime);

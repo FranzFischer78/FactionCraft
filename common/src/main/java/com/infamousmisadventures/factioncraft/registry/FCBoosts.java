@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 import static com.infamousmisadventures.factioncraft.util.ResourceLocationHelper.modLoc;
 
 public class FCBoosts {
-    public static final ResourceLocation RESOURCELOCATION = modLoc("faction_entity_type");
+    public static final ResourceLocation RESOURCELOCATION = modLoc("boost");
 
     public static final CodecJsonDataManager<Boost> BOOSTS = new CodecJsonDataManager<>(RESOURCELOCATION, "boost", Boost.CODEC);
 

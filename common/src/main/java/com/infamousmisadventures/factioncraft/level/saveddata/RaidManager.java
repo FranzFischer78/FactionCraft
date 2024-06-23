@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import com.infamousmisadventures.factioncraft.config.FactionCraftConfig;
 import com.infamousmisadventures.factioncraft.faction.Faction;
 import com.infamousmisadventures.factioncraft.raid.Raid;
+import com.infamousmisadventures.factioncraft.raid.target.RaidConfig;
 import com.infamousmisadventures.factioncraft.raid.target.RaidTarget;
 import com.infamousmisadventures.factioncraft.registry.FCMobEffects;
 import net.minecraft.advancements.CriteriaTriggers;
@@ -18,10 +19,12 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.saveddata.SavedData;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import static com.infamousmisadventures.factioncraft.FCConstants.MOD_ID;
-import static com.infamousmisadventures.factioncraft.config.FactionCraftConfig.RAID_MAX_FACTIONS;
 
 public class RaidManager extends SavedData {
     private final Map<Integer, Raid> raidMap = Maps.newHashMap();
@@ -104,61 +107,18 @@ public class RaidManager extends SavedData {
         return raid;
     }
 
-    public Raid createRaid(Faction faction, RaidTarget raidTarget) {
-        return createRaid(Arrays.asList(faction), raidTarget);
-    }
-
-    public Raid createRaid(List<Faction> factions, RaidTarget raidTarget) {
+    public Raid createRaid(RaidConfig raidConfig) {
         if (FactionCraftConfig.DISABLE_FACTION_RAIDS.get()) {
             return null;
         } else {
-            Raid raid = this.getRaidAt(raidTarget.getTargetBlockPos());
+            Raid raid = this.getRaidAt(raidConfig.getTargetBlockPos());
             if (raid == null) {
-                raid = new Raid(this.getUniqueId(), factions, this.level, raidTarget);
+                raid = new Raid(this.getUniqueId(), this.level, raidConfig);
                 if (!this.raidMap.containsKey(raid.getId())) {
                     this.raidMap.put(raid.getId(), raid);
                 }
             }
             return raid;
-        }
-    }
-
-    public Raid createBadOmenRaid(RaidTarget raidTarget, ServerPlayer player, int amplifier) {
-        if (FactionCraftConfig.DISABLE_FACTION_RAIDS.get()) {
-            return null;
-        } else {
-            Raid raid = this.getRaidAt(raidTarget.getTargetBlockPos());
-            if (raid == null) {
-                raid = createRaid(getBadOmenFactions(player, amplifier), raidTarget);
-                clearBadOmen(player, raid, true);
-            } else if (raid.getFactions().size() <= RAID_MAX_FACTIONS.get()) {
-                if (raid.getFactions().size() + badOmenFactions.size() <= RAID_MAX_FACTIONS.get()) {
-                    raid.addFactions(badOmenFactions);
-                } else {
-                    for (Faction badOmenFaction : badOmenFactions) {
-                        if (raid.getFactions().size() < RAID_MAX_FACTIONS.get()) {
-                            raid.addFaction(badOmenFaction);
-                        }
-                    }
-                }
-                clearBadOmen(player, raid, true);
-            } else {
-                clearBadOmen(player, raid, false);
-            }
-            return raid;
-        }
-    }
-
-    private List<Faction> getBadOmenFactions(ServerPlayer player, int amplifier) {
-        return null;
-    }
-
-    private void clearBadOmen(ServerPlayer player, Raid raid, boolean contributed) {
-        player.removeEffect(FCMobEffects.FACTION_BAD_OMEN.get());
-        player.connection.send(new ClientboundEntityEventPacket(player, (byte) 43));
-        if (contributed && !raid.hasFirstWaveSpawned()) {
-            player.awardStat(Stats.RAID_TRIGGER);
-            CriteriaTriggers.BAD_OMEN.trigger(player);
         }
     }
 

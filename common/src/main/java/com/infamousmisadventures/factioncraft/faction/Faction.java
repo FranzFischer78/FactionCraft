@@ -5,13 +5,13 @@ import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityType;
 import com.infamousmisadventures.factioncraft.faction.relations.FactionRelations;
 import com.infamousmisadventures.factioncraft.faction.spawning.DominionSpawner;
 import com.infamousmisadventures.factioncraft.level.saveddata.FactionData;
+import com.infamousmisadventures.factioncraft.raid.target.RaidConfigType;
 import com.infamousmisadventures.factioncraft.util.data.ResourceSet;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -24,11 +24,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.infamousmisadventures.factioncraft.FCConstants.MOD_ID;
 import static com.infamousmisadventures.factioncraft.config.FactionCraftConfig.DISABLED_FACTIONS;
 import static com.infamousmisadventures.factioncraft.util.ResourceLocationHelper.modLoc;
 import static net.minecraft.world.level.Level.OVERWORLD;
@@ -189,5 +191,9 @@ public class Faction {
 
     public List<FactionEntityType> getSpawnableFactionEntityTypes(LevelAccessor level, BlockPos spawnBlockPos, int dominionAmount) {
         return dominionSpawner.GetSpawnableFactionEntityTypes(level, spawnBlockPos, dominionAmount);
+    }
+
+    public List<RaidConfigType> getRaidConfigs() {
+        return null;
     }
 }
