@@ -8,6 +8,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.Difficulty;
 
 import java.util.Map;
 import java.util.Optional;
@@ -29,7 +30,7 @@ public interface RaidConfig {
 
     boolean isValidSpawnPos(int outerAttempt, BlockPos.MutableBlockPos blockpos$mutable, ServerLevel level);
 
-    RaidWaveConfig getWaveRaidConfig();
+    RaidWaveConfig getRaidWaveConfig();
 
     float getSpawnDistance();
 
@@ -53,8 +54,19 @@ public interface RaidConfig {
 
     Map<Faction, Integer> determineFactionFractions(int targetStrength);
 
+    default int getNumberOfWaves(Difficulty difficulty) {
+        int numberOfWaves = switch (difficulty) {
+            case EASY -> getRaidWaveConfig().getNumberWavesEasy();
+            case NORMAL -> getRaidWaveConfig().getNumberWavesNormal();
+            case HARD -> getRaidWaveConfig().getNumberWavesHard();
+            default -> 0;
+        };
+        numberOfWaves = numberOfWaves + getAdditionalWaves();
+        return Math.min(numberOfWaves, getRaidWaveConfig().getMaxNumberWaves());
+    }
+
     default int getWaveTargetStrength(Raid raid) {
-        float waveMultiplier = getRaidStrengthConfig().getBaseMultiplier() + (raid.getGroupsSpawned() * getRaidStrengthConfig().getMultiplierAdjustmentPerWave());
+        float waveMultiplier = getRaidStrengthConfig().getBaseMultiplier() + (raid.getCurrentWave() * getRaidStrengthConfig().getMultiplierAdjustmentPerWave());
         float spreadMultiplier = ((raid.getLevel().random.nextFloat() * 2) - 1) * getRaidStrengthConfig().getMultiplierSpread();
         float difficultyMultiplier = getRaidStrengthConfig().getDifficultyMultiplier(raid.getLevel().getDifficulty());
         float badOmenMultiplier = getRaidStrengthConfig().getMultiplierPerOmenLevel() * raid.getBadOmenLevel();

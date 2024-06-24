@@ -112,10 +112,10 @@ public class FactionBattleConfig implements RaidConfig {
 
     @Override
     public boolean isDefeat(Raid raid, ServerLevel level) {
-        if (raid.getGroupsSpawned() <= raidWaveConfig.getStartingWave()) {
+        if (raid.getCurrentWave() <= raidWaveConfig.getStartingWave()) {
             return false;
         }
-        Set<Mob> raidersInWave = raid.getRaidersInWave(raid.getGroupsSpawned());
+        Set<Mob> raidersInWave = raid.getRaidersInWave(raid.getCurrentWave());
         if (raidersInWave == null) return true;
         return raidersInWave.stream().map(mobEntity -> ((IFactionEntityDataHolder) mobEntity).getOrCreateFactionEntityData().getFaction()).collect(Collectors.toSet()).size() <= 1;
     }
@@ -130,7 +130,7 @@ public class FactionBattleConfig implements RaidConfig {
     }
 
     @Override
-    public RaidWaveConfig getWaveRaidConfig() {
+    public RaidWaveConfig getRaidWaveConfig() {
         return raidWaveConfig;
     }
 

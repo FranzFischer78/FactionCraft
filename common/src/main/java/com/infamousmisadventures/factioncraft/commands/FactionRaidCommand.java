@@ -145,7 +145,7 @@ public class FactionRaidCommand {
         if (raid == null) {
             throw ERROR_GLOW_FAILED.create();
         } else {
-            Set<Mob> raidersInWave = raid.getRaidersInWave(raid.getGroupsSpawned());
+            Set<Mob> raidersInWave = raid.getRaidersInWave(raid.getCurrentWave());
             raidersInWave.forEach(FactionRaidCommand::factioncraft_glow);
             source.sendSuccess(() -> Component.translatable("commands.raid.glow.success", blockPos.toString(), raidersInWave.size()), true);
         }

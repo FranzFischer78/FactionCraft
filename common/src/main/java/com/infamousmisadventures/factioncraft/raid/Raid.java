@@ -52,14 +52,14 @@ public class Raid {
     private final ServerLevel level;
     private final RaidConfig raidConfig;
     private final ServerBossEvent raidEvent = new ServerBossEvent(Component.literal(""), BossEvent.BossBarColor.RED, BossEvent.BossBarOverlay.NOTCHED_10);
-    private final int numGroups;
+    private final int numberOfWaves;
     private final Queue<BlockPos> waveSpawnPos = new LinkedList<>();
     private final Map<Integer, Mob> groupToLeaderMap = Maps.newHashMap();
     private final Map<Integer, Set<Mob>> groupRaiderMap = Maps.newHashMap();
     private final Set<UUID> heroesOfTheVillage = Sets.newHashSet();
     private int badOmenLevel;
     private float totalHealth;
-    private int groupsSpawned = 0;
+    private int currentWave = 0;
     private boolean started;
     private boolean active;
     private Status status;
@@ -72,8 +72,8 @@ public class Raid {
         this.id = uniqueId;
         this.level = level;
         this.raidConfig = raidConfig;
-        this.numGroups = this.getNumGroups(level.getDifficulty(), raidConfig);
-        this.groupsSpawned = raidConfig.getWaveRaidConfig().getStartingWave();
+        this.numberOfWaves = raidConfig.getNumberOfWaves(level.getDifficulty());
+        this.currentWave = raidConfig.getRaidWaveConfig().getStartingWave();
         this.active = true;
         this.raidEvent.setName(getRaidEventName(raidConfig));
         this.raidEvent.setProgress(0.0F);
@@ -90,11 +90,11 @@ public class Raid {
         this.active = compoundNBT.getBoolean("Active");
         this.ticksActive = compoundNBT.getLong("TicksActive");
         this.badOmenLevel = compoundNBT.getInt("BadOmenLevel");
-        this.groupsSpawned = compoundNBT.getInt("GroupsSpawned");
+        this.currentWave = compoundNBT.getInt("CurrentWave");
         this.raidCooldownTicks = compoundNBT.getInt("PreRaidTicks");
         this.postRaidTicks = compoundNBT.getInt("PostRaidTicks");
         this.totalHealth = compoundNBT.getFloat("TotalHealth");
-        this.numGroups = compoundNBT.getInt("NumGroups");
+        this.numberOfWaves = compoundNBT.getInt("NumberOfWaves");
         this.status = Status.getByName(compoundNBT.getString("Status"));
         this.heroesOfTheVillage.clear();
         if (compoundNBT.contains("HeroesOfTheVillage", 9)) {
@@ -144,7 +144,7 @@ public class Raid {
                 raidConfig.updateTargetBlockPos(level);
 
                 if (raidConfig.isDefeat(this, level)) {
-                    if (this.groupsSpawned > 0) {
+                    if (this.currentWave > 0) {
                         FactionRaidEvent.Defeat event = new FactionRaidEvent.Defeat(this);
                         Services.EVENT_BUS.post(event);
                         this.status = Status.LOSS;
@@ -280,7 +280,7 @@ public class Raid {
 
     private boolean raidCooldownTick() {
         if (this.raidCooldownTicks <= 0) {
-            if (this.raidCooldownTicks == 0 && this.groupsSpawned > 0) {
+            if (this.raidCooldownTicks == 0 && this.currentWave > 0) {
                 this.raidCooldownTicks = 300;
                 this.raidEvent.setName(getRaidEventName(raidConfig));
                 return true;
@@ -318,19 +318,19 @@ public class Raid {
     }
 
     private boolean shouldSpawnGroup() {
-        return this.raidCooldownTicks == 0 && (this.groupsSpawned < this.numGroups) && this.getTotalRaidersAlive() == 0;
+        return this.raidCooldownTicks == 0 && this.hasMoreWaves() && this.getTotalRaidersAlive() == 0;
     }
 
     private void spawnGroup() {
-        int waveNumber = this.groupsSpawned + 1;
+        int waveNumber = this.currentWave + 1;
         this.totalHealth = 0.0F;
 
         int targetStrength = raidConfig.getWaveTargetStrength(this);
         Map<Faction, Integer> factionFractions = raidConfig.determineFactionFractions(targetStrength);
-        factionFractions.entrySet().forEach(entry -> spawnGroupForFaction(this.waveSpawnPos.poll(), waveNumber, entry.getValue(), entry.getKey()));
+        factionFractions.forEach((key, value) -> spawnGroupForFaction(this.waveSpawnPos.poll(), waveNumber, value, key));
 
         this.waveSpawnPos.clear();
-        ++this.groupsSpawned;
+        ++this.currentWave;
         this.updateBossbar();
     }
 
@@ -481,35 +481,16 @@ public class Raid {
         return this.waveSpawnPos.stream().map(existingWaveSpawnPos -> blockpos$mutable.distSqr(existingWaveSpawnPos) > 40).reduce((aBoolean, aBoolean2) -> aBoolean && aBoolean2).orElse(true);
     }
 
-    public int getNumGroups(Difficulty difficulty, RaidConfig raidConfig) {
-        int numberOfWaves = 0;
-        switch (difficulty) {
-            case EASY:
-                numberOfWaves = raidConfig.getWaveRaidConfig().getNumberWavesEasy();
-                break;
-            case NORMAL:
-                numberOfWaves = raidConfig.getWaveRaidConfig().getNumberWavesNormal();
-                break;
-            case HARD:
-                numberOfWaves = raidConfig.getWaveRaidConfig().getNumberWavesHard();
-                break;
-            default:
-                numberOfWaves = 0;
-        }
-        numberOfWaves = numberOfWaves + raidConfig.getAdditionalWaves();
-        return Math.min(numberOfWaves, raidConfig.getWaveRaidConfig().getMaxNumberWaves());
-    }
-
     private boolean hasMoreWaves() {
         return !this.isFinalWave();
     }
 
     private boolean isFinalWave() {
-        return this.getGroupsSpawned() >= this.numGroups;
+        return this.getCurrentWave() >= this.numberOfWaves + this.raidConfig.getRaidWaveConfig().getStartingWave();
     }
 
-    public int getGroupsSpawned() {
-        return groupsSpawned;
+    public int getCurrentWave() {
+        return currentWave;
     }
 
     private Predicate<ServerPlayer> validPlayer() {
@@ -548,7 +529,7 @@ public class Raid {
     public void stop() {
         this.active = false;
         this.raidEvent.removeAllPlayers();
-        Set<Mob> raidersInWave = getRaidersInWave(getGroupsSpawned());
+        Set<Mob> raidersInWave = getRaidersInWave(getCurrentWave());
         if (raidersInWave != null && !this.isLoss()) {
             new HashSet<>(raidersInWave).forEach(LivingEntity::kill);
         }
@@ -565,7 +546,7 @@ public class Raid {
     }
 
     public boolean hasFirstWaveSpawned() {
-        return this.groupsSpawned > 0;
+        return this.currentWave > 0;
     }
 
     public boolean isStarted() {
@@ -605,7 +586,7 @@ public class Raid {
     }
 
     public void endWave() {
-        Set<Mob> raidersInWave = getRaidersInWave(getGroupsSpawned());
+        Set<Mob> raidersInWave = getRaidersInWave(getCurrentWave());
         if (raidersInWave != null) {
             new HashSet<Mob>(raidersInWave).forEach(LivingEntity::kill);
         }
@@ -618,19 +599,19 @@ public class Raid {
 
     public void spawnDigger(Faction faction, BlockPos spawnBlockPos) {
         // check how many diggers are already spawned
-        if(getDiggersInWave() > Mth.ceil(this.getRaidersInWave(this.getGroupsSpawned()).size() * 0.10)) return;
+        if(getDiggersInWave() > Mth.ceil(this.getRaidersInWave(this.getCurrentWave()).size() * 0.10)) return;
         EntityWeightMapProperties entityWeightMapProperties = new EntityWeightMapProperties().setAllowedRanks(List.of(FactionEntityRank.DIGGER)).setBlockPos(spawnBlockPos);
         Map<FactionEntityType, Integer> weightMap = faction.getWeightMap(entityWeightMapProperties);
         if (weightMap.isEmpty()) return;
         FactionEntityType randomEntry = getRandomEntry(weightMap, level.random);
         Entity entity = randomEntry.createEntity(level, faction, spawnBlockPos, false, FactionEntityRank.DIGGER, MobSpawnType.PATROL);
         if(entity instanceof Mob mob) {
-            this.joinRaid(this.getGroupsSpawned(), mob);
+            this.joinRaid(this.getCurrentWave(), mob);
         }
     }
 
     private long getDiggersInWave() {
-        return this.getRaidersInWave(this.getGroupsSpawned()).stream()
+        return this.getRaidersInWave(this.getCurrentWave()).stream()
                 .filter(entity -> ((IFactionEntityDataHolder) entity).getOrCreateFactionEntityData().hasRank(FactionEntityRank.DIGGER)).count();
     }
 
@@ -640,11 +621,11 @@ public class Raid {
         pNbt.putBoolean("Active", this.active);
         pNbt.putLong("TicksActive", this.ticksActive);
         pNbt.putInt("BadOmenLevel", this.badOmenLevel);
-        pNbt.putInt("GroupsSpawned", this.groupsSpawned);
+        pNbt.putInt("CurrentWave", this.currentWave);
         pNbt.putInt("PreRaidTicks", this.raidCooldownTicks);
         pNbt.putInt("PostRaidTicks", this.postRaidTicks);
         pNbt.putFloat("TotalHealth", this.totalHealth);
-        pNbt.putInt("NumGroups", this.numGroups);
+        pNbt.putInt("NumberOfWaves", this.numberOfWaves);
         pNbt.putString("Status", this.status.getName());
 
         CompoundTag NewRaidTargetNbt = new CompoundTag();

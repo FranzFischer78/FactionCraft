@@ -116,7 +116,7 @@ public class MoveTowardsRaidGoal<T extends Mob> extends Goal {
             set.addAll(list);
 
             for(Mob abstractraiderentity : set) {
-                pRaid.joinRaid(pRaid.getGroupsSpawned(), abstractraiderentity);
+                pRaid.joinRaid(pRaid.getCurrentWave(), abstractraiderentity);
             }
         }
     }

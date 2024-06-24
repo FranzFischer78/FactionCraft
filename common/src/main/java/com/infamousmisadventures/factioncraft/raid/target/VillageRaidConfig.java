@@ -139,7 +139,7 @@ public class VillageRaidConfig implements RaidConfig {
     }
 
     @Override
-    public RaidWaveConfig getWaveRaidConfig() {
+    public RaidWaveConfig getRaidWaveConfig() {
         return raidWaveConfig;
     }
 
