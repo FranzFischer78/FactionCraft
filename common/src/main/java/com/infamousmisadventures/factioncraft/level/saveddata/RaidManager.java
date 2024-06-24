@@ -2,26 +2,17 @@ package com.infamousmisadventures.factioncraft.level.saveddata;
 
 import com.google.common.collect.Maps;
 import com.infamousmisadventures.factioncraft.config.FactionCraftConfig;
-import com.infamousmisadventures.factioncraft.faction.Faction;
 import com.infamousmisadventures.factioncraft.raid.Raid;
 import com.infamousmisadventures.factioncraft.raid.target.RaidConfig;
-import com.infamousmisadventures.factioncraft.raid.target.RaidTarget;
-import com.infamousmisadventures.factioncraft.registry.FCMobEffects;
-import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.network.protocol.game.ClientboundEntityEventPacket;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.saveddata.SavedData;
 
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import static com.infamousmisadventures.factioncraft.FCConstants.MOD_ID;

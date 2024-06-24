@@ -25,12 +25,12 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.infamousmisadventures.factioncraft.config.FactionCraftConfig.*;
-import static com.infamousmisadventures.factioncraft.raid.target.RaidTarget.Type.PLAYER;
 
 public class PlayerRaidConfig implements RaidConfig {
 
     private final RaidConfigType type;
 
+    private final WaveRaidConfig waveRaidConfig;
     private final Component raidBarNameComponent;
     private final Component raidBarVictoryComponent;
     private final Component raidBarDefeatComponent;
@@ -44,8 +44,9 @@ public class PlayerRaidConfig implements RaidConfig {
     private ServerPlayer player;
     private int targetStrength;
 
-    public PlayerRaidConfig(RaidConfigType type, Component raidBarNameComponent, Component raidBarVictoryComponent, Component raidBarDefeatComponent, float mobsFraction, Optional<Holder<SoundEvent>> waveSoundEvent, Optional<Holder<SoundEvent>> victorySoundEvent, Optional<Holder<SoundEvent>> defeatSoundEvent) {
+    public PlayerRaidConfig(RaidConfigType type, WaveRaidConfig waveRaidConfig, Component raidBarNameComponent, Component raidBarVictoryComponent, Component raidBarDefeatComponent, float mobsFraction, Optional<Holder<SoundEvent>> waveSoundEvent, Optional<Holder<SoundEvent>> victorySoundEvent, Optional<Holder<SoundEvent>> defeatSoundEvent) {
         this.type = type;
+        this.waveRaidConfig = waveRaidConfig;
         this.raidBarNameComponent = raidBarNameComponent;
         this.raidBarVictoryComponent = raidBarVictoryComponent;
         this.raidBarDefeatComponent = raidBarDefeatComponent;
@@ -71,7 +72,7 @@ public class PlayerRaidConfig implements RaidConfig {
 
     private int calculateTargetStrength(ServerPlayer player, ServerLevel level) {
         int strength = PLAYER_RAID_TARGET_BASE_STRENGTH.get();
-        CalculateStrengthEvent event = new CalculateStrengthEvent.Player(PLAYER, player, level, strength, strength);
+        CalculateStrengthEvent event = new CalculateStrengthEvent.Player(this, player, level, strength, strength);
         Services.EVENT_BUS.post(event);
         FCConstants.LOGGER.info("Strength = " + strength);
         return (int) Math.floor(event.getStrength() * PLAYER_RAID_TARGET_STRENGTH_MULTIPLIER.get());
@@ -117,8 +118,8 @@ public class PlayerRaidConfig implements RaidConfig {
     }
 
     @Override
-    public int getStartingWave() {
-        return 0;
+    public WaveRaidConfig getWaveRaidConfig() {
+        return waveRaidConfig;
     }
 
     @Override

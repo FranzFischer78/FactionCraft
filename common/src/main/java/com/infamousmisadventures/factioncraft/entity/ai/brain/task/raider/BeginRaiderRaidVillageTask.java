@@ -3,7 +3,6 @@ package com.infamousmisadventures.factioncraft.entity.ai.brain.task.raider;
 import com.google.common.collect.ImmutableMap;
 import com.infamousmisadventures.factioncraft.entity.data.holder.IMobRaiderDataHolder;
 import com.infamousmisadventures.factioncraft.raid.Raid;
-import com.infamousmisadventures.factioncraft.raid.target.RaidTarget;
 import com.infamousmisadventures.factioncraft.registry.FCActivities;
 import com.infamousmisadventures.factioncraft.registry.FCMemoryModuleTypes;
 import com.infamousmisadventures.factioncraft.registry.FCRaidConfigBaseTypes;

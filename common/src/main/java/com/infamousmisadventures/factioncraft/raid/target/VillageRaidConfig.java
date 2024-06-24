@@ -29,12 +29,12 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static com.infamousmisadventures.factioncraft.config.FactionCraftConfig.*;
-import static com.infamousmisadventures.factioncraft.raid.target.RaidTarget.Type.VILLAGE;
 
 public class VillageRaidConfig implements RaidConfig {
 
     private final RaidConfigType type;
 
+    private final WaveRaidConfig waveRaidConfig;
     private final float mobsFraction;
     private final Component raidBarNameComponent;
     private final Component raidBarVictoryComponent;
@@ -48,8 +48,9 @@ public class VillageRaidConfig implements RaidConfig {
     private BlockPos blockPos;
     private int targetStrength;
 
-    public VillageRaidConfig(RaidConfigType type, String raidBarName, String raidBarVictory, String raidBarDefeat, float mobsFraction, Optional<Holder<SoundEvent>> waveSoundEvent, Optional<Holder<SoundEvent>> victorySoundEvent, Optional<Holder<SoundEvent>> defeatSoundEvent) {
+    public VillageRaidConfig(RaidConfigType type, WaveRaidConfig waveRaidConfig, String raidBarName, String raidBarVictory, String raidBarDefeat, float mobsFraction, Optional<Holder<SoundEvent>> waveSoundEvent, Optional<Holder<SoundEvent>> victorySoundEvent, Optional<Holder<SoundEvent>> defeatSoundEvent) {
         this.type = type;
+        this.waveRaidConfig = waveRaidConfig;
         this.raidBarNameComponent = Component.translatable(raidBarName);
         this.raidBarVictoryComponent = raidBarNameComponent.copy().append(" - ").append(Component.translatable(raidBarVictory));
         this.raidBarDefeatComponent = raidBarNameComponent.copy().append(" - ").append(Component.translatable(raidBarDefeat));
@@ -80,7 +81,7 @@ public class VillageRaidConfig implements RaidConfig {
         strength += level.getEntitiesOfClass(IronGolem.class,
                 new AABB(blockPos).inflate(100),
                 ironGolemEntity -> true).size() * VILLAGE_RAID_IRON_GOLEM_WEIGHT.get();
-        CalculateStrengthEvent event = new CalculateStrengthEvent(VILLAGE, blockPos, level, strength, strength);
+        CalculateStrengthEvent event = new CalculateStrengthEvent(this, blockPos, level, strength, strength);
         Services.EVENT_BUS.post(event);
         return (int) Math.floor(event.getStrength() * VILLAGE_RAID_TARGET_STRENGTH_MULTIPLIER.get());
     }
@@ -138,8 +139,8 @@ public class VillageRaidConfig implements RaidConfig {
     }
 
     @Override
-    public int getStartingWave() {
-        return 0;
+    public WaveRaidConfig getWaveRaidConfig() {
+        return waveRaidConfig;
     }
 
     @Override

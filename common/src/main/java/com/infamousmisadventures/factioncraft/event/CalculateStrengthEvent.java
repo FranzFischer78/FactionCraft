@@ -1,28 +1,28 @@
 package com.infamousmisadventures.factioncraft.event;
 
 import com.infamousmisadventures.factioncraft.faction.Faction;
-import com.infamousmisadventures.factioncraft.raid.target.RaidTarget;
+import com.infamousmisadventures.factioncraft.raid.target.RaidConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
 public class CalculateStrengthEvent implements FCEvent {
-    RaidTarget.Type type;
+    RaidConfig config;
     BlockPos blockPos;
     ServerLevel level;
     int originalStrength;
     int strength;
 
-    public CalculateStrengthEvent(RaidTarget.Type type, BlockPos blockPos, ServerLevel level, int originalStrength, int strength) {
-        this.type = type;
+    public CalculateStrengthEvent(RaidConfig config, BlockPos blockPos, ServerLevel level, int originalStrength, int strength) {
+        this.config = config;
         this.blockPos = blockPos;
         this.level = level;
         this.originalStrength = originalStrength;
         this.strength = strength;
     }
 
-    public RaidTarget.Type getType() {
-        return type;
+    public RaidConfig getConfig() {
+        return config;
     }
 
     public BlockPos getBlockPos() {
@@ -49,8 +49,8 @@ public class CalculateStrengthEvent implements FCEvent {
     {
         ServerPlayer player;
 
-        public Player(RaidTarget.Type type, ServerPlayer player, ServerLevel level, int originalStrength, int strength) {
-            super(type, player.blockPosition(), level, originalStrength, strength);
+        public Player(RaidConfig config, ServerPlayer player, ServerLevel level, int originalStrength, int strength) {
+            super(config, player.blockPosition(), level, originalStrength, strength);
             this.player = player;
         }
 
@@ -64,8 +64,8 @@ public class CalculateStrengthEvent implements FCEvent {
         private final Faction faction1;
         private final Faction faction2;
 
-        public FactionBattle(RaidTarget.Type type, BlockPos blockPos, ServerLevel level, int originalStrength, int strength, Faction faction1, Faction faction2) {
-            super(type, blockPos, level, originalStrength, strength);
+        public FactionBattle(RaidConfig config, BlockPos blockPos, ServerLevel level, int originalStrength, int strength, Faction faction1, Faction faction2) {
+            super(config, blockPos, level, originalStrength, strength);
             this.faction1 = faction1;
             this.faction2 = faction2;
         }

@@ -28,12 +28,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.infamousmisadventures.factioncraft.config.FactionCraftConfig.*;
-import static com.infamousmisadventures.factioncraft.raid.target.RaidTarget.Type.BATTLE;
 
 public class FactionBattleConfig implements RaidConfig {
 
     private final RaidConfigType type;
 
+    private final WaveRaidConfig waveRaidConfig;
     private final Component raidBarNameComponent;
     private final Component raidBarVictoryComponent;
     private final Component raidBarDefeatComponent;
@@ -49,8 +49,9 @@ public class FactionBattleConfig implements RaidConfig {
     private int startingWave;
 
 
-    public FactionBattleConfig(RaidConfigType type, String raidBarName, String raidBarVictory, String raidBarDefeat, float mobsFraction, Optional<Holder<SoundEvent>> waveSoundEvent, Optional<Holder<SoundEvent>> victorySoundEvent, Optional<Holder<SoundEvent>> defeatSoundEvent) {
+    public FactionBattleConfig(RaidConfigType type, WaveRaidConfig waveRaidConfig, String raidBarName, String raidBarVictory, String raidBarDefeat, float mobsFraction, Optional<Holder<SoundEvent>> waveSoundEvent, Optional<Holder<SoundEvent>> victorySoundEvent, Optional<Holder<SoundEvent>> defeatSoundEvent) {
         this.type = type;
+        this.waveRaidConfig = waveRaidConfig;
         this.raidBarNameComponent = Component.translatable(raidBarName);
         this.raidBarVictoryComponent = raidBarNameComponent.copy().append(" - ").append(Component.translatable(raidBarVictory));
         this.raidBarDefeatComponent = raidBarNameComponent.copy().append(" - ").append(Component.translatable(raidBarDefeat));
@@ -70,7 +71,7 @@ public class FactionBattleConfig implements RaidConfig {
 
     private int calculateTargetStrength(ServerLevel level, int startingWave) {
         int strength = FACTION_BATTLE_RAID_TARGET_BASE_STRENGTH_PER_WAVE.get() * startingWave;
-        CalculateStrengthEvent event = new CalculateStrengthEvent.FactionBattle(BATTLE, targetBlockPos, level, strength, strength, faction1, faction2);
+        CalculateStrengthEvent event = new CalculateStrengthEvent.FactionBattle(this, targetBlockPos, level, strength, strength, faction1, faction2);
         Services.EVENT_BUS.post(event);
         FCConstants.LOGGER.info("Strength = " + strength);
         return (int) Math.floor(event.getStrength() * FACTION_BATTLE_RAID_TARGET_STRENGTH_MULTIPLIER.get());
@@ -111,7 +112,7 @@ public class FactionBattleConfig implements RaidConfig {
 
     @Override
     public boolean isDefeat(Raid raid, ServerLevel level) {
-        if (raid.getGroupsSpawned() <= getStartingWave()) {
+        if (raid.getGroupsSpawned() <= waveRaidConfig.getStartingWave()) {
             return false;
         }
         Set<Mob> raidersInWave = raid.getRaidersInWave(raid.getGroupsSpawned());
@@ -129,8 +130,8 @@ public class FactionBattleConfig implements RaidConfig {
     }
 
     @Override
-    public int getStartingWave() {
-        return startingWave;
+    public WaveRaidConfig getWaveRaidConfig() {
+        return waveRaidConfig;
     }
 
     private int getWeightedRandom(int min, int max) {

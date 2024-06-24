@@ -29,7 +29,7 @@ public interface RaidConfig {
 
     boolean isValidSpawnPos(int outerAttempt, BlockPos.MutableBlockPos blockpos$mutable, ServerLevel level);
 
-    int getStartingWave();
+    WaveRaidConfig getWaveRaidConfig();
 
     float getSpawnDistance();
 

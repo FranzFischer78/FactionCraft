@@ -14,7 +14,7 @@ import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityRank;
 import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityType;
 import com.infamousmisadventures.factioncraft.level.saveddata.RaidManager;
 import com.infamousmisadventures.factioncraft.platform.Services;
-import com.infamousmisadventures.factioncraft.raid.target.NewRaidTargetHelper;
+import com.infamousmisadventures.factioncraft.raid.target.RaidConfigHelper;
 import com.infamousmisadventures.factioncraft.raid.target.RaidConfig;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
@@ -74,7 +74,7 @@ public class Raid {
         this.level = level;
         this.raidConfig = raidConfig;
         this.numGroups = this.getNumGroups(level.getDifficulty(), raidConfig);
-        this.groupsSpawned = raidConfig.getStartingWave();
+        this.groupsSpawned = raidConfig.getWaveRaidConfig().getStartingWave();
         this.active = true;
         this.raidEvent.setName(getRaidEventName(raidConfig));
         this.raidEvent.setProgress(0.0F);
@@ -84,7 +84,7 @@ public class Raid {
 
     public Raid(ServerLevel level, CompoundTag compoundNBT) {
         this.level = level;
-        this.raidConfig = NewRaidTargetHelper.load(level, compoundNBT.getCompound("RaidTarget"));
+        this.raidConfig = RaidConfigHelper.load(level, compoundNBT.getCompound("RaidTarget"));
         this.raidEvent.setName(getRaidEventName(this.raidConfig));
         this.id = compoundNBT.getInt("Id");
         this.started = compoundNBT.getBoolean("Started");
@@ -500,19 +500,19 @@ public class Raid {
         int numberOfWaves = 0;
         switch (difficulty) {
             case EASY:
-                numberOfWaves = NUMBER_WAVES_EASY.get();
+                numberOfWaves = raidConfig.getWaveRaidConfig().getNumberWavesEasy();
                 break;
             case NORMAL:
-                numberOfWaves = NUMBER_WAVES_NORMAL.get();
+                numberOfWaves = raidConfig.getWaveRaidConfig().getNumberWavesNormal();
                 break;
             case HARD:
-                numberOfWaves = NUMBER_WAVES_HARD.get();
+                numberOfWaves = raidConfig.getWaveRaidConfig().getNumberWavesHard();
                 break;
             default:
                 numberOfWaves = 0;
         }
         numberOfWaves = numberOfWaves + raidConfig.getAdditionalWaves();
-        return Math.min(numberOfWaves, MAX_NUMBER_WAVES.get());
+        return Math.min(numberOfWaves, raidConfig.getWaveRaidConfig().getMaxNumberWaves());
     }
 
     private boolean hasMoreWaves() {

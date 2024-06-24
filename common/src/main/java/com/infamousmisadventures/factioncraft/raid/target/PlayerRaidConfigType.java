@@ -11,18 +11,20 @@ import net.minecraft.sounds.SoundEvents;
 import java.util.Optional;
 
 public class PlayerRaidConfigType extends RaidConfigType {
-    public static final PlayerRaidConfigType DEFAULT = new PlayerRaidConfigType("event.minecraft.raid", "event.minecraft.raid.victory", "event.minecraft.raid.defeat", DEFAULT_MOBS_FRACTION, Optional.of(SoundEvents.RAID_HORN), Optional.empty(), Optional.of(SoundEvents.RAID_HORN));
+    public static final PlayerRaidConfigType DEFAULT = new PlayerRaidConfigType(WaveRaidConfig.DEFAULT, DEFAULT_MOBS_FRACTION, "event.minecraft.raid", "event.minecraft.raid.victory", "event.minecraft.raid.defeat", Optional.of(SoundEvents.RAID_HORN), Optional.empty(), Optional.of(SoundEvents.RAID_HORN));
     public static final Codec<PlayerRaidConfigType> CODEC = RecordCodecBuilder.create(builder ->
             builder.group(
+                    WaveRaidConfig.CODEC.optionalFieldOf("wave_raid_config", WaveRaidConfig.DEFAULT).forGetter(PlayerRaidConfigType::getWaveRaidConfig),
+                    Codec.FLOAT.optionalFieldOf("mobs_fraction", DEFAULT_MOBS_FRACTION).forGetter(PlayerRaidConfigType::getMobsFraction),
                     Codec.STRING.optionalFieldOf("raid_bar_name", "event.minecraft.raid").forGetter((PlayerRaidConfigType config) -> config.getRaidBarNameComponent().getString()),
                     Codec.STRING.optionalFieldOf("raid_bar_victory", "event.minecraft.raid.victory").forGetter((PlayerRaidConfigType config) -> config.getRaidBarVictoryComponent().getString()),
                     Codec.STRING.optionalFieldOf("raid_bar_defeat", "event.minecraft.raid.defeat").forGetter((PlayerRaidConfigType config) -> config.getRaidBarDefeatComponent().getString()),
-                    Codec.FLOAT.optionalFieldOf("mobs_fraction", DEFAULT_MOBS_FRACTION).forGetter(PlayerRaidConfigType::getMobsFraction),
                     SoundEvent.CODEC.optionalFieldOf("wave_sound").forGetter(PlayerRaidConfigType::getWaveSoundEvent),
                     SoundEvent.CODEC.optionalFieldOf("victory_sound").forGetter(PlayerRaidConfigType::getVictorySoundEvent),
                     SoundEvent.CODEC.optionalFieldOf("defeat_sound").forGetter(PlayerRaidConfigType::getDefeatSoundEvent)
             ).apply(builder, PlayerRaidConfigType::new));
 
+    private final WaveRaidConfig waveRaidConfig;
     private final Component raidBarNameComponent;
     private final Component raidBarVictoryComponent;
     private final Component raidBarDefeatComponent;
@@ -31,14 +33,19 @@ public class PlayerRaidConfigType extends RaidConfigType {
     private final Optional<Holder<SoundEvent>> victorySoundEvent;
     private final Optional<Holder<SoundEvent>> defeatSoundEvent;
 
-    public PlayerRaidConfigType(String raidBarName, String raidBarVictory, String raidBarDefeat, float mobsFraction, Optional<Holder<SoundEvent>> waveSoundEvent, Optional<Holder<SoundEvent>> victorySoundEvent, Optional<Holder<SoundEvent>> defeatSoundEvent) {
+    public PlayerRaidConfigType(WaveRaidConfig waveRaidConfig, float mobsFraction, String raidBarName, String raidBarVictory, String raidBarDefeat, Optional<Holder<SoundEvent>> waveSoundEvent, Optional<Holder<SoundEvent>> victorySoundEvent, Optional<Holder<SoundEvent>> defeatSoundEvent) {
+        this.waveRaidConfig = waveRaidConfig;
+        this.mobsFraction = mobsFraction;
         this.raidBarNameComponent = Component.translatable(raidBarName);
         this.raidBarVictoryComponent = raidBarNameComponent.copy().append(" - ").append(Component.translatable(raidBarVictory));
         this.raidBarDefeatComponent = raidBarNameComponent.copy().append(" - ").append(Component.translatable(raidBarDefeat));
-        this.mobsFraction = mobsFraction;
         this.waveSoundEvent = waveSoundEvent;
         this.victorySoundEvent = victorySoundEvent;
         this.defeatSoundEvent = defeatSoundEvent;
+    }
+
+    public WaveRaidConfig getWaveRaidConfig() {
+        return waveRaidConfig;
     }
 
     public Component getRaidBarNameComponent() {
@@ -73,6 +80,7 @@ public class PlayerRaidConfigType extends RaidConfigType {
     public RaidConfig create() {
         return new PlayerRaidConfig(
                 this,
+                waveRaidConfig,
                 raidBarNameComponent,
                 raidBarVictoryComponent,
                 raidBarDefeatComponent,

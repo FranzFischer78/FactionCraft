@@ -11,34 +11,41 @@ import net.minecraft.sounds.SoundEvents;
 import java.util.Optional;
 
 public class VillageRaidConfigType extends RaidConfigType {
-    public static final VillageRaidConfigType DEFAULT = new VillageRaidConfigType("event.minecraft.raid", "event.minecraft.raid.victory", "event.minecraft.raid.defeat", DEFAULT_MOBS_FRACTION, Optional.of(SoundEvents.RAID_HORN), Optional.empty(), Optional.of(SoundEvents.RAID_HORN));
+    public static final VillageRaidConfigType DEFAULT = new VillageRaidConfigType(WaveRaidConfig.DEFAULT, DEFAULT_MOBS_FRACTION, "event.minecraft.raid", "event.minecraft.raid.victory", "event.minecraft.raid.defeat", Optional.of(SoundEvents.RAID_HORN), Optional.empty(), Optional.of(SoundEvents.RAID_HORN));
     public static final Codec<VillageRaidConfigType> CODEC = RecordCodecBuilder.create(builder ->
             builder.group(
+                    WaveRaidConfig.CODEC.optionalFieldOf("wave_raid_config", WaveRaidConfig.DEFAULT).forGetter(VillageRaidConfigType::getWaveRaidConfig),
+                    Codec.FLOAT.optionalFieldOf("mobs_fraction", DEFAULT_MOBS_FRACTION).forGetter(VillageRaidConfigType::getMobsFraction),
                     Codec.STRING.optionalFieldOf("raid_bar_name", "event.minecraft.raid").forGetter((VillageRaidConfigType config) -> config.getRaidBarNameComponent().getString()),
                     Codec.STRING.optionalFieldOf("raid_bar_victory", "event.minecraft.raid.victory").forGetter((VillageRaidConfigType config) -> config.getRaidBarVictoryComponent().getString()),
                     Codec.STRING.optionalFieldOf("raid_bar_defeat", "event.minecraft.raid.defeat").forGetter((VillageRaidConfigType config) -> config.getRaidBarDefeatComponent().getString()),
-                    Codec.FLOAT.optionalFieldOf("mobs_fraction", DEFAULT_MOBS_FRACTION).forGetter(VillageRaidConfigType::getMobsFraction),
                     SoundEvent.CODEC.optionalFieldOf("wave_sound").forGetter(VillageRaidConfigType::getWaveSoundEvent),
                     SoundEvent.CODEC.optionalFieldOf("victory_sound").forGetter(VillageRaidConfigType::getVictorySoundEvent),
                     SoundEvent.CODEC.optionalFieldOf("defeat_sound").forGetter(VillageRaidConfigType::getDefeatSoundEvent)
             ).apply(builder, VillageRaidConfigType::new));
 
+    private final WaveRaidConfig waveRaidConfig;
+    private final float mobsFraction;
     private final Component raidBarNameComponent;
     private final Component raidBarVictoryComponent;
     private final Component raidBarDefeatComponent;
-    private final float mobsFraction;
     private final Optional<Holder<SoundEvent>> waveSoundEvent;
     private final Optional<Holder<SoundEvent>> victorySoundEvent;
     private final Optional<Holder<SoundEvent>> defeatSoundEvent;
 
-    public VillageRaidConfigType(String raidBarName, String raidBarVictory, String raidBarDefeat, float mobsFraction, Optional<Holder<SoundEvent>> waveSoundEvent, Optional<Holder<SoundEvent>> victorySoundEvent, Optional<Holder<SoundEvent>> defeatSoundEvent) {
+    public VillageRaidConfigType(WaveRaidConfig waveRaidConfig, float mobsFraction, String raidBarName, String raidBarVictory, String raidBarDefeat, Optional<Holder<SoundEvent>> waveSoundEvent, Optional<Holder<SoundEvent>> victorySoundEvent, Optional<Holder<SoundEvent>> defeatSoundEvent) {
+        this.waveRaidConfig = waveRaidConfig;
+        this.mobsFraction = mobsFraction;
         this.raidBarNameComponent = Component.translatable(raidBarName);
         this.raidBarVictoryComponent = raidBarNameComponent.copy().append(" - ").append(Component.translatable(raidBarVictory));
         this.raidBarDefeatComponent = raidBarNameComponent.copy().append(" - ").append(Component.translatable(raidBarDefeat));
-        this.mobsFraction = mobsFraction;
         this.waveSoundEvent = waveSoundEvent;
         this.victorySoundEvent = victorySoundEvent;
         this.defeatSoundEvent = defeatSoundEvent;
+    }
+
+    public WaveRaidConfig getWaveRaidConfig() {
+        return waveRaidConfig;
     }
 
     public Component getRaidBarNameComponent() {
@@ -78,6 +85,7 @@ public class VillageRaidConfigType extends RaidConfigType {
     public RaidConfig create() {
         return new VillageRaidConfig(
                 this,
+                waveRaidConfig,
                 raidBarNameComponent.getString(),
                 raidBarVictoryComponent.getString(),
                 raidBarDefeatComponent.getString(),

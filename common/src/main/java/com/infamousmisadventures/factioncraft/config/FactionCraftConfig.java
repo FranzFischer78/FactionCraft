@@ -17,11 +17,6 @@ public class FactionCraftConfig {
     public static ForgeConfigSpec.ConfigValue<Boolean> ENABLE_GAIA_FACTION;
 
     public static ForgeConfigSpec.ConfigValue<Boolean> DISABLE_FACTION_RAIDS;
-    public static ForgeConfigSpec.ConfigValue<Integer> RAID_MAX_FACTIONS;
-    public static ForgeConfigSpec.ConfigValue<Integer> NUMBER_WAVES_EASY;
-    public static ForgeConfigSpec.ConfigValue<Integer> NUMBER_WAVES_NORMAL;
-    public static ForgeConfigSpec.ConfigValue<Integer> NUMBER_WAVES_HARD;
-    public static ForgeConfigSpec.ConfigValue<Integer> MAX_NUMBER_WAVES;
     public static ForgeConfigSpec.ConfigValue<Double> BASE_WAVE_MULTIPLIER;
     public static ForgeConfigSpec.ConfigValue<Double> MULTIPLIER_INCREASE_PER_WAVE;
     public static ForgeConfigSpec.ConfigValue<Double> MULTIPLIER_INCREASE_PER_BAD_OMEN;
@@ -126,26 +121,6 @@ public class FactionCraftConfig {
                     .comment("Disables faction raids \n" +
                             "Default false")
                     .define("disableFactionRaids", false);
-            RAID_MAX_FACTIONS = builder
-                    .comment("The max number of factions that can participate. \n" +
-                            "Roughly corresponds to the max bad omen level in vanilla. Default 5")
-                    .defineInRange("numberWavesEasy", 5, 0, 100);
-            NUMBER_WAVES_EASY = builder
-                    .comment("The number of waves for Easy difficulty. \n" +
-                            "Default 2")
-                    .defineInRange("numberWavesEasy", 2, 1, 9999);
-            NUMBER_WAVES_NORMAL = builder
-                    .comment("The number of waves for Normal difficulty. \n" +
-                            "Default 4")
-                    .defineInRange("numberWavesNormal", 4, 1, 9999);
-            NUMBER_WAVES_HARD = builder
-                    .comment("The number of waves for Hard difficulty. \n" +
-                            "Default 6")
-                    .defineInRange("numberWavesHard", 6, 1, 9999);
-            MAX_NUMBER_WAVES = builder
-                    .comment("The max number of waves. \n" +
-                            "Default 10")
-                    .defineInRange("maxNumberWaves", 10, 1, 9999);
             BASE_WAVE_MULTIPLIER = builder
                     .comment("The multiplier for the target strength for the first wave. \n" +
                             "1.0 disables Starting wave multiplier. Default 0.65")
