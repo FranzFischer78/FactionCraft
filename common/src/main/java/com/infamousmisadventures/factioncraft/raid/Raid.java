@@ -45,7 +45,6 @@ import net.minecraft.world.phys.Vec3;
 import java.util.*;
 import java.util.function.Predicate;
 
-import static com.infamousmisadventures.factioncraft.config.FactionCraftConfig.*;
 import static com.infamousmisadventures.factioncraft.util.GeneralUtils.getRandomEntry;
 
 public class Raid {
@@ -120,6 +119,10 @@ public class Raid {
 
     public BlockPos getCenter() {
         return this.raidConfig.getTargetBlockPos();
+    }
+
+    public int getBadOmenLevel() {
+        return badOmenLevel;
     }
 
     public void tick() {
@@ -322,12 +325,7 @@ public class Raid {
         int waveNumber = this.groupsSpawned + 1;
         this.totalHealth = 0.0F;
 
-        double waveMultiplier = BASE_WAVE_MULTIPLIER.get() + (this.groupsSpawned * MULTIPLIER_INCREASE_PER_WAVE.get());
-        double spreadMultiplier = ((level.random.nextFloat() * 2) - 1) * WAVE_TARGET_STRENGTH_SPREAD.get();
-        double difficultyMultiplier = getDifficultyMultiplier(level.getDifficulty());
-        double badOmenMultiplier = MULTIPLIER_INCREASE_PER_BAD_OMEN.get();
-        double totalMultiplier = waveMultiplier + spreadMultiplier + difficultyMultiplier + badOmenMultiplier;
-        int targetStrength = (int) Math.floor(raidConfig.getTargetStrength() * totalMultiplier);
+        int targetStrength = raidConfig.getWaveTargetStrength(this);
         Map<Faction, Integer> factionFractions = raidConfig.determineFactionFractions(targetStrength);
         factionFractions.entrySet().forEach(entry -> spawnGroupForFaction(this.waveSpawnPos.poll(), waveNumber, entry.getValue(), entry.getKey()));
 
@@ -337,7 +335,7 @@ public class Raid {
     }
 
     private void spawnGroupForFaction(BlockPos spawnBlockPos, int waveNumber, int targetStrength, Faction faction) {
-        FactionGroupSpawner factionGroupSpawner = new FactionGroupSpawner(level, spawnBlockPos, waveNumber, targetStrength, raidConfig.getMobsFraction(), faction);
+        FactionGroupSpawner factionGroupSpawner = new FactionGroupSpawner(level, spawnBlockPos, waveNumber, targetStrength, raidConfig.getRaidStrengthConfig().getMobsFraction(), faction);
         factionGroupSpawner.spawnGroup();
         factionGroupSpawner.getEntities().forEach(mobEntity -> {
             FactionEntityData factionEntityCapability = ((IFactionEntityDataHolder) mobEntity).getOrCreateFactionEntityData();
@@ -346,19 +344,6 @@ public class Raid {
             }
         });
         this.playSound(spawnBlockPos, raidConfig.getWaveSoundEvent());
-    }
-
-    public double getDifficultyMultiplier(Difficulty difficulty) {
-        switch (difficulty) {
-            case EASY:
-                return TARGET_STRENGTH_DIFFICULTY_MULTIPLIER_EASY.get();
-            case NORMAL:
-                return TARGET_STRENGTH_DIFFICULTY_MULTIPLIER_NORMAL.get();
-            case HARD:
-                return TARGET_STRENGTH_DIFFICULTY_MULTIPLIER_HARD.get();
-            default:
-                return 0;
-        }
     }
 
     public void setLeader(int pRaidId, Mob mobEntity) {

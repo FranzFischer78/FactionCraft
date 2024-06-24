@@ -34,8 +34,8 @@ public class VillageRaidConfig implements RaidConfig {
 
     private final RaidConfigType type;
 
-    private final WaveRaidConfig waveRaidConfig;
-    private final float mobsFraction;
+    private final RaidWaveConfig raidWaveConfig;
+    private final RaidStrengthConfig raidStrengthConfig;
     private final Component raidBarNameComponent;
     private final Component raidBarVictoryComponent;
     private final Component raidBarDefeatComponent;
@@ -48,13 +48,13 @@ public class VillageRaidConfig implements RaidConfig {
     private BlockPos blockPos;
     private int targetStrength;
 
-    public VillageRaidConfig(RaidConfigType type, WaveRaidConfig waveRaidConfig, String raidBarName, String raidBarVictory, String raidBarDefeat, float mobsFraction, Optional<Holder<SoundEvent>> waveSoundEvent, Optional<Holder<SoundEvent>> victorySoundEvent, Optional<Holder<SoundEvent>> defeatSoundEvent) {
+    public VillageRaidConfig(RaidConfigType type, RaidWaveConfig raidWaveConfig, RaidStrengthConfig raidStrengthConfig, String raidBarName, String raidBarVictory, String raidBarDefeat, Optional<Holder<SoundEvent>> waveSoundEvent, Optional<Holder<SoundEvent>> victorySoundEvent, Optional<Holder<SoundEvent>> defeatSoundEvent) {
         this.type = type;
-        this.waveRaidConfig = waveRaidConfig;
+        this.raidStrengthConfig = raidStrengthConfig;
+        this.raidWaveConfig = raidWaveConfig;
         this.raidBarNameComponent = Component.translatable(raidBarName);
         this.raidBarVictoryComponent = raidBarNameComponent.copy().append(" - ").append(Component.translatable(raidBarVictory));
         this.raidBarDefeatComponent = raidBarNameComponent.copy().append(" - ").append(Component.translatable(raidBarDefeat));
-        this.mobsFraction = mobsFraction;
         this.waveSoundEvent = waveSoundEvent;
         this.victorySoundEvent = victorySoundEvent;
         this.defeatSoundEvent = defeatSoundEvent;
@@ -83,7 +83,7 @@ public class VillageRaidConfig implements RaidConfig {
                 ironGolemEntity -> true).size() * VILLAGE_RAID_IRON_GOLEM_WEIGHT.get();
         CalculateStrengthEvent event = new CalculateStrengthEvent(this, blockPos, level, strength, strength);
         Services.EVENT_BUS.post(event);
-        return (int) Math.floor(event.getStrength() * VILLAGE_RAID_TARGET_STRENGTH_MULTIPLIER.get());
+        return (int) Math.floor(event.getStrength());
     }
 
     @Override
@@ -139,8 +139,8 @@ public class VillageRaidConfig implements RaidConfig {
     }
 
     @Override
-    public WaveRaidConfig getWaveRaidConfig() {
-        return waveRaidConfig;
+    public RaidWaveConfig getWaveRaidConfig() {
+        return raidWaveConfig;
     }
 
     @Override
@@ -169,8 +169,8 @@ public class VillageRaidConfig implements RaidConfig {
     }
 
     @Override
-    public float getMobsFraction() {
-        return mobsFraction;
+    public RaidStrengthConfig getRaidStrengthConfig() {
+        return raidStrengthConfig;
     }
 
     @Override

@@ -30,11 +30,11 @@ public class PlayerRaidConfig implements RaidConfig {
 
     private final RaidConfigType type;
 
-    private final WaveRaidConfig waveRaidConfig;
+    private final RaidWaveConfig raidWaveConfig;
     private final Component raidBarNameComponent;
     private final Component raidBarVictoryComponent;
     private final Component raidBarDefeatComponent;
-    private final float mobsFraction;
+    private final RaidStrengthConfig raidStrengthConfig;
     private final Optional<Holder<SoundEvent>> waveSoundEvent;
     private final Optional<Holder<SoundEvent>> victorySoundEvent;
     private final Optional<Holder<SoundEvent>> defeatSoundEvent;
@@ -44,13 +44,13 @@ public class PlayerRaidConfig implements RaidConfig {
     private ServerPlayer player;
     private int targetStrength;
 
-    public PlayerRaidConfig(RaidConfigType type, WaveRaidConfig waveRaidConfig, Component raidBarNameComponent, Component raidBarVictoryComponent, Component raidBarDefeatComponent, float mobsFraction, Optional<Holder<SoundEvent>> waveSoundEvent, Optional<Holder<SoundEvent>> victorySoundEvent, Optional<Holder<SoundEvent>> defeatSoundEvent) {
+    public PlayerRaidConfig(RaidConfigType type, RaidWaveConfig raidWaveConfig, RaidStrengthConfig raidStrengthConfig, Component raidBarNameComponent, Component raidBarVictoryComponent, Component raidBarDefeatComponent, Optional<Holder<SoundEvent>> waveSoundEvent, Optional<Holder<SoundEvent>> victorySoundEvent, Optional<Holder<SoundEvent>> defeatSoundEvent) {
         this.type = type;
-        this.waveRaidConfig = waveRaidConfig;
+        this.raidWaveConfig = raidWaveConfig;
         this.raidBarNameComponent = raidBarNameComponent;
         this.raidBarVictoryComponent = raidBarVictoryComponent;
         this.raidBarDefeatComponent = raidBarDefeatComponent;
-        this.mobsFraction = mobsFraction;
+        this.raidStrengthConfig = raidStrengthConfig;
         this.waveSoundEvent = waveSoundEvent;
         this.victorySoundEvent = victorySoundEvent;
         this.defeatSoundEvent = defeatSoundEvent;
@@ -75,7 +75,7 @@ public class PlayerRaidConfig implements RaidConfig {
         CalculateStrengthEvent event = new CalculateStrengthEvent.Player(this, player, level, strength, strength);
         Services.EVENT_BUS.post(event);
         FCConstants.LOGGER.info("Strength = " + strength);
-        return (int) Math.floor(event.getStrength() * PLAYER_RAID_TARGET_STRENGTH_MULTIPLIER.get());
+        return (int) Math.floor(event.getStrength());
     }
 
     @Override
@@ -118,8 +118,13 @@ public class PlayerRaidConfig implements RaidConfig {
     }
 
     @Override
-    public WaveRaidConfig getWaveRaidConfig() {
-        return waveRaidConfig;
+    public RaidWaveConfig getWaveRaidConfig() {
+        return raidWaveConfig;
+    }
+
+    @Override
+    public RaidStrengthConfig getRaidStrengthConfig() {
+        return raidStrengthConfig;
     }
 
     @Override
@@ -146,11 +151,6 @@ public class PlayerRaidConfig implements RaidConfig {
     @Override
     public Component getRaidBarDefeatComponent() {
         return raidBarDefeatComponent;
-    }
-
-    @Override
-    public float getMobsFraction() {
-        return mobsFraction;
     }
 
     @Override

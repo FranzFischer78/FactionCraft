@@ -33,11 +33,11 @@ public class FactionBattleConfig implements RaidConfig {
 
     private final RaidConfigType type;
 
-    private final WaveRaidConfig waveRaidConfig;
+    private final RaidWaveConfig raidWaveConfig;
     private final Component raidBarNameComponent;
     private final Component raidBarVictoryComponent;
     private final Component raidBarDefeatComponent;
-    private final float mobsFraction;
+    private final RaidStrengthConfig raidStrengthConfig;
     private final Optional<Holder<SoundEvent>> waveSoundEvent;
     private final Optional<Holder<SoundEvent>> victorySoundEvent;
     private final Optional<Holder<SoundEvent>> defeatSoundEvent;
@@ -49,13 +49,13 @@ public class FactionBattleConfig implements RaidConfig {
     private int startingWave;
 
 
-    public FactionBattleConfig(RaidConfigType type, WaveRaidConfig waveRaidConfig, String raidBarName, String raidBarVictory, String raidBarDefeat, float mobsFraction, Optional<Holder<SoundEvent>> waveSoundEvent, Optional<Holder<SoundEvent>> victorySoundEvent, Optional<Holder<SoundEvent>> defeatSoundEvent) {
+    public FactionBattleConfig(RaidConfigType type, RaidWaveConfig raidWaveConfig, String raidBarName, String raidBarVictory, String raidBarDefeat, RaidStrengthConfig raidStrengthConfig, Optional<Holder<SoundEvent>> waveSoundEvent, Optional<Holder<SoundEvent>> victorySoundEvent, Optional<Holder<SoundEvent>> defeatSoundEvent) {
         this.type = type;
-        this.waveRaidConfig = waveRaidConfig;
+        this.raidWaveConfig = raidWaveConfig;
         this.raidBarNameComponent = Component.translatable(raidBarName);
         this.raidBarVictoryComponent = raidBarNameComponent.copy().append(" - ").append(Component.translatable(raidBarVictory));
         this.raidBarDefeatComponent = raidBarNameComponent.copy().append(" - ").append(Component.translatable(raidBarDefeat));
-        this.mobsFraction = mobsFraction;
+        this.raidStrengthConfig = raidStrengthConfig;
         this.waveSoundEvent = waveSoundEvent;
         this.victorySoundEvent = victorySoundEvent;
         this.defeatSoundEvent = defeatSoundEvent;
@@ -74,7 +74,7 @@ public class FactionBattleConfig implements RaidConfig {
         CalculateStrengthEvent event = new CalculateStrengthEvent.FactionBattle(this, targetBlockPos, level, strength, strength, faction1, faction2);
         Services.EVENT_BUS.post(event);
         FCConstants.LOGGER.info("Strength = " + strength);
-        return (int) Math.floor(event.getStrength() * FACTION_BATTLE_RAID_TARGET_STRENGTH_MULTIPLIER.get());
+        return (int) Math.floor(event.getStrength());
     }
 
     public void init(int targetStrength, BlockPos targetBlockPos, Faction faction1, Faction faction2, int startingWave) {
@@ -112,7 +112,7 @@ public class FactionBattleConfig implements RaidConfig {
 
     @Override
     public boolean isDefeat(Raid raid, ServerLevel level) {
-        if (raid.getGroupsSpawned() <= waveRaidConfig.getStartingWave()) {
+        if (raid.getGroupsSpawned() <= raidWaveConfig.getStartingWave()) {
             return false;
         }
         Set<Mob> raidersInWave = raid.getRaidersInWave(raid.getGroupsSpawned());
@@ -130,8 +130,8 @@ public class FactionBattleConfig implements RaidConfig {
     }
 
     @Override
-    public WaveRaidConfig getWaveRaidConfig() {
-        return waveRaidConfig;
+    public RaidWaveConfig getWaveRaidConfig() {
+        return raidWaveConfig;
     }
 
     private int getWeightedRandom(int min, int max) {
@@ -171,8 +171,8 @@ public class FactionBattleConfig implements RaidConfig {
     }
 
     @Override
-    public float getMobsFraction() {
-        return mobsFraction;
+    public RaidStrengthConfig getRaidStrengthConfig() {
+        return raidStrengthConfig;
     }
 
     @Override

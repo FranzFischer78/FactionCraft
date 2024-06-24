@@ -17,15 +17,7 @@ public class FactionCraftConfig {
     public static ForgeConfigSpec.ConfigValue<Boolean> ENABLE_GAIA_FACTION;
 
     public static ForgeConfigSpec.ConfigValue<Boolean> DISABLE_FACTION_RAIDS;
-    public static ForgeConfigSpec.ConfigValue<Double> BASE_WAVE_MULTIPLIER;
-    public static ForgeConfigSpec.ConfigValue<Double> MULTIPLIER_INCREASE_PER_WAVE;
-    public static ForgeConfigSpec.ConfigValue<Double> MULTIPLIER_INCREASE_PER_BAD_OMEN;
-    public static ForgeConfigSpec.ConfigValue<Double> WAVE_TARGET_STRENGTH_SPREAD;
-    public static ForgeConfigSpec.ConfigValue<Double> TARGET_STRENGTH_DIFFICULTY_MULTIPLIER_EASY;
-    public static ForgeConfigSpec.ConfigValue<Double> TARGET_STRENGTH_DIFFICULTY_MULTIPLIER_NORMAL;
-    public static ForgeConfigSpec.ConfigValue<Double> TARGET_STRENGTH_DIFFICULTY_MULTIPLIER_HARD;
 
-    public static ForgeConfigSpec.ConfigValue<Double> VILLAGE_RAID_TARGET_STRENGTH_MULTIPLIER;
     public static ForgeConfigSpec.ConfigValue<Double> VILLAGE_RAID_ADDITIONAL_WAVE_CHANCE;
     public static ForgeConfigSpec.ConfigValue<Integer> VILLAGE_RAID_VILLAGER_WEIGHT;
     public static ForgeConfigSpec.ConfigValue<Integer> VILLAGE_RAID_IRON_GOLEM_WEIGHT;
@@ -33,10 +25,8 @@ public class FactionCraftConfig {
 
 
     public static ForgeConfigSpec.ConfigValue<Integer> PLAYER_RAID_TARGET_BASE_STRENGTH;
-    public static ForgeConfigSpec.ConfigValue<Double> PLAYER_RAID_TARGET_STRENGTH_MULTIPLIER;
 
     public static ForgeConfigSpec.ConfigValue<Integer> FACTION_BATTLE_RAID_TARGET_BASE_STRENGTH_PER_WAVE;
-    public static ForgeConfigSpec.ConfigValue<Double> FACTION_BATTLE_RAID_TARGET_STRENGTH_MULTIPLIER;
 
     public static ForgeConfigSpec.ConfigValue<Boolean> DISABLE_FACTION_PATROLS;
     public static ForgeConfigSpec.ConfigValue<Boolean> DISABLE_VANILLA_PATROLS;
@@ -121,45 +111,11 @@ public class FactionCraftConfig {
                     .comment("Disables faction raids \n" +
                             "Default false")
                     .define("disableFactionRaids", false);
-            BASE_WAVE_MULTIPLIER = builder
-                    .comment("The multiplier for the target strength for the first wave. \n" +
-                            "1.0 disables Starting wave multiplier. Default 0.65")
-                    .defineInRange("baseWaveMultiplier", 0.65, -100.0, 100.0);
-            MULTIPLIER_INCREASE_PER_WAVE = builder
-                    .comment("The amount the multiplier for the target strength increases per wave. \n" +
-                            "0.0 removes target growth per wave. Default 0.15")
-                    .defineInRange("multiplierIncreasePerWave", 0.15, -100.0, 100.0);
-            MULTIPLIER_INCREASE_PER_BAD_OMEN = builder
-                    .comment("The multiplier per bad omen level for the target strength. \n" +
-                            "0.0 removes increase Bad Omen impact. Default 0.1")
-                    .defineInRange("multiplierIncreasePerBadOmen", 0.1, -100.0, 100.0);
-            WAVE_TARGET_STRENGTH_SPREAD = builder
-                    .comment("The amount the the target strength can fluctuate per wave. \n" +
-                            "Default 0.1")
-                    .defineInRange("waveTargetStrengthSpread", 0.1, -100.0, 100.0);
-            TARGET_STRENGTH_DIFFICULTY_MULTIPLIER_EASY = builder
-                    .comment("The multiplier applied to target strength for Easy difficulty. \n" +
-                            "0.0 disables difficulty based multipliers. Default -0.1")
-                    .defineInRange("targetStrengthDifficultyMultiplierEasy", -0.1, -100.0, 100.0);
-            TARGET_STRENGTH_DIFFICULTY_MULTIPLIER_NORMAL = builder
-                    .comment("The multiplier applied to target strength for Normal difficulty. \n" +
-                            "0.0 disables difficulty based multipliers. Default 0.0")
-                    .defineInRange("targetStrengthDifficultyMultiplierNormal", 0.0, -100.0, 100.0);
-            TARGET_STRENGTH_DIFFICULTY_MULTIPLIER_HARD = builder
-                    .comment("The multiplier applied to target strength for Hard difficulty. \n" +
-                            "0.0 disables difficulty based multipliers. Default 1.1")
-                    .defineInRange("targetStrengthDifficultyMultiplierHard", 0.1, -100.0, 100.0);
-
             builder.pop();
         }
 
         private void raidTargetConfig(ForgeConfigSpec.Builder builder) {
             builder.comment("Village Raid Target Calculations").push("village_raid_target_calculations");
-            VILLAGE_RAID_TARGET_STRENGTH_MULTIPLIER = builder
-                    .comment("Applied to the target strength of the village \n" +
-                            "Multiplies the target strength and rounds down. \n" +
-                            "Vanilla villages have a target strength between 10 and 20. Default 1.0F")
-                    .defineInRange("villageRaidTargetStrengthMultiplier", 1.0, 0.0, 100.0);
             VILLAGE_RAID_ADDITIONAL_WAVE_CHANCE = builder
                     .comment("Applied to the target strength of the village \n" +
                             "Additional waves is calulcated by applying this value to target strength. \n" +
@@ -184,10 +140,6 @@ public class FactionCraftConfig {
                     .comment("Base target strength of the player \n" +
                             "Default 70")
                     .defineInRange("playerRaidTargetBaseStrength", 70, 0, 9999);
-            PLAYER_RAID_TARGET_STRENGTH_MULTIPLIER = builder
-                    .comment("Applied to the target strength of the player \n" +
-                            "Multiplies the target strength and rounds down. Default 1.0F")
-                    .defineInRange("playerRaidTargetStrengthMultiplier", 1.0, 0.0, 100.0);
             builder.pop();
         }
 
@@ -254,10 +206,6 @@ public class FactionCraftConfig {
                     .comment("Base target strength of a faction battle. \n" +
                             "Will be divided over both factions. Default 45")
                     .defineInRange("factionBattleRaidTargetBaseStrengthPerWave", 45, 0, 9999);
-            FACTION_BATTLE_RAID_TARGET_STRENGTH_MULTIPLIER = builder
-                    .comment("Applied to the target strength of a faction battle. \n" +
-                            "Multiplies the target strength and rounds down. Default 1.0F")
-                    .defineInRange("factionBattleRaidTargetStrengthMultiplier", 1.0, 0.0, 100.0);
             builder.pop();
         }
 

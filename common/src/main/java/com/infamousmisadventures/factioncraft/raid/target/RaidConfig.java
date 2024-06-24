@@ -29,7 +29,7 @@ public interface RaidConfig {
 
     boolean isValidSpawnPos(int outerAttempt, BlockPos.MutableBlockPos blockpos$mutable, ServerLevel level);
 
-    WaveRaidConfig getWaveRaidConfig();
+    RaidWaveConfig getWaveRaidConfig();
 
     float getSpawnDistance();
 
@@ -45,11 +45,21 @@ public interface RaidConfig {
 
     Optional<Holder<SoundEvent>> getDefeatSoundEvent();
 
-    float getMobsFraction();
+    RaidStrengthConfig getRaidStrengthConfig();
 
     CompoundTag saveAdditionalData(CompoundTag compoundNbt);
 
     void loadAdditionalData(ServerLevel level, CompoundTag compoundNBT);
 
     Map<Faction, Integer> determineFactionFractions(int targetStrength);
+
+    default int getWaveTargetStrength(Raid raid) {
+        float waveMultiplier = getRaidStrengthConfig().getBaseMultiplier() + (raid.getGroupsSpawned() * getRaidStrengthConfig().getMultiplierAdjustmentPerWave());
+        float spreadMultiplier = ((raid.getLevel().random.nextFloat() * 2) - 1) * getRaidStrengthConfig().getMultiplierSpread();
+        float difficultyMultiplier = getRaidStrengthConfig().getDifficultyMultiplier(raid.getLevel().getDifficulty());
+        float badOmenMultiplier = getRaidStrengthConfig().getMultiplierPerOmenLevel() * raid.getBadOmenLevel();
+        float totalMultiplier = waveMultiplier + spreadMultiplier + difficultyMultiplier + badOmenMultiplier;
+        int targetStrength = (int) Math.floor(getTargetStrength() * totalMultiplier);
+        return targetStrength;
+    }
 }
