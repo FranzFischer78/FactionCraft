@@ -42,7 +42,7 @@ public class AreaDominion implements INBTSerializable<CompoundTag> {
         Map<ResourceLocation, Integer> factionDominions = new HashMap<>();
         RandomSource randomSource = RandomSource.create();
         if(randomSource.nextFloat() <= 0.05F){
-            Faction randomFaction = FCFactions.getRandomFaction(level, randomSource, faction1 -> faction1.getRaidConfig().isEnabled());
+            Faction randomFaction = FCFactions.getRandomFaction(level, randomSource, Faction::canRaid);
             factionDominions.put(GAIA.getName(), 1);
             factionDominions.put(randomFaction.getName(), 100);
         }else {

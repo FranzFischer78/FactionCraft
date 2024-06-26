@@ -68,7 +68,7 @@ public class PatrolSpawner implements CustomSpawner {
                            if (holder.is(BiomeTags.WITHOUT_PATROL_SPAWNS)) {
                               return 0;
                            } else {
-                              Faction faction = FCFactions.getRandomFaction(pLevel, random, faction1 -> faction1.getRaidConfig().isEnabled());
+                              Faction faction = FCFactions.getRandomFaction(pLevel, random, faction1 -> faction1.canRaid());
                               return spawnPatrol(pLevel, random, faction, blockpos$mutable);
                            }
                         }

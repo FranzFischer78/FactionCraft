@@ -9,6 +9,7 @@ import com.infamousmisadventures.factioncraft.faction.relations.FactionRelations
 import com.infamousmisadventures.factioncraft.level.saveddata.PlayerFaction;
 import com.infamousmisadventures.factioncraft.level.saveddata.PlayerFactions;
 import com.infamousmisadventures.factioncraft.platform.Services;
+import com.infamousmisadventures.factioncraft.raid.target.RaidConfigType;
 import com.infamousmisadventures.factioncraft.util.GeneralUtils;
 import com.infamousmisadventures.factioncraft.util.data.MergeableCodecDataManager;
 import com.infamousmisadventures.factioncraft.util.data.ResourceSet;
@@ -43,7 +44,7 @@ public class FCFactions {
         ResourceLocation name = null;
         FactionType factionType = null;
         CompoundTag banner = null;
-        FactionRaidConfig factionRaidConfig = null;
+        List<RaidConfigType> raidConfigs = new ArrayList<>();
         FactionBoostConfig boostConfig = null;
         FactionRelations factionRelations = null;
         ResourceLocation activationAdvancement = null;
@@ -54,7 +55,7 @@ public class FCFactions {
                 factionType = raw.getFactionType();
                 banner = raw.getBanner();
                 name = raw.getName();
-                factionRaidConfig = raw.getRaidConfig();
+                raidConfigs = raw.getRaidConfigs();
                 boostConfig = null;
                 factionRelations = null;
                 homeDimensions.clear();
@@ -69,9 +70,7 @@ public class FCFactions {
             if(name == null){
                 name = raw.getName();
             }
-            if(factionRaidConfig == null){
-                factionRaidConfig = raw.getRaidConfig();
-            }
+            raidConfigs.addAll(raw.getRaidConfigs());
             if(activationAdvancement == null){
                 activationAdvancement = raw.getActivationAdvancement();
             }
@@ -94,7 +93,7 @@ public class FCFactions {
             homeDimensions.addAll(raw.getHomeDimensions());
             defaultEntities = defaultEntities.merge(raw.getDefaultEntities());
         }
-        return new Faction(name,false, factionType, banner, factionRaidConfig, boostConfig, factionRelations, activationAdvancement, homeDimensions, defaultEntities);
+        return new Faction(name,false, factionType, banner, raidConfigs, boostConfig, factionRelations, activationAdvancement, homeDimensions, defaultEntities);
     }
 
 

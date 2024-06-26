@@ -1,9 +1,9 @@
 package com.infamousmisadventures.factioncraft.faction;
 
 import com.infamousmisadventures.factioncraft.entity.data.FactionEntityData;
+import com.infamousmisadventures.factioncraft.entity.data.MobRaiderData;
 import com.infamousmisadventures.factioncraft.entity.data.holder.IFactionEntityDataHolder;
 import com.infamousmisadventures.factioncraft.entity.data.holder.IMobRaiderDataHolder;
-import com.infamousmisadventures.factioncraft.entity.data.MobRaiderData;
 import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityRank;
 import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityType;
 import com.infamousmisadventures.factioncraft.util.GeneralUtils;
@@ -46,7 +46,6 @@ public class FactionGroupSpawner {
     }
 
     public void spawnGroup() {
-        float mobsFraction = faction.getRaidConfig().getMobsFraction();
         int totalMobStrength = (int) Math.floor(targetStrength * mobsFraction);
 
         SelectedFactionEntityTypes selectedFactionEntityTypes = determineFactionEntityTypes(totalMobStrength, waveNumber, faction, spawnBlockPos);

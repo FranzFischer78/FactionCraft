@@ -5,7 +5,7 @@ import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityType;
 import com.infamousmisadventures.factioncraft.faction.relations.FactionRelations;
 import com.infamousmisadventures.factioncraft.faction.spawning.DominionSpawner;
 import com.infamousmisadventures.factioncraft.level.saveddata.FactionData;
-import com.infamousmisadventures.factioncraft.raid.target.RaidConfigType;
+import com.infamousmisadventures.factioncraft.raid.target.*;
 import com.infamousmisadventures.factioncraft.util.data.ResourceSet;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
@@ -36,8 +36,9 @@ import static com.infamousmisadventures.factioncraft.util.ResourceLocationHelper
 import static net.minecraft.world.level.Level.OVERWORLD;
 
 public class Faction {
-    public static final Faction DEFAULT = new Faction(new ResourceLocation("faction/default"), false, FactionType.MONSTER, new CompoundTag(), FactionRaidConfig.DEFAULT, FactionBoostConfig.DEFAULT, FactionRelations.DEFAULT, modLoc("default"), List.of(OVERWORLD.location()), ResourceSet.getEmpty(Registries.ENTITY_TYPE));
-    public static final Faction GAIA = new Faction(new ResourceLocation("faction/gaia"), false, FactionType.GAIA, new CompoundTag(), FactionRaidConfig.DEFAULT, FactionBoostConfig.DEFAULT, FactionRelations.DEFAULT, modLoc("default"), List.of(OVERWORLD.location()), ResourceSet.getEmpty(Registries.ENTITY_TYPE));
+    public static List<RaidConfigType> DEFAULT_RAIDS = List.of(VillageRaidConfigType.DEFAULT, PlayerRaidConfigType.DEFAULT, FactionBattleConfigType.DEFAULT);
+    public static final Faction DEFAULT = new Faction(new ResourceLocation("faction/default"), false, FactionType.MONSTER, new CompoundTag(), DEFAULT_RAIDS, FactionBoostConfig.DEFAULT, FactionRelations.DEFAULT, modLoc("default"), List.of(OVERWORLD.location()), ResourceSet.getEmpty(Registries.ENTITY_TYPE));
+    public static final Faction GAIA = new Faction(new ResourceLocation("faction/gaia"), false, FactionType.GAIA, new CompoundTag(), new ArrayList<>(), FactionBoostConfig.DEFAULT, FactionRelations.DEFAULT, modLoc("default"), List.of(OVERWORLD.location()), ResourceSet.getEmpty(Registries.ENTITY_TYPE));
     public static final ResourceLocation VILLAGE_NAME = new ResourceLocation("faction/village");
 
     public static final Codec<Faction> CODEC = RecordCodecBuilder.create(builder ->
@@ -46,7 +47,7 @@ public class Faction {
                     Codec.BOOL.optionalFieldOf("replace", false).forGetter(data -> data.replace),
                     FactionType.CODEC.optionalFieldOf("type", FactionType.MONSTER).forGetter(Faction::getFactionType),
                     CompoundTag.CODEC.fieldOf("banner").forGetter(Faction::getBanner),
-                    FactionRaidConfig.CODEC.optionalFieldOf("raid_config", FactionRaidConfig.DEFAULT).forGetter(Faction::getRaidConfig),
+                    RaidConfigType.CODEC.listOf().optionalFieldOf("raid_config", DEFAULT_RAIDS).forGetter(Faction::getRaidConfigs),
                     FactionBoostConfig.CODEC.optionalFieldOf("boosts", FactionBoostConfig.DEFAULT).forGetter(Faction::getBoostConfig),
                     FactionRelations.CODEC_OLD.optionalFieldOf("relations", FactionRelations.DEFAULT).forGetter(Faction::getRelations),
                     ResourceLocation.CODEC.optionalFieldOf("activation_advancement", modLoc("activation_advancement")).forGetter(Faction::getActivationAdvancement),
@@ -58,7 +59,7 @@ public class Faction {
     private final boolean replace;
     private final FactionType factionType;
     private final CompoundTag banner;
-    private final FactionRaidConfig raidConfig;
+    private final List<RaidConfigType> raidConfigs;
     private final FactionBoostConfig boostConfig;
     private final FactionRelations relations;
     private List<FactionEntityType> entityTypes = new ArrayList<>();
@@ -67,12 +68,12 @@ public class Faction {
     private final ResourceSet<EntityType<?>> defaultEntities;
     private final DominionSpawner dominionSpawner = new DominionSpawner(this);
 
-    public Faction(ResourceLocation name, boolean replace, FactionType factionType, CompoundTag banner, FactionRaidConfig raidConfig, FactionBoostConfig boostConfig, FactionRelations relations, ResourceLocation activationAdvancement, List<ResourceLocation> homeDimensions, ResourceSet<EntityType<?>> defaultEntities) {
+    public Faction(ResourceLocation name, boolean replace, FactionType factionType, CompoundTag banner, List<RaidConfigType> raidConfigs, FactionBoostConfig boostConfig, FactionRelations relations, ResourceLocation activationAdvancement, List<ResourceLocation> homeDimensions, ResourceSet<EntityType<?>> defaultEntities) {
         this.name = name;
         this.replace = replace;
         this.factionType = factionType;
         this.banner = banner;
-        this.raidConfig = raidConfig;
+        this.raidConfigs = raidConfigs;
         this.boostConfig = boostConfig;
         this.relations = relations;
         this.activationAdvancement = activationAdvancement;
@@ -96,8 +97,8 @@ public class Faction {
         return banner;
     }
 
-    public FactionRaidConfig getRaidConfig() {
-        return raidConfig;
+    public List<RaidConfigType> getRaidConfigs() {
+        return raidConfigs;
     }
 
     public FactionBoostConfig getBoostConfig() {
@@ -122,6 +123,10 @@ public class Faction {
 
     public ResourceSet<EntityType<?>> getDefaultEntities() {
         return defaultEntities;
+    }
+
+    public boolean canRaid() {
+        return !raidConfigs.isEmpty();
     }
 
     public List<Pair<FactionEntityType, Integer>> getWeightMap(){
@@ -191,9 +196,5 @@ public class Faction {
 
     public List<FactionEntityType> getSpawnableFactionEntityTypes(LevelAccessor level, BlockPos spawnBlockPos, int dominionAmount) {
         return dominionSpawner.GetSpawnableFactionEntityTypes(level, spawnBlockPos, dominionAmount);
-    }
-
-    public List<RaidConfigType> getRaidConfigs() {
-        return null;
     }
 }

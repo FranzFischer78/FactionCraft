@@ -75,7 +75,7 @@ public class BattleSpawner implements CustomSpawner {
     }
 
     public static int spawnFactionBattle(ServerLevel pLevel, RandomSource random, BlockPos blockPos) {
-        Faction faction1 = FCFactions.getRandomFactionWithEnemies(pLevel, random, faction -> faction.getRaidConfig().isEnabled());
+        Faction faction1 = FCFactions.getRandomFactionWithEnemies(pLevel, random, faction -> faction.canRaid());
         if (faction1 == null) {
             return 0;
         }
