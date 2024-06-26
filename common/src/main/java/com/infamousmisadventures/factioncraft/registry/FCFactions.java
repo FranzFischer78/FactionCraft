@@ -3,7 +3,6 @@ package com.infamousmisadventures.factioncraft.registry;
 import com.infamousmisadventures.factioncraft.boost.Boost;
 import com.infamousmisadventures.factioncraft.faction.Faction;
 import com.infamousmisadventures.factioncraft.faction.FactionBoostConfig;
-import com.infamousmisadventures.factioncraft.faction.FactionRaidConfig;
 import com.infamousmisadventures.factioncraft.faction.FactionType;
 import com.infamousmisadventures.factioncraft.faction.relations.FactionRelations;
 import com.infamousmisadventures.factioncraft.level.saveddata.PlayerFaction;
@@ -149,7 +148,7 @@ public class FCFactions {
     }
 
     public static Faction createPlayerFaction(Player player){
-        Faction faction = new Faction(new ResourceLocation(MOD_ID, "player/" + player.getName().getString().toLowerCase()), false, FactionType.PLAYER, new CompoundTag(), FactionRaidConfig.PLAYER, FactionBoostConfig.DEFAULT, FactionRelations.DEFAULT, modLoc("default"), new ArrayList<>(), ResourceSet.getEmpty(ENTITY_TYPE));
+        Faction faction = new Faction(new ResourceLocation(MOD_ID, "player/" + player.getName().getString().toLowerCase()), false, FactionType.PLAYER, new CompoundTag(), new ArrayList<>(), FactionBoostConfig.DEFAULT, FactionRelations.DEFAULT, modLoc("default"), new ArrayList<>(), ResourceSet.getEmpty(ENTITY_TYPE));
         for (Faction faction1 : getFactionData().values()) {
             if(!faction.getRelations().getEnemies().contains(getKey(faction))){
                 if(faction1.getFactionType().equals(FactionType.MONSTER)) {
