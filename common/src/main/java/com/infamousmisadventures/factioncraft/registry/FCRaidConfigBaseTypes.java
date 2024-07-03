@@ -5,7 +5,6 @@ import com.infamousmisadventures.factioncraft.raid.config.PlayerRaidConfigType;
 import com.infamousmisadventures.factioncraft.raid.config.RaidConfigBaseType;
 import com.infamousmisadventures.factioncraft.raid.config.RaidConfigType;
 import com.infamousmisadventures.factioncraft.raid.config.VillageRaidConfigType;
-import com.infamousmisadventures.factioncraft.raid.target.*;
 
 import java.util.function.Supplier;
 

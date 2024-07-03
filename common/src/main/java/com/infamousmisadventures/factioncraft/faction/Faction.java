@@ -9,7 +9,6 @@ import com.infamousmisadventures.factioncraft.raid.config.FactionBattleConfigTyp
 import com.infamousmisadventures.factioncraft.raid.config.PlayerRaidConfigType;
 import com.infamousmisadventures.factioncraft.raid.config.RaidConfigType;
 import com.infamousmisadventures.factioncraft.raid.config.VillageRaidConfigType;
-import com.infamousmisadventures.factioncraft.raid.target.*;
 import com.infamousmisadventures.factioncraft.util.data.ResourceSet;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
