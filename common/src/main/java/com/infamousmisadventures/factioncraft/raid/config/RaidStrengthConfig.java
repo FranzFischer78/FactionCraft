@@ -1,10 +1,8 @@
-package com.infamousmisadventures.factioncraft.raid.target;
+package com.infamousmisadventures.factioncraft.raid.config;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.Difficulty;
-
-import static com.infamousmisadventures.factioncraft.config.FactionCraftConfig.*;
 
 public class RaidStrengthConfig {
     public static final RaidStrengthConfig DEFAULT = new RaidStrengthConfig(0.65F, 0.15F, 0.1F, -0.1F, 0F, 0.1F, 0.1F, 0.7F);

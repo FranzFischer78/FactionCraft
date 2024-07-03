@@ -1,4 +1,4 @@
-package com.infamousmisadventures.factioncraft.raid.target;
+package com.infamousmisadventures.factioncraft.raid.config;
 
 import com.infamousmisadventures.factioncraft.faction.Faction;
 import com.infamousmisadventures.factioncraft.raid.Raid;
@@ -73,5 +73,9 @@ public interface RaidConfig {
         float totalMultiplier = waveMultiplier + spreadMultiplier + difficultyMultiplier + badOmenMultiplier;
         int targetStrength = (int) Math.floor(getTargetStrength() * totalMultiplier);
         return targetStrength;
+    }
+
+    default int getSpawnPosAmount() {
+        return 1;
     }
 }

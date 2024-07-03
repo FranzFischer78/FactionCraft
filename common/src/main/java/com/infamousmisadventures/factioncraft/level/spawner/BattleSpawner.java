@@ -3,9 +3,9 @@ package com.infamousmisadventures.factioncraft.level.spawner;
 import com.infamousmisadventures.factioncraft.config.FactionCraftConfig;
 import com.infamousmisadventures.factioncraft.faction.Faction;
 import com.infamousmisadventures.factioncraft.level.saveddata.RaidManager;
-import com.infamousmisadventures.factioncraft.raid.target.FactionBattleConfig;
-import com.infamousmisadventures.factioncraft.raid.target.FactionBattleConfigType;
-import com.infamousmisadventures.factioncraft.raid.target.RaidConfigType;
+import com.infamousmisadventures.factioncraft.raid.config.FactionBattleConfig;
+import com.infamousmisadventures.factioncraft.raid.config.FactionBattleConfigType;
+import com.infamousmisadventures.factioncraft.raid.config.RaidConfigType;
 import com.infamousmisadventures.factioncraft.registry.FCFactions;
 import com.infamousmisadventures.factioncraft.registry.FCRaidConfigTypes;
 import com.infamousmisadventures.factioncraft.util.GeneralUtils;
@@ -18,7 +18,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.CustomSpawner;
 import net.minecraft.world.level.biome.Biome;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 

@@ -2,20 +2,18 @@ package com.infamousmisadventures.factioncraft.raid;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.infamousmisadventures.factioncraft.entity.data.FactionEntityData;
 import com.infamousmisadventures.factioncraft.entity.data.MobRaiderData;
 import com.infamousmisadventures.factioncraft.entity.data.holder.IFactionEntityDataHolder;
 import com.infamousmisadventures.factioncraft.entity.data.holder.IMobRaiderDataHolder;
 import com.infamousmisadventures.factioncraft.event.FactionRaidEvent;
 import com.infamousmisadventures.factioncraft.faction.EntityWeightMapProperties;
 import com.infamousmisadventures.factioncraft.faction.Faction;
-import com.infamousmisadventures.factioncraft.faction.FactionGroupSpawner;
 import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityRank;
 import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityType;
 import com.infamousmisadventures.factioncraft.level.saveddata.RaidManager;
 import com.infamousmisadventures.factioncraft.platform.Services;
-import com.infamousmisadventures.factioncraft.raid.target.RaidConfigHelper;
-import com.infamousmisadventures.factioncraft.raid.target.RaidConfig;
+import com.infamousmisadventures.factioncraft.raid.config.RaidConfigHelper;
+import com.infamousmisadventures.factioncraft.raid.config.RaidConfig;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -39,7 +37,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.*;
@@ -56,17 +53,17 @@ public class Raid {
     private final Queue<BlockPos> waveSpawnPos = new LinkedList<>();
     private final Map<Integer, Mob> groupToLeaderMap = Maps.newHashMap();
     private final Map<Integer, Set<Mob>> groupRaiderMap = Maps.newHashMap();
-    private final Set<UUID> heroesOfTheVillage = Sets.newHashSet();
+    private final Set<UUID> playerParticipants = Sets.newHashSet();
     private int badOmenLevel;
     private float totalHealth;
     private int currentWave = 0;
-    private boolean started;
     private boolean active;
     private Status status;
     private long ticksActive;
     private int raidCooldownTicks;
     private int postRaidTicks;
     private int celebrationTicks;
+    private final RaidSpawner raidSpawner;
 
     public Raid(int uniqueId, ServerLevel level, RaidConfig raidConfig) {
         this.id = uniqueId;
@@ -75,18 +72,18 @@ public class Raid {
         this.numberOfWaves = raidConfig.getNumberOfWaves(level.getDifficulty());
         this.currentWave = raidConfig.getRaidWaveConfig().getStartingWave();
         this.active = true;
-        this.raidEvent.setName(getRaidEventName(raidConfig));
+        this.raidEvent.setName(getRaidEventName());
         this.raidEvent.setProgress(0.0F);
-        this.status = Status.ONGOING;
+        this.status = Status.STARTING;
+        this.raidSpawner = new RaidSpawner(this);
     }
 
 
     public Raid(ServerLevel level, CompoundTag compoundNBT) {
         this.level = level;
         this.raidConfig = RaidConfigHelper.load(level, compoundNBT.getCompound("RaidTarget"));
-        this.raidEvent.setName(getRaidEventName(this.raidConfig));
+        this.raidEvent.setName(getRaidEventName());
         this.id = compoundNBT.getInt("Id");
-        this.started = compoundNBT.getBoolean("Started");
         this.active = compoundNBT.getBoolean("Active");
         this.ticksActive = compoundNBT.getLong("TicksActive");
         this.badOmenLevel = compoundNBT.getInt("BadOmenLevel");
@@ -96,13 +93,14 @@ public class Raid {
         this.totalHealth = compoundNBT.getFloat("TotalHealth");
         this.numberOfWaves = compoundNBT.getInt("NumberOfWaves");
         this.status = Status.getByName(compoundNBT.getString("Status"));
-        this.heroesOfTheVillage.clear();
+        this.playerParticipants.clear();
         if (compoundNBT.contains("HeroesOfTheVillage", 9)) {
             ListTag listnbt = compoundNBT.getList("HeroesOfTheVillage", 11);
             for (int i = 0; i < listnbt.size(); ++i) {
-                this.heroesOfTheVillage.add(NbtUtils.loadUUID(listnbt.get(i)));
+                this.playerParticipants.add(NbtUtils.loadUUID(listnbt.get(i)));
             }
         }
+        this.raidSpawner = new RaidSpawner(this);
     }
 
     public ServerLevel getLevel() {
@@ -127,7 +125,7 @@ public class Raid {
 
     public void tick() {
         if (!this.isStopped()) {
-            if (this.status == Status.ONGOING) {
+            if (this.status.isOngoing()) {
                 ongoingRaidTick();
             } else if (this.isOver()) {
                 finalizeRaidTick();
@@ -141,29 +139,16 @@ public class Raid {
         raidConfig.updateTargetBlockPos(level);
 
         if (raidConfig.isDefeat(this, level)) {
-            if (this.currentWave > 0) {
-                FactionRaidEvent.Defeat event = new FactionRaidEvent.Defeat(this);
-                Services.EVENT_BUS.post(event);
-                this.status = Status.LOSS;
-                this.playSound(raidConfig.getTargetBlockPos(), raidConfig.getDefeatSoundEvent());
-                this.raidEvent.setName(getRaidEventNameDefeat(raidConfig));
-            } else {
-                this.stop();
-            }
+            handleDefeat();
         }
 
         ++this.ticksActive;
-        if (this.ticksActive >= 48000L) {
-            this.stop();
-            return;
-        }
+        if (isRaidTooOld()) return;
 
 
         int i = this.getTotalRaidersAlive();
-        if (i == 0 && this.hasMoreWaves()) {
-            if (raidCooldownTick()) {
-                return;
-            }
+        if (raidCooldownTick(i)) {
+            return;
         }
 
         if (this.ticksActive % 20L == 0L) {
@@ -171,66 +156,89 @@ public class Raid {
             this.updateRaiders();
             if (i > 0) {
                 if (i <= 2) {
-                    this.raidEvent.setName(getRaidEventName(raidConfig).copy().append(" - ").append(Component.translatable("event.minecraft.raid.raiders_remaining", i)));
+                    this.raidEvent.setName(getRaidEventName().copy().append(" - ").append(Component.translatable("event.minecraft.raid.raiders_remaining", i)));
                 } else {
-                    this.raidEvent.setName(getRaidEventName(raidConfig));
+                    this.raidEvent.setName(getRaidEventName());
                 }
             } else {
-                this.raidEvent.setName(getRaidEventName(raidConfig));
+                this.raidEvent.setName(getRaidEventName());
             }
         }
 
-        boolean flag3 = false;
-        int k = 0;
-
-        while (this.shouldSpawnGroup()) {
-            for (int j = this.waveSpawnPos.size(); j < getSpawnPosAmount(); j++) {
-                BlockPos randomSpawnPos = this.findRandomSpawnPos(k, 20);
-                if (randomSpawnPos != null) {
-                    this.waveSpawnPos.add(randomSpawnPos);
-                }
-            }
-            if (this.waveSpawnPos.size() >= getSpawnPosAmount()) {
-                this.started = true;
-                this.spawnGroup();
-                if (!flag3) {
-                    FactionRaidEvent.Wave event = new FactionRaidEvent.Wave(this);
-                    Services.EVENT_BUS.post(event);
-                    flag3 = true;
-                }
-            } else {
-                ++k;
-            }
-
-            if (k > 3) {
-                this.stop();
-                break;
-            }
-        }
+        checkShouldStartWave();
 
         if (this.isStarted() && !this.hasMoreWaves() && i == 0) {
-            if (this.postRaidTicks < 40) {
-                ++this.postRaidTicks;
-            } else {
-                this.status = Status.VICTORY;
-                FactionRaidEvent.Victory event = new FactionRaidEvent.Victory(this);
-                Services.EVENT_BUS.post(event);
-                this.playSound(raidConfig.getTargetBlockPos(), raidConfig.getVictorySoundEvent());
-                this.raidEvent.setName(getRaidEventNameVictory(raidConfig));
+            postRaidTick();
+        }
+    }
 
-                for (UUID uuid : this.heroesOfTheVillage) {
-                    Entity entity = this.level.getEntity(uuid);
-                    if (entity instanceof LivingEntity && !entity.isSpectator()) {
-                        LivingEntity livingentity = (LivingEntity) entity;
-                        livingentity.addEffect(new MobEffectInstance(MobEffects.HERO_OF_THE_VILLAGE, 48000, this.badOmenLevel - 1, false, false, true));
-                        if (livingentity instanceof ServerPlayer) {
-                            ServerPlayer serverplayerentity = (ServerPlayer) livingentity;
-                            serverplayerentity.awardStat(Stats.RAID_WIN);
-                            CriteriaTriggers.RAID_WIN.trigger(serverplayerentity);
-                        }
-                    }
+    private void checkShouldStartWave() {
+
+        if(shouldSpawnGroup()) {
+            this.totalHealth = 0.0F;
+            if (raidSpawner.attemptSpawnGroup(this.currentWave + 1)) {
+                startWave();
+            } else {
+                this.stop();
+            }
+        }
+    }
+
+    private void startWave() {
+        this.status = Status.ONGOING;
+        FactionRaidEvent.Wave event = new FactionRaidEvent.Wave(this);
+        Services.EVENT_BUS.post(event);
+        ++this.currentWave;
+        this.updateBossbar();
+        this.playSound(raidSpawner.getLastSpawnPos(), raidConfig.getWaveSoundEvent());
+    }
+
+    private void postRaidTick() {
+        if (this.postRaidTicks < 40) {
+            ++this.postRaidTicks;
+        } else {
+            handleVictory();
+        }
+    }
+
+    private boolean isRaidTooOld() {
+        if (this.ticksActive >= 48000L) {
+            this.stop();
+            return true;
+        }
+        return false;
+    }
+
+    private void handleVictory() {
+        this.status = Status.VICTORY;
+        FactionRaidEvent.Victory event = new FactionRaidEvent.Victory(this);
+        Services.EVENT_BUS.post(event);
+        this.playSound(raidConfig.getTargetBlockPos(), raidConfig.getVictorySoundEvent());
+        this.raidEvent.setName(getRaidEventNameVictory());
+
+        for (UUID uuid : this.playerParticipants) {
+            Entity entity = this.level.getEntity(uuid);
+            if (entity instanceof LivingEntity && !entity.isSpectator()) {
+                LivingEntity livingentity = (LivingEntity) entity;
+                livingentity.addEffect(new MobEffectInstance(MobEffects.HERO_OF_THE_VILLAGE, 48000, this.badOmenLevel - 1, false, false, true));
+                if (livingentity instanceof ServerPlayer) {
+                    ServerPlayer serverplayerentity = (ServerPlayer) livingentity;
+                    serverplayerentity.awardStat(Stats.RAID_WIN);
+                    CriteriaTriggers.RAID_WIN.trigger(serverplayerentity);
                 }
             }
+        }
+    }
+
+    private void handleDefeat() {
+        if (this.currentWave > 0) {
+            FactionRaidEvent.Defeat event = new FactionRaidEvent.Defeat(this);
+            Services.EVENT_BUS.post(event);
+            this.status = Status.LOSS;
+            this.playSound(raidConfig.getTargetBlockPos(), raidConfig.getDefeatSoundEvent());
+            this.raidEvent.setName(getRaidEventNameDefeat());
+        } else {
+            this.stop();
         }
     }
 
@@ -259,19 +267,15 @@ public class Raid {
             this.raidEvent.setVisible(true);
             if (this.isVictory()) {
                 this.raidEvent.setProgress(0.0F);
-                this.raidEvent.setName(getRaidEventNameVictory(raidConfig));
+                this.raidEvent.setName(getRaidEventNameVictory());
             } else {
-                this.raidEvent.setName(getRaidEventNameDefeat(raidConfig));
+                this.raidEvent.setName(getRaidEventNameDefeat());
             }
         }
     }
 
-    private int getSpawnPosAmount() {
-        return 1;
-    }
-
     private void playSound(BlockPos p_221293_1_, Optional<Holder<SoundEvent>> soundEvent) {
-        if(soundEvent.isEmpty()) return;
+        if (soundEvent.isEmpty()) return;
         float f = 13.0F;
         int i = 64;
         Collection<ServerPlayer> collection = this.raidEvent.getPlayers();
@@ -288,32 +292,14 @@ public class Raid {
         }
     }
 
-    private boolean raidCooldownTick() {
+    private boolean raidCooldownTick(int totalRaidersAlive) {
+        if (totalRaidersAlive != 0 || !this.hasMoreWaves()) return false;
         if (this.raidCooldownTicks <= 0) {
             this.raidCooldownTicks = 300;
-            this.raidEvent.setName(getRaidEventName(raidConfig));
+            this.raidEvent.setName(getRaidEventName());
             return true;
         } else {
-            boolean flag1 = this.waveSpawnPos.size() >= getSpawnPosAmount();
-            boolean flag2 = !flag1 && this.raidCooldownTicks % 5 == 0;
-            if (flag1 && !this.level.isPositionEntityTicking(this.waveSpawnPos.peek())) {
-                this.waveSpawnPos.poll();
-                flag2 = true;
-            }
-
-            if (flag2) {
-                int j = 0;
-                if (this.raidCooldownTicks < 100) {
-                    j = 1;
-                } else if (this.raidCooldownTicks < 40) {
-                    j = 2;
-                }
-
-                Optional<BlockPos> validSpawnPos = this.getValidSpawnPos(j);
-                if (validSpawnPos.isPresent()) {
-                    this.waveSpawnPos.add(validSpawnPos.get());
-                }
-            }
+            raidSpawner.cooldownTick(this.raidCooldownTicks);
 
             if (this.raidCooldownTicks == 300 || this.raidCooldownTicks % 20 == 0) {
                 this.updatePlayers();
@@ -325,33 +311,8 @@ public class Raid {
         return false;
     }
 
-    private boolean shouldSpawnGroup() {
+    public boolean shouldSpawnGroup() {
         return this.raidCooldownTicks == 0 && this.hasMoreWaves() && this.getTotalRaidersAlive() == 0;
-    }
-
-    private void spawnGroup() {
-        int waveNumber = this.currentWave + 1;
-        this.totalHealth = 0.0F;
-
-        int targetStrength = raidConfig.getWaveTargetStrength(this);
-        Map<Faction, Integer> factionFractions = raidConfig.determineFactionFractions(targetStrength);
-        factionFractions.forEach((key, value) -> spawnGroupForFaction(this.waveSpawnPos.poll(), waveNumber, value, key));
-
-        this.waveSpawnPos.clear();
-        ++this.currentWave;
-        this.updateBossbar();
-    }
-
-    private void spawnGroupForFaction(BlockPos spawnBlockPos, int waveNumber, int targetStrength, Faction faction) {
-        FactionGroupSpawner factionGroupSpawner = new FactionGroupSpawner(level, spawnBlockPos, waveNumber, targetStrength, raidConfig.getRaidStrengthConfig().getMobsFraction(), faction);
-        factionGroupSpawner.spawnGroup();
-        factionGroupSpawner.getEntities().forEach(mobEntity -> {
-            FactionEntityData factionEntityCapability = ((IFactionEntityDataHolder) mobEntity).getOrCreateFactionEntityData();
-            if (factionEntityCapability.getFaction() != null && factionEntityCapability.getFactionEntityType() != null) {
-                this.joinRaid(waveNumber, mobEntity);
-            }
-        });
-        this.playSound(spawnBlockPos, raidConfig.getWaveSoundEvent());
     }
 
     public void setLeader(int pRaidId, Mob mobEntity) {
@@ -400,7 +361,7 @@ public class Raid {
                     this.totalHealth -= mobEntity.getHealth();
                 }
 
-               ((IMobRaiderDataHolder) mobEntity).getOrCreateMobRaiderData().setRaid(null);
+                ((IMobRaiderDataHolder) mobEntity).getOrCreateMobRaiderData().setRaid(null);
                 this.updateBossbar();
             }
         }
@@ -454,39 +415,6 @@ public class Raid {
         }
 
         return f;
-    }
-
-    private Optional<BlockPos> getValidSpawnPos(int p_221313_1_) {
-        for (int i = 0; i < 3; ++i) {
-            BlockPos blockpos = this.findRandomSpawnPos(p_221313_1_, 1);
-            if (blockpos != null) {
-                return Optional.of(blockpos);
-            }
-        }
-
-        return Optional.empty();
-    }
-
-    private BlockPos findRandomSpawnPos(int outerAttempt, int maxInnerAttempts) {
-        int i = 2 - outerAttempt;
-        BlockPos.MutableBlockPos blockpos$mutable = new BlockPos.MutableBlockPos();
-
-        for (int i1 = 0; i1 < maxInnerAttempts; ++i1) {
-            float f = this.level.random.nextFloat() * ((float) Math.PI * 2F);
-            int j = this.raidConfig.getTargetBlockPos().getX() + Mth.floor(Mth.cos(f) * raidConfig.getSpawnDistance() * (float) i) + this.level.random.nextInt(5);
-            int l = this.raidConfig.getTargetBlockPos().getZ() + Mth.floor(Mth.sin(f) * raidConfig.getSpawnDistance() * (float) i) + this.level.random.nextInt(5);
-            int k = this.level.getHeight(Heightmap.Types.WORLD_SURFACE, j, l);
-            blockpos$mutable.set(j, k, l);
-            if (isValidSpawnPos(blockpos$mutable) && raidConfig.isValidSpawnPos(outerAttempt, blockpos$mutable, this.level)) {
-                return blockpos$mutable;
-            }
-        }
-
-        return null;
-    }
-
-    private boolean isValidSpawnPos(BlockPos.MutableBlockPos blockpos$mutable) {
-        return this.waveSpawnPos.stream().map(existingWaveSpawnPos -> blockpos$mutable.distSqr(existingWaveSpawnPos) > 40).reduce((aBoolean, aBoolean2) -> aBoolean && aBoolean2).orElse(true);
     }
 
     private boolean hasMoreWaves() {
@@ -545,7 +473,7 @@ public class Raid {
     }
 
     public void addHeroOfTheVillage(Entity p_221311_1_) {
-        this.heroesOfTheVillage.add(p_221311_1_.getUUID());
+        this.playerParticipants.add(p_221311_1_.getUUID());
     }
 
 
@@ -558,7 +486,7 @@ public class Raid {
     }
 
     public boolean isStarted() {
-        return this.started;
+        return this.status != Status.STARTING;
     }
 
     public boolean isActive() {
@@ -581,15 +509,15 @@ public class Raid {
         return this.isVictory() || this.isLoss();
     }
 
-    private Component getRaidEventName(RaidConfig raidConfig) {
+    private Component getRaidEventName() {
         return this.raidConfig.getRaidBarNameComponent();
     }
 
-    private Component getRaidEventNameDefeat(RaidConfig raidConfig) {
+    private Component getRaidEventNameDefeat() {
         return this.raidConfig.getRaidBarDefeatComponent();
     }
 
-    private Component getRaidEventNameVictory(RaidConfig raidConfig) {
+    private Component getRaidEventNameVictory() {
         return this.raidConfig.getRaidBarVictoryComponent();
     }
 
@@ -601,19 +529,20 @@ public class Raid {
     }
 
     public void spawnDigger(Faction faction, BlockPos spawnBlockPos, Mob mob) {
-        if(((IFactionEntityDataHolder) mob).getOrCreateFactionEntityData().getFactionEntityType().hasRank(FactionEntityRank.DIGGER)) return;
+        if (((IFactionEntityDataHolder) mob).getOrCreateFactionEntityData().getFactionEntityType().hasRank(FactionEntityRank.DIGGER))
+            return;
         this.spawnDigger(faction, spawnBlockPos);
     }
 
     public void spawnDigger(Faction faction, BlockPos spawnBlockPos) {
         // check how many diggers are already spawned
-        if(getDiggersInWave() > Mth.ceil(this.getRaidersInWave(this.getCurrentWave()).size() * 0.10)) return;
+        if (getDiggersInWave() > Mth.ceil(this.getRaidersInWave(this.getCurrentWave()).size() * 0.10)) return;
         EntityWeightMapProperties entityWeightMapProperties = new EntityWeightMapProperties().setAllowedRanks(List.of(FactionEntityRank.DIGGER)).setBlockPos(spawnBlockPos);
         Map<FactionEntityType, Integer> weightMap = faction.getWeightMap(entityWeightMapProperties);
         if (weightMap.isEmpty()) return;
         FactionEntityType randomEntry = getRandomEntry(weightMap, level.random);
         Entity entity = randomEntry.createEntity(level, faction, spawnBlockPos, false, FactionEntityRank.DIGGER, MobSpawnType.PATROL);
-        if(entity instanceof Mob mob) {
+        if (entity instanceof Mob mob) {
             this.joinRaid(this.getCurrentWave(), mob);
         }
     }
@@ -625,7 +554,6 @@ public class Raid {
 
     public CompoundTag save(CompoundTag pNbt) {
         pNbt.putInt("Id", this.id);
-        pNbt.putBoolean("Started", this.started);
         pNbt.putBoolean("Active", this.active);
         pNbt.putLong("TicksActive", this.ticksActive);
         pNbt.putInt("BadOmenLevel", this.badOmenLevel);
@@ -642,7 +570,7 @@ public class Raid {
 
         ListTag listnbt = new ListTag();
 
-        for (UUID uuid : this.heroesOfTheVillage) {
+        for (UUID uuid : this.playerParticipants) {
             listnbt.add(NbtUtils.createUUID(uuid));
         }
         pNbt.put("HeroesOfTheVillage", listnbt);
@@ -650,6 +578,7 @@ public class Raid {
     }
 
     private enum Status {
+        STARTING,
         ONGOING,
         VICTORY,
         LOSS,
@@ -669,6 +598,10 @@ public class Raid {
 
         public String getName() {
             return this.name().toLowerCase(Locale.ROOT);
+        }
+
+        public boolean isOngoing() {
+            return this == ONGOING || this == STARTING;
         }
     }
 }

@@ -8,7 +8,7 @@ import com.infamousmisadventures.factioncraft.faction.relations.FactionRelations
 import com.infamousmisadventures.factioncraft.level.saveddata.PlayerFaction;
 import com.infamousmisadventures.factioncraft.level.saveddata.PlayerFactions;
 import com.infamousmisadventures.factioncraft.platform.Services;
-import com.infamousmisadventures.factioncraft.raid.target.RaidConfigType;
+import com.infamousmisadventures.factioncraft.raid.config.RaidConfigType;
 import com.infamousmisadventures.factioncraft.util.GeneralUtils;
 import com.infamousmisadventures.factioncraft.util.data.MergeableCodecDataManager;
 import com.infamousmisadventures.factioncraft.util.data.ResourceSet;

@@ -1,9 +1,7 @@
-package com.infamousmisadventures.factioncraft.raid.target;
+package com.infamousmisadventures.factioncraft.raid.config;
 
 import com.infamousmisadventures.factioncraft.registry.FCRegistries;
 import com.mojang.serialization.Codec;
-
-import java.util.List;
 
 public abstract class RaidConfigType {
     public static Codec<RaidConfigType> CODEC = FCRegistries.RAID_CONFIG_BASE_TYPE.byNameCodec().dispatch(RaidConfigType::baseType, RaidConfigBaseType::codec);

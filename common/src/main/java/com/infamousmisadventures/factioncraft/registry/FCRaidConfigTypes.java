@@ -1,8 +1,11 @@
 package com.infamousmisadventures.factioncraft.registry;
 
+import com.infamousmisadventures.factioncraft.raid.config.FactionBattleConfigType;
+import com.infamousmisadventures.factioncraft.raid.config.PlayerRaidConfigType;
+import com.infamousmisadventures.factioncraft.raid.config.RaidConfigType;
+import com.infamousmisadventures.factioncraft.raid.config.VillageRaidConfigType;
 import com.infamousmisadventures.factioncraft.raid.target.*;
 import com.infamousmisadventures.factioncraft.util.GeneralUtils;
-import com.infamousmisadventures.factioncraft.util.data.CodecJsonDataManager;
 import com.infamousmisadventures.factioncraft.util.data.DefaultsCodecJsonDataManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;

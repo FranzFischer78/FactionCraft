@@ -4,6 +4,7 @@ import com.infamousmisadventures.factioncraft.commands.arguments.FactionArgument
 import com.infamousmisadventures.factioncraft.faction.Faction;
 import com.infamousmisadventures.factioncraft.level.saveddata.RaidManager;
 import com.infamousmisadventures.factioncraft.raid.Raid;
+import com.infamousmisadventures.factioncraft.raid.config.*;
 import com.infamousmisadventures.factioncraft.raid.target.*;
 import com.infamousmisadventures.factioncraft.registry.FCRaidConfigTypes;
 import com.mojang.brigadier.CommandDispatcher;

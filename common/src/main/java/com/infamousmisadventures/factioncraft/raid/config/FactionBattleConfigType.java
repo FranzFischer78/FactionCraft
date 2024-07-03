@@ -1,4 +1,4 @@
-package com.infamousmisadventures.factioncraft.raid.target;
+package com.infamousmisadventures.factioncraft.raid.config;
 
 import com.infamousmisadventures.factioncraft.registry.FCRaidConfigBaseTypes;
 import com.mojang.serialization.Codec;
@@ -10,19 +10,19 @@ import net.minecraft.sounds.SoundEvents;
 
 import java.util.Optional;
 
-public class VillageRaidConfigType extends RaidConfigType {
-    public static final VillageRaidConfigType DEFAULT = new VillageRaidConfigType(RaidWaveConfig.DEFAULT, RaidStrengthConfig.DEFAULT, "event.minecraft.raid", "event.minecraft.raid.victory", "event.minecraft.raid.defeat", Optional.of(SoundEvents.RAID_HORN), Optional.empty(), Optional.of(SoundEvents.RAID_HORN));
-    public static final Codec<VillageRaidConfigType> CODEC = RecordCodecBuilder.create(builder ->
+public class FactionBattleConfigType extends RaidConfigType {
+    public static final FactionBattleConfigType DEFAULT = new FactionBattleConfigType(RaidWaveConfig.DEFAULT, RaidStrengthConfig.DEFAULT, "event.minecraft.raid", "event.minecraft.raid.victory", "event.minecraft.raid.defeat", Optional.of(SoundEvents.RAID_HORN), Optional.empty(), Optional.of(SoundEvents.RAID_HORN));
+    public static final Codec<FactionBattleConfigType> CODEC = RecordCodecBuilder.create(builder ->
             builder.group(
-                    RaidWaveConfig.CODEC.optionalFieldOf("wave_raid_config", RaidWaveConfig.DEFAULT).forGetter(VillageRaidConfigType::getWaveRaidConfig),
-                    RaidStrengthConfig.CODEC.optionalFieldOf("mobs_fraction", RaidStrengthConfig.DEFAULT).forGetter(VillageRaidConfigType::getRaidStrengthConfig),
-                    Codec.STRING.optionalFieldOf("raid_bar_name", "event.minecraft.raid").forGetter((VillageRaidConfigType config) -> config.getRaidBarNameComponent().getString()),
-                    Codec.STRING.optionalFieldOf("raid_bar_victory", "event.minecraft.raid.victory").forGetter((VillageRaidConfigType config) -> config.getRaidBarVictoryComponent().getString()),
-                    Codec.STRING.optionalFieldOf("raid_bar_defeat", "event.minecraft.raid.defeat").forGetter((VillageRaidConfigType config) -> config.getRaidBarDefeatComponent().getString()),
-                    SoundEvent.CODEC.optionalFieldOf("wave_sound").forGetter(VillageRaidConfigType::getWaveSoundEvent),
-                    SoundEvent.CODEC.optionalFieldOf("victory_sound").forGetter(VillageRaidConfigType::getVictorySoundEvent),
-                    SoundEvent.CODEC.optionalFieldOf("defeat_sound").forGetter(VillageRaidConfigType::getDefeatSoundEvent)
-            ).apply(builder, VillageRaidConfigType::new));
+                    RaidWaveConfig.CODEC.optionalFieldOf("raid_wave_config", RaidWaveConfig.DEFAULT).forGetter(FactionBattleConfigType::getWaveRaidConfig),
+                    RaidStrengthConfig.CODEC.optionalFieldOf("raid_strength_config", RaidStrengthConfig.DEFAULT).forGetter(FactionBattleConfigType::getRaidStrengthConfig),
+                    Codec.STRING.optionalFieldOf("raid_bar_name", "event.minecraft.raid").forGetter((FactionBattleConfigType config) -> config.getRaidBarNameComponent().getString()),
+                    Codec.STRING.optionalFieldOf("raid_bar_victory", "event.minecraft.raid.victory").forGetter((FactionBattleConfigType config) -> config.getRaidBarVictoryComponent().getString()),
+                    Codec.STRING.optionalFieldOf("raid_bar_defeat", "event.minecraft.raid.defeat").forGetter((FactionBattleConfigType config) -> config.getRaidBarDefeatComponent().getString()),
+                    SoundEvent.CODEC.optionalFieldOf("wave_sound").forGetter(FactionBattleConfigType::getWaveSoundEvent),
+                    SoundEvent.CODEC.optionalFieldOf("victory_sound").forGetter(FactionBattleConfigType::getVictorySoundEvent),
+                    SoundEvent.CODEC.optionalFieldOf("defeat_sound").forGetter(FactionBattleConfigType::getDefeatSoundEvent)
+            ).apply(builder, FactionBattleConfigType::new));
 
     private final RaidWaveConfig raidWaveConfig;
     private final RaidStrengthConfig raidStrengthConfig;
@@ -33,7 +33,7 @@ public class VillageRaidConfigType extends RaidConfigType {
     private final Optional<Holder<SoundEvent>> victorySoundEvent;
     private final Optional<Holder<SoundEvent>> defeatSoundEvent;
 
-    public VillageRaidConfigType(RaidWaveConfig raidWaveConfig, RaidStrengthConfig raidStrengthConfig, String raidBarName, String raidBarVictory, String raidBarDefeat, Optional<Holder<SoundEvent>> waveSoundEvent, Optional<Holder<SoundEvent>> victorySoundEvent, Optional<Holder<SoundEvent>> defeatSoundEvent) {
+    public FactionBattleConfigType(RaidWaveConfig raidWaveConfig, RaidStrengthConfig raidStrengthConfig, String raidBarName, String raidBarVictory, String raidBarDefeat, Optional<Holder<SoundEvent>> waveSoundEvent, Optional<Holder<SoundEvent>> victorySoundEvent, Optional<Holder<SoundEvent>> defeatSoundEvent) {
         this.raidWaveConfig = raidWaveConfig;
         this.raidStrengthConfig = raidStrengthConfig;
         this.raidBarNameComponent = Component.translatable(raidBarName);
@@ -83,13 +83,13 @@ public class VillageRaidConfigType extends RaidConfigType {
 
     @Override
     public RaidConfig create() {
-        return new VillageRaidConfig(
+        return new FactionBattleConfig(
                 this,
                 raidWaveConfig,
-                raidStrengthConfig,
                 raidBarNameComponent.getString(),
                 raidBarVictoryComponent.getString(),
                 raidBarDefeatComponent.getString(),
+                raidStrengthConfig,
                 waveSoundEvent,
                 victorySoundEvent,
                 defeatSoundEvent

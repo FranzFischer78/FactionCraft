@@ -1,4 +1,4 @@
-package com.infamousmisadventures.factioncraft.raid.target;
+package com.infamousmisadventures.factioncraft.raid.config;
 
 import com.infamousmisadventures.factioncraft.event.CalculateStrengthEvent;
 import com.infamousmisadventures.factioncraft.faction.Faction;

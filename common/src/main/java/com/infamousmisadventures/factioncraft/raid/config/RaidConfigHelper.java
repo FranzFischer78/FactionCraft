@@ -1,4 +1,4 @@
-package com.infamousmisadventures.factioncraft.raid.target;
+package com.infamousmisadventures.factioncraft.raid.config;
 
 import com.infamousmisadventures.factioncraft.registry.FCRaidConfigTypes;
 import net.minecraft.nbt.CompoundTag;
