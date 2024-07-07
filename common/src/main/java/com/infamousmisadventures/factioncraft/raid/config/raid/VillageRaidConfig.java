@@ -1,6 +1,5 @@
-package com.infamousmisadventures.factioncraft.raid.config;
+package com.infamousmisadventures.factioncraft.raid.config.raid;
 
-import com.infamousmisadventures.factioncraft.FCConstants;
 import com.infamousmisadventures.factioncraft.event.CalculateStrengthEvent;
 import com.infamousmisadventures.factioncraft.faction.Faction;
 import com.infamousmisadventures.factioncraft.platform.Services;
@@ -9,83 +8,98 @@ import com.infamousmisadventures.factioncraft.registry.FCFactions;
 import com.infamousmisadventures.factioncraft.registry.FCRaidConfigTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.SectionPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.SpawnPlacements;
+import net.minecraft.world.entity.animal.IronGolem;
+import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.level.NaturalSpawner;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.AABB;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static com.infamousmisadventures.factioncraft.config.FactionCraftConfig.*;
 
-public class PlayerRaidConfig implements RaidConfig {
+public class VillageRaidConfig implements RaidConfig {
 
     private final RaidConfigType type;
 
     private final RaidWaveConfig raidWaveConfig;
+    private final RaidStrengthConfig raidStrengthConfig;
     private final Component raidBarNameComponent;
     private final Component raidBarVictoryComponent;
     private final Component raidBarDefeatComponent;
-    private final RaidStrengthConfig raidStrengthConfig;
     private final Optional<Holder<SoundEvent>> waveSoundEvent;
     private final Optional<Holder<SoundEvent>> victorySoundEvent;
     private final Optional<Holder<SoundEvent>> defeatSoundEvent;
 
     //AdditionalData
     private Faction faction;
-    private ServerPlayer player;
+    private BlockPos blockPos;
     private int targetStrength;
 
-    public PlayerRaidConfig(RaidConfigType type, RaidWaveConfig raidWaveConfig, RaidStrengthConfig raidStrengthConfig, Component raidBarNameComponent, Component raidBarVictoryComponent, Component raidBarDefeatComponent, Optional<Holder<SoundEvent>> waveSoundEvent, Optional<Holder<SoundEvent>> victorySoundEvent, Optional<Holder<SoundEvent>> defeatSoundEvent) {
+    public VillageRaidConfig(RaidConfigType type, RaidWaveConfig raidWaveConfig, RaidStrengthConfig raidStrengthConfig, String raidBarName, String raidBarVictory, String raidBarDefeat, Optional<Holder<SoundEvent>> waveSoundEvent, Optional<Holder<SoundEvent>> victorySoundEvent, Optional<Holder<SoundEvent>> defeatSoundEvent) {
         this.type = type;
-        this.raidWaveConfig = raidWaveConfig;
-        this.raidBarNameComponent = raidBarNameComponent;
-        this.raidBarVictoryComponent = raidBarVictoryComponent;
-        this.raidBarDefeatComponent = raidBarDefeatComponent;
         this.raidStrengthConfig = raidStrengthConfig;
+        this.raidWaveConfig = raidWaveConfig;
+        this.raidBarNameComponent = Component.translatable(raidBarName);
+        this.raidBarVictoryComponent = raidBarNameComponent.copy().append(" - ").append(Component.translatable(raidBarVictory));
+        this.raidBarDefeatComponent = raidBarNameComponent.copy().append(" - ").append(Component.translatable(raidBarDefeat));
         this.waveSoundEvent = waveSoundEvent;
         this.victorySoundEvent = victorySoundEvent;
         this.defeatSoundEvent = defeatSoundEvent;
     }
 
-    public void init(Faction faction, ServerPlayer player, ServerLevel level) {
-        init(
-                faction,
-                player,
-                calculateTargetStrength(player, level)
-        );
+    public void init(Faction faction, BlockPos blockPos, ServerLevel level) {
+        this.faction = faction;
+        this.blockPos = blockPos;
+        updateTargetBlockPos(level);
+        this.targetStrength = calculateTargetStrength(blockPos, level);
     }
 
-    public void init(Faction faction, ServerPlayer player, int targetStrength) {
-        this.faction = this.faction;
-        this.player = player;
+    public void init(Faction faction, BlockPos blockPos, int targetStrength) {
+        this.faction = faction;
+        this.blockPos = blockPos;
         this.targetStrength = targetStrength;
     }
 
-    private int calculateTargetStrength(ServerPlayer player, ServerLevel level) {
-        int strength = PLAYER_RAID_TARGET_BASE_STRENGTH.get();
-        CalculateStrengthEvent event = new CalculateStrengthEvent.Player(this, player, level, strength, strength);
+    private int calculateTargetStrength(BlockPos blockPos, ServerLevel level) {
+        int strength = 0;
+        strength += level.getEntitiesOfClass(AbstractVillager.class,
+                new AABB(blockPos).inflate(100),
+                abstractVillagerEntity -> true).size() * VILLAGE_RAID_VILLAGER_WEIGHT.get();
+        strength += level.getEntitiesOfClass(IronGolem.class,
+                new AABB(blockPos).inflate(100),
+                ironGolemEntity -> true).size() * VILLAGE_RAID_IRON_GOLEM_WEIGHT.get();
+        CalculateStrengthEvent event = new CalculateStrengthEvent(this, blockPos, level, strength, strength);
         Services.EVENT_BUS.post(event);
-        FCConstants.LOGGER.info("Strength = " + strength);
         return (int) Math.floor(event.getStrength());
     }
 
     @Override
     public BlockPos getTargetBlockPos() {
-        return player.blockPosition();
+        return blockPos;
     }
 
     @Override
     public void updateTargetBlockPos(ServerLevel level) {
-        // noop
+        if (!level.isVillage(blockPos)) {
+            this.moveRaidCenterToNearbyVillageSection(level);
+        }
+    }
+
+    public void setBlockPos(BlockPos blockPos) {
+        this.blockPos = blockPos;
     }
 
     @Override
@@ -95,7 +109,7 @@ public class PlayerRaidConfig implements RaidConfig {
 
     @Override
     public void increaseTargetStrength(int amount) {
-        targetStrength += amount;
+        this.targetStrength += amount;
     }
 
     @Override
@@ -105,12 +119,19 @@ public class PlayerRaidConfig implements RaidConfig {
 
     @Override
     public boolean isDefeat(Raid raid, ServerLevel level) {
-        return !player.isAlive();
+        if (level.getGameTime() % 20 == 0) {
+            if (level.getEntitiesOfClass(AbstractVillager.class,
+                    new AABB(blockPos).inflate(100),
+                    abstractVillagerEntity -> !abstractVillagerEntity.isBaby()).size() == 0) {
+                return true;
+            }
+        }
+        return !level.isVillage(blockPos);
     }
 
     @Override
     public boolean isValidSpawnPos(int outerAttempt, BlockPos.MutableBlockPos blockpos$mutable, ServerLevel level) {
-        return (blockpos$mutable.distSqr(player.blockPosition()) > 30 || outerAttempt >= 2)
+        return (!level.isVillage(blockpos$mutable) || outerAttempt >= 2)
                 && level.hasChunksAt(blockpos$mutable.getX() - 10, blockpos$mutable.getY() - 10, blockpos$mutable.getZ() - 10, blockpos$mutable.getX() + 10, blockpos$mutable.getY() + 10, blockpos$mutable.getZ() + 10)
                 && level.isPositionEntityTicking(blockpos$mutable)
                 && (NaturalSpawner.isSpawnPositionOk(SpawnPlacements.Type.ON_GROUND, level, blockpos$mutable, EntityType.RAVAGER)
@@ -123,15 +144,9 @@ public class PlayerRaidConfig implements RaidConfig {
     }
 
     @Override
-    public RaidStrengthConfig getRaidStrengthConfig() {
-        return raidStrengthConfig;
-    }
-
-    @Override
     public float getSpawnDistance() {
         return 32.0F;
     }
-
 
     @Override
     public RaidConfigType type() {
@@ -154,6 +169,11 @@ public class PlayerRaidConfig implements RaidConfig {
     }
 
     @Override
+    public RaidStrengthConfig getRaidStrengthConfig() {
+        return raidStrengthConfig;
+    }
+
+    @Override
     public Optional<Holder<SoundEvent>> getWaveSoundEvent() {
         return waveSoundEvent;
     }
@@ -168,6 +188,26 @@ public class PlayerRaidConfig implements RaidConfig {
         return defeatSoundEvent;
     }
 
+    private void moveRaidCenterToNearbyVillageSection(ServerLevel level) {
+        Stream<SectionPos> stream = SectionPos.cube(SectionPos.of(blockPos), 2);
+        stream.filter(level::isVillage).map(SectionPos::center).min(Comparator.comparingDouble((p_223025_1_) -> {
+            return p_223025_1_.distSqr(blockPos);
+        })).ifPresent(this::setBlockPos);
+    }
+
+    @Override
+    public void loadAdditionalData(ServerLevel level, CompoundTag compoundNBT) {
+        ResourceLocation factionName = new ResourceLocation(compoundNBT.getString("Faction"));
+        if (FCFactions.factionExists(factionName)) {
+            Faction faction = FCFactions.getFaction(factionName);
+            init(
+                    faction,
+                    new BlockPos(compoundNBT.getInt("X"), compoundNBT.getInt("Y"), compoundNBT.getInt("Z")),
+                    compoundNBT.getInt("TargetStrength")
+            );
+        }
+    }
+
     @Override
     public Map<Faction, Integer> determineFactionFractions(int targetStrength) {
         Map<Faction, Integer> factionFractions = new HashMap<>();
@@ -179,21 +219,10 @@ public class PlayerRaidConfig implements RaidConfig {
     public CompoundTag saveAdditionalData(CompoundTag compoundNbt) {
         compoundNbt.putString("Type", FCRaidConfigTypes.getKey(this.type()).toString());
         compoundNbt.putString("Faction", faction.getName().toString());
-        compoundNbt.putString("Player", player.getStringUUID());
+        compoundNbt.putInt("X", blockPos.getX());
+        compoundNbt.putInt("Y", blockPos.getY());
+        compoundNbt.putInt("Z", blockPos.getZ());
         compoundNbt.putInt("TargetStrength", targetStrength);
         return compoundNbt;
-    }
-
-    @Override
-    public void loadAdditionalData(ServerLevel level, CompoundTag compoundNBT) {
-        ResourceLocation factionName = new ResourceLocation(compoundNBT.getString("Faction"));
-        if (FCFactions.factionExists(factionName)) {
-            Faction loadedFaction = FCFactions.getFaction(factionName);
-            init(
-                    loadedFaction,
-                    level.players().stream().filter(serverPlayerEntity -> serverPlayerEntity.getStringUUID().equals(compoundNBT.getString("Player"))).findFirst().get(),
-                    compoundNBT.getInt("TargetStrength")
-            );
-        }
     }
 }

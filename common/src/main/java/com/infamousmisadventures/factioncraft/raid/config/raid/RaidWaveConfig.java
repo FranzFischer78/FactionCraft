@@ -1,4 +1,4 @@
-package com.infamousmisadventures.factioncraft.raid.config;
+package com.infamousmisadventures.factioncraft.raid.config.raid;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

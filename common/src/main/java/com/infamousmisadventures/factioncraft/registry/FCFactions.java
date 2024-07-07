@@ -8,7 +8,7 @@ import com.infamousmisadventures.factioncraft.faction.relations.FactionRelations
 import com.infamousmisadventures.factioncraft.level.saveddata.PlayerFaction;
 import com.infamousmisadventures.factioncraft.level.saveddata.PlayerFactions;
 import com.infamousmisadventures.factioncraft.platform.Services;
-import com.infamousmisadventures.factioncraft.raid.config.RaidConfigType;
+import com.infamousmisadventures.factioncraft.raid.config.raid.RaidConfigType;
 import com.infamousmisadventures.factioncraft.util.GeneralUtils;
 import com.infamousmisadventures.factioncraft.util.data.MergeableCodecDataManager;
 import com.infamousmisadventures.factioncraft.util.data.ResourceSet;
@@ -54,7 +54,7 @@ public class FCFactions {
                 factionType = raw.getFactionType();
                 banner = raw.getBanner();
                 name = raw.getName();
-                raidConfigs = raw.getRaidConfigs();
+                raidConfigs.clear();
                 boostConfig = null;
                 factionRelations = null;
                 homeDimensions.clear();
@@ -69,7 +69,6 @@ public class FCFactions {
             if(name == null){
                 name = raw.getName();
             }
-            raidConfigs.addAll(raw.getRaidConfigs());
             if(activationAdvancement == null){
                 activationAdvancement = raw.getActivationAdvancement();
             }
@@ -89,6 +88,7 @@ public class FCFactions {
                 List<ResourceLocation> enemies = Stream.concat(factionRelations.getEnemies().stream(), raw.getRelations().getEnemies().stream()).collect(Collectors.toList());
                 factionRelations = new FactionRelations(allies, enemies);
             }
+            raidConfigs.addAll(raw.getRaidConfigs());
             homeDimensions.addAll(raw.getHomeDimensions());
             defaultEntities = defaultEntities.merge(raw.getDefaultEntities());
         }

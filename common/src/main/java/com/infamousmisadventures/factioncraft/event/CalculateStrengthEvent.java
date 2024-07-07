@@ -1,7 +1,7 @@
 package com.infamousmisadventures.factioncraft.event;
 
 import com.infamousmisadventures.factioncraft.faction.Faction;
-import com.infamousmisadventures.factioncraft.raid.config.RaidConfig;
+import com.infamousmisadventures.factioncraft.raid.config.raid.RaidConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;

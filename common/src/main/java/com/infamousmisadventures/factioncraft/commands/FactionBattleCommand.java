@@ -4,9 +4,9 @@ import com.infamousmisadventures.factioncraft.commands.arguments.FactionArgument
 import com.infamousmisadventures.factioncraft.faction.Faction;
 import com.infamousmisadventures.factioncraft.level.saveddata.RaidManager;
 import com.infamousmisadventures.factioncraft.raid.Raid;
-import com.infamousmisadventures.factioncraft.raid.config.FactionBattleConfig;
-import com.infamousmisadventures.factioncraft.raid.config.FactionBattleConfigType;
-import com.infamousmisadventures.factioncraft.raid.config.RaidConfigType;
+import com.infamousmisadventures.factioncraft.raid.config.raid.FactionBattleConfig;
+import com.infamousmisadventures.factioncraft.raid.config.raid.FactionBattleConfigType;
+import com.infamousmisadventures.factioncraft.raid.config.raid.RaidConfigType;
 import com.infamousmisadventures.factioncraft.registry.FCRaidConfigTypes;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;

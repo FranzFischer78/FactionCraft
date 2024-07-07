@@ -2,7 +2,7 @@ package com.infamousmisadventures.factioncraft.registry;
 
 import com.infamousmisadventures.factioncraft.boost.BoostType;
 import com.infamousmisadventures.factioncraft.platform.Services;
-import com.infamousmisadventures.factioncraft.raid.config.RaidConfigBaseType;
+import com.infamousmisadventures.factioncraft.raid.config.raid.RaidConfigBaseType;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 

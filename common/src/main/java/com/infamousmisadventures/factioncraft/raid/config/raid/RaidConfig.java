@@ -1,7 +1,7 @@
-package com.infamousmisadventures.factioncraft.raid.config;
+package com.infamousmisadventures.factioncraft.raid.config.raid;
 
-import com.infamousmisadventures.factioncraft.faction.Faction;
 import com.infamousmisadventures.factioncraft.raid.Raid;
+import com.infamousmisadventures.factioncraft.raid.config.wave.WaveConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
@@ -10,10 +10,10 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.Difficulty;
 
-import java.util.Map;
 import java.util.Optional;
 
-public interface RaidConfig {
+public interface RaidConfig extends WaveConfig {
+    // Raid Config
     RaidConfigType type();
 
     BlockPos getTargetBlockPos();
@@ -32,27 +32,13 @@ public interface RaidConfig {
 
     RaidWaveConfig getRaidWaveConfig();
 
-    float getSpawnDistance();
-
-    Component getRaidBarNameComponent();
-
     Component getRaidBarDefeatComponent();
 
     Component getRaidBarVictoryComponent();
 
-    Optional<Holder<SoundEvent>> getWaveSoundEvent();
-
     Optional<Holder<SoundEvent>> getVictorySoundEvent();
 
     Optional<Holder<SoundEvent>> getDefeatSoundEvent();
-
-    RaidStrengthConfig getRaidStrengthConfig();
-
-    CompoundTag saveAdditionalData(CompoundTag compoundNbt);
-
-    void loadAdditionalData(ServerLevel level, CompoundTag compoundNBT);
-
-    Map<Faction, Integer> determineFactionFractions(int targetStrength);
 
     default int getNumberOfWaves(Difficulty difficulty) {
         int numberOfWaves = switch (difficulty) {
@@ -65,6 +51,12 @@ public interface RaidConfig {
         return Math.min(numberOfWaves, getRaidWaveConfig().getMaxNumberWaves());
     }
 
+    RaidStrengthConfig getRaidStrengthConfig();
+
+    CompoundTag saveAdditionalData(CompoundTag compoundNbt);
+
+    void loadAdditionalData(ServerLevel level, CompoundTag compoundNBT);
+
     default int getWaveTargetStrength(Raid raid) {
         float waveMultiplier = getRaidStrengthConfig().getBaseMultiplier() + (raid.getCurrentWave() * getRaidStrengthConfig().getMultiplierAdjustmentPerWave());
         float spreadMultiplier = ((raid.getLevel().random.nextFloat() * 2) - 1) * getRaidStrengthConfig().getMultiplierSpread();
@@ -75,7 +67,7 @@ public interface RaidConfig {
         return targetStrength;
     }
 
-    default int getSpawnPosAmount() {
-        return 1;
+    default float getMobsFraction() {
+        return getRaidStrengthConfig().getMobsFraction();
     }
 }

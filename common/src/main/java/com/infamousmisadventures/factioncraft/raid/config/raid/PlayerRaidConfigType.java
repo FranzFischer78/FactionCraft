@@ -1,4 +1,4 @@
-package com.infamousmisadventures.factioncraft.raid.config;
+package com.infamousmisadventures.factioncraft.raid.config.raid;
 
 import com.infamousmisadventures.factioncraft.registry.FCRaidConfigBaseTypes;
 import com.mojang.serialization.Codec;

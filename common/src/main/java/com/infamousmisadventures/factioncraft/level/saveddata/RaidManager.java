@@ -3,7 +3,7 @@ package com.infamousmisadventures.factioncraft.level.saveddata;
 import com.google.common.collect.Maps;
 import com.infamousmisadventures.factioncraft.config.FactionCraftConfig;
 import com.infamousmisadventures.factioncraft.raid.Raid;
-import com.infamousmisadventures.factioncraft.raid.config.RaidConfig;
+import com.infamousmisadventures.factioncraft.raid.config.raid.RaidConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;

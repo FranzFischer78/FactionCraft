@@ -1,10 +1,10 @@
 package com.infamousmisadventures.factioncraft.registry;
 
 import com.infamousmisadventures.factioncraft.platform.Services;
-import com.infamousmisadventures.factioncraft.raid.config.PlayerRaidConfigType;
-import com.infamousmisadventures.factioncraft.raid.config.RaidConfigBaseType;
-import com.infamousmisadventures.factioncraft.raid.config.RaidConfigType;
-import com.infamousmisadventures.factioncraft.raid.config.VillageRaidConfigType;
+import com.infamousmisadventures.factioncraft.raid.config.raid.PlayerRaidConfigType;
+import com.infamousmisadventures.factioncraft.raid.config.raid.RaidConfigBaseType;
+import com.infamousmisadventures.factioncraft.raid.config.raid.RaidConfigType;
+import com.infamousmisadventures.factioncraft.raid.config.raid.VillageRaidConfigType;
 
 import java.util.function.Supplier;
 

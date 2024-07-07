@@ -12,8 +12,10 @@ import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityRank;
 import com.infamousmisadventures.factioncraft.faction.entity.FactionEntityType;
 import com.infamousmisadventures.factioncraft.level.saveddata.RaidManager;
 import com.infamousmisadventures.factioncraft.platform.Services;
-import com.infamousmisadventures.factioncraft.raid.config.RaidConfigHelper;
-import com.infamousmisadventures.factioncraft.raid.config.RaidConfig;
+import com.infamousmisadventures.factioncraft.raid.config.raid.RaidConfig;
+import com.infamousmisadventures.factioncraft.raid.config.raid.RaidConfigHelper;
+import com.infamousmisadventures.factioncraft.raid.config.wave.WaveConfig;
+import com.infamousmisadventures.factioncraft.raid.config.wave.WaveConfigHelper;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -63,6 +65,7 @@ public class Raid {
     private int raidCooldownTicks;
     private int postRaidTicks;
     private int celebrationTicks;
+    private WaveConfig currentWaveConfig;
     private final RaidSpawner raidSpawner;
 
     public Raid(int uniqueId, ServerLevel level, RaidConfig raidConfig) {
@@ -76,12 +79,14 @@ public class Raid {
         this.raidEvent.setProgress(0.0F);
         this.status = Status.STARTING;
         this.raidSpawner = new RaidSpawner(this);
+        this.currentWaveConfig = raidConfig;
     }
 
 
     public Raid(ServerLevel level, CompoundTag compoundNBT) {
         this.level = level;
-        this.raidConfig = RaidConfigHelper.load(level, compoundNBT.getCompound("RaidTarget"));
+        this.raidConfig = RaidConfigHelper.load(level, compoundNBT.getCompound("RaidConfig"));
+        this.currentWaveConfig = WaveConfigHelper.load(level, this, compoundNBT.getCompound("WaveConfig"));
         this.raidEvent.setName(getRaidEventName());
         this.id = compoundNBT.getInt("Id");
         this.active = compoundNBT.getBoolean("Active");
@@ -173,7 +178,6 @@ public class Raid {
     }
 
     private void checkShouldStartWave() {
-
         if(shouldSpawnGroup()) {
             this.totalHealth = 0.0F;
             if (raidSpawner.attemptSpawnGroup(this.currentWave + 1)) {
@@ -190,7 +194,7 @@ public class Raid {
         Services.EVENT_BUS.post(event);
         ++this.currentWave;
         this.updateBossbar();
-        this.playSound(raidSpawner.getLastSpawnPos(), raidConfig.getWaveSoundEvent());
+        this.playSound(raidSpawner.getLastSpawnPos(), currentWaveConfig.getWaveSoundEvent());
     }
 
     private void postRaidTick() {
@@ -295,6 +299,7 @@ public class Raid {
     private boolean raidCooldownTick(int totalRaidersAlive) {
         if (totalRaidersAlive != 0 || !this.hasMoreWaves()) return false;
         if (this.raidCooldownTicks <= 0) {
+            updateCurrentWaveConfig();
             this.raidCooldownTicks = 300;
             this.raidEvent.setName(getRaidEventName());
             return true;
@@ -309,6 +314,11 @@ public class Raid {
             this.raidEvent.setProgress(Mth.clamp((float) (300 - this.raidCooldownTicks) / 300.0F, 0.0F, 1.0F));
         }
         return false;
+    }
+
+    private void updateCurrentWaveConfig() {
+        this.currentWaveConfig = this.raidConfig;
+        raidSpawner.reset(currentWaveConfig);
     }
 
     public boolean shouldSpawnGroup() {
@@ -510,7 +520,7 @@ public class Raid {
     }
 
     private Component getRaidEventName() {
-        return this.raidConfig.getRaidBarNameComponent();
+        return this.currentWaveConfig.getRaidBarNameComponent();
     }
 
     private Component getRaidEventNameDefeat() {
