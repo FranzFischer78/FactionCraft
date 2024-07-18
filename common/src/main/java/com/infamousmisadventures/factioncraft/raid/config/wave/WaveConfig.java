@@ -1,6 +1,7 @@
 package com.infamousmisadventures.factioncraft.raid.config.wave;
 
 import com.infamousmisadventures.factioncraft.faction.Faction;
+import com.infamousmisadventures.factioncraft.raid.config.raid.RaidSpawnPosConfig;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
@@ -23,4 +24,6 @@ public interface WaveConfig {
     }
 
     float getMobsFraction();
+
+    RaidSpawnPosConfig getRaidSpawnPosConfig();
 }

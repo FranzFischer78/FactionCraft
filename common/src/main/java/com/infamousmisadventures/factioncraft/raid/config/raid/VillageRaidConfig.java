@@ -14,12 +14,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.npc.AbstractVillager;
-import net.minecraft.world.level.NaturalSpawner;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 
 import java.util.Comparator;
@@ -36,6 +32,7 @@ public class VillageRaidConfig implements RaidConfig {
 
     private final RaidWaveConfig raidWaveConfig;
     private final RaidStrengthConfig raidStrengthConfig;
+    private final RaidSpawnPosConfig raidSpawnPosConfig;
     private final Component raidBarNameComponent;
     private final Component raidBarVictoryComponent;
     private final Component raidBarDefeatComponent;
@@ -48,10 +45,11 @@ public class VillageRaidConfig implements RaidConfig {
     private BlockPos blockPos;
     private int targetStrength;
 
-    public VillageRaidConfig(RaidConfigType type, RaidWaveConfig raidWaveConfig, RaidStrengthConfig raidStrengthConfig, String raidBarName, String raidBarVictory, String raidBarDefeat, Optional<Holder<SoundEvent>> waveSoundEvent, Optional<Holder<SoundEvent>> victorySoundEvent, Optional<Holder<SoundEvent>> defeatSoundEvent) {
+    public VillageRaidConfig(RaidConfigType type, RaidWaveConfig raidWaveConfig, RaidStrengthConfig raidStrengthConfig, RaidSpawnPosConfig raidSpawnPosConfig, String raidBarName, String raidBarVictory, String raidBarDefeat, Optional<Holder<SoundEvent>> waveSoundEvent, Optional<Holder<SoundEvent>> victorySoundEvent, Optional<Holder<SoundEvent>> defeatSoundEvent) {
         this.type = type;
-        this.raidStrengthConfig = raidStrengthConfig;
         this.raidWaveConfig = raidWaveConfig;
+        this.raidStrengthConfig = raidStrengthConfig;
+        this.raidSpawnPosConfig = raidSpawnPosConfig;
         this.raidBarNameComponent = Component.translatable(raidBarName);
         this.raidBarVictoryComponent = raidBarNameComponent.copy().append(" - ").append(Component.translatable(raidBarVictory));
         this.raidBarDefeatComponent = raidBarNameComponent.copy().append(" - ").append(Component.translatable(raidBarDefeat));
@@ -132,15 +130,17 @@ public class VillageRaidConfig implements RaidConfig {
     @Override
     public boolean isValidSpawnPos(int outerAttempt, BlockPos.MutableBlockPos blockpos$mutable, ServerLevel level) {
         return (!level.isVillage(blockpos$mutable) || outerAttempt >= 2)
-                && level.hasChunksAt(blockpos$mutable.getX() - 10, blockpos$mutable.getY() - 10, blockpos$mutable.getZ() - 10, blockpos$mutable.getX() + 10, blockpos$mutable.getY() + 10, blockpos$mutable.getZ() + 10)
-                && level.isPositionEntityTicking(blockpos$mutable)
-                && (NaturalSpawner.isSpawnPositionOk(SpawnPlacements.Type.ON_GROUND, level, blockpos$mutable, EntityType.RAVAGER)
-                || level.getBlockState(blockpos$mutable.below()).is(Blocks.SNOW) && level.getBlockState(blockpos$mutable).isAir());
+                && raidSpawnPosConfig.isValidSpawnPos(blockpos$mutable, level);
     }
 
     @Override
     public RaidWaveConfig getRaidWaveConfig() {
         return raidWaveConfig;
+    }
+
+    @Override
+    public RaidSpawnPosConfig getRaidSpawnPosConfig() {
+        return raidSpawnPosConfig;
     }
 
     @Override

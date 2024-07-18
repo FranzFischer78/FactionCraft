@@ -18,11 +18,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.random.WeightedEntry;
 import net.minecraft.util.random.WeightedRandom;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.SpawnPlacements;
-import net.minecraft.world.level.NaturalSpawner;
-import net.minecraft.world.level.block.Blocks;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -38,6 +34,8 @@ public class FactionBattleConfig implements RaidConfig {
     private final Component raidBarVictoryComponent;
     private final Component raidBarDefeatComponent;
     private final RaidStrengthConfig raidStrengthConfig;
+
+    private final RaidSpawnPosConfig raidSpawnPosConfig;
     private final Optional<Holder<SoundEvent>> waveSoundEvent;
     private final Optional<Holder<SoundEvent>> victorySoundEvent;
     private final Optional<Holder<SoundEvent>> defeatSoundEvent;
@@ -49,13 +47,14 @@ public class FactionBattleConfig implements RaidConfig {
     private int startingWave;
 
 
-    public FactionBattleConfig(RaidConfigType type, RaidWaveConfig raidWaveConfig, String raidBarName, String raidBarVictory, String raidBarDefeat, RaidStrengthConfig raidStrengthConfig, Optional<Holder<SoundEvent>> waveSoundEvent, Optional<Holder<SoundEvent>> victorySoundEvent, Optional<Holder<SoundEvent>> defeatSoundEvent) {
+    public FactionBattleConfig(RaidConfigType type, RaidWaveConfig raidWaveConfig, RaidStrengthConfig raidStrengthConfig, RaidSpawnPosConfig raidSpawnPosConfig, String raidBarName, String raidBarVictory, String raidBarDefeat, Optional<Holder<SoundEvent>> waveSoundEvent, Optional<Holder<SoundEvent>> victorySoundEvent, Optional<Holder<SoundEvent>> defeatSoundEvent) {
         this.type = type;
         this.raidWaveConfig = raidWaveConfig;
+        this.raidStrengthConfig = raidStrengthConfig;
+        this.raidSpawnPosConfig = raidSpawnPosConfig;
         this.raidBarNameComponent = Component.translatable(raidBarName);
         this.raidBarVictoryComponent = raidBarNameComponent.copy().append(" - ").append(Component.translatable(raidBarVictory));
         this.raidBarDefeatComponent = raidBarNameComponent.copy().append(" - ").append(Component.translatable(raidBarDefeat));
-        this.raidStrengthConfig = raidStrengthConfig;
         this.waveSoundEvent = waveSoundEvent;
         this.victorySoundEvent = victorySoundEvent;
         this.defeatSoundEvent = defeatSoundEvent;
@@ -123,15 +122,17 @@ public class FactionBattleConfig implements RaidConfig {
     @Override
     public boolean isValidSpawnPos(int outerAttempt, BlockPos.MutableBlockPos blockpos$mutable, ServerLevel level) {
         return (blockpos$mutable.distSqr(targetBlockPos) > 30 || outerAttempt >= 2)
-                && level.hasChunksAt(blockpos$mutable.getX() - 10, blockpos$mutable.getY() - 10, blockpos$mutable.getZ() - 10, blockpos$mutable.getX() + 10, blockpos$mutable.getY() + 10, blockpos$mutable.getZ() + 10)
-                && level.isPositionEntityTicking(blockpos$mutable)
-                && (NaturalSpawner.isSpawnPositionOk(SpawnPlacements.Type.ON_GROUND, level, blockpos$mutable, EntityType.RAVAGER)
-                || level.getBlockState(blockpos$mutable.below()).is(Blocks.SNOW) && level.getBlockState(blockpos$mutable).isAir());
+                && raidSpawnPosConfig.isValidSpawnPos(blockpos$mutable, level);
     }
 
     @Override
     public RaidWaveConfig getRaidWaveConfig() {
         return raidWaveConfig;
+    }
+
+    @Override
+    public RaidSpawnPosConfig getRaidSpawnPosConfig() {
+        return raidSpawnPosConfig;
     }
 
     private int getWeightedRandom(int min, int max) {

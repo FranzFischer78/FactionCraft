@@ -7,8 +7,11 @@ import com.infamousmisadventures.factioncraft.faction.FactionGroupSpawner;
 import com.infamousmisadventures.factioncraft.raid.config.raid.RaidConfig;
 import com.infamousmisadventures.factioncraft.raid.config.wave.WaveConfig;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.Heightmap;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedList;
 import java.util.Map;
@@ -86,15 +89,11 @@ public class RaidSpawner {
 
     private BlockPos findRandomSpawnPos(int urgencyModifier, int maxInnerAttempts) {
         int i = 2 - urgencyModifier;
+        ServerLevel level = raid.getLevel();
         BlockPos.MutableBlockPos blockpos$mutable = new BlockPos.MutableBlockPos();
-
         for (int i1 = 0; i1 < maxInnerAttempts; ++i1) {
-            float f = raid.getLevel().random.nextFloat() * ((float) Math.PI * 2F);
-            int j = getRaidConfig().getTargetBlockPos().getX() + Mth.floor(Mth.cos(f) * waveConfig.getSpawnDistance() * (float) i) + raid.getLevel().random.nextInt(5);
-            int l = getRaidConfig().getTargetBlockPos().getZ() + Mth.floor(Mth.sin(f) * waveConfig.getSpawnDistance() * (float) i) + raid.getLevel().random.nextInt(5);
-            int k = raid.getLevel().getHeight(Heightmap.Types.WORLD_SURFACE, j, l);
-            blockpos$mutable.set(j, k, l);
-            if (isValidSpawnPos(blockpos$mutable) && getRaidConfig().isValidSpawnPos(urgencyModifier, blockpos$mutable, raid.getLevel())) {
+            blockpos$mutable.set(waveConfig.getRaidSpawnPosConfig().getRandomSpawnBlockPos(getRaidConfig(), waveConfig, level, i));
+            if (isValidSpawnPos(blockpos$mutable) && getRaidConfig().isValidSpawnPos(urgencyModifier, blockpos$mutable, level)) {
                 return blockpos$mutable;
             }
         }
