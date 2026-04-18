@@ -9,3 +9,4 @@ You can download the mod from the [CurseForge page](https://www.curseforge.com/m
 
 ## Wiki
 You can check the [FactionCraft Wiki](https://github.com/Patrigan/FactionCraft/wiki) out to get started with adding and modifying factions.
+a
